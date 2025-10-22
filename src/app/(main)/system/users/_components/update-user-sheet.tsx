@@ -206,7 +206,7 @@ export function UpdateUserSheet({
               <PermissionTree checked={checked} setChecked={setChecked} nodes={menus} />
             </CredenzaBody>
             <CredenzaFooter>
-              <LoadingButton isPending={isSaveMenuPending} onClick={handleSave} variant="shine">Save</LoadingButton>
+              <LoadingButton loading={isSaveMenuPending} onClick={handleSave} variant="shine">Save</LoadingButton>
               <CredenzaClose asChild>
                 <Button variant="secondary">Cancel</Button>
               </CredenzaClose>

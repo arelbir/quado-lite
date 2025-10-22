@@ -105,7 +105,7 @@ export const NewPasswordForm = () => {
 
           <FormError message={error} />
           <FormSuccess message={success} />
-          <LoadingButton isPending={isPending}
+          <LoadingButton loading={isPending}
             className="w-full">
             Reset password
           </LoadingButton>

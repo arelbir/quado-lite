@@ -5,6 +5,10 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from 'drizzle-zod'
 import { role } from "./role";
 import { userMenuTable } from "./menu";
+import { audits } from "./audit";
+import { findings } from "./finding";
+import { actions } from "./action";
+import { dofs, dofActivities } from "./dof";
 
 
 export const user = pgTable("User", {
@@ -103,9 +107,38 @@ export const userRelation = relations(user, ({ one, many }) => ({
 	}),
 	menus: many(userMenuTable, {
 		relationName: 'user_menu_u',
-
 	}),
-
+	// Audit System Relations
+	createdAudits: many(audits, {
+		relationName: 'audit_creator',
+	}),
+	assignedFindings: many(findings, {
+		relationName: 'finding_assigned',
+	}),
+	createdFindings: many(findings, {
+		relationName: 'finding_creator',
+	}),
+	assignedActions: many(actions, {
+		relationName: 'action_assigned',
+	}),
+	managedActions: many(actions, {
+		relationName: 'action_manager',
+	}),
+	createdActions: many(actions, {
+		relationName: 'action_creator',
+	}),
+	assignedDofs: many(dofs, {
+		relationName: 'dof_assigned',
+	}),
+	managedDofs: many(dofs, {
+		relationName: 'dof_manager',
+	}),
+	createdDofs: many(dofs, {
+		relationName: 'dof_creator',
+	}),
+	responsibleActivities: many(dofActivities, {
+		relationName: 'dof_activity_responsible',
+	}),
 }))
 
 export const accountRelation = relations(account, ({ one }) => ({

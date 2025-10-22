@@ -21,10 +21,10 @@ export const {
 
       if (!existingUser) return token
 
-      token.role = existingUser.role?.userRole
+      token.role = existingUser.role?.userRole || undefined
       token.image = existingUser.image
-      token.superAdmin = existingUser.role?.superAdmin
-      token.roleId = existingUser.role.id
+      token.superAdmin = existingUser.role?.superAdmin || undefined
+      token.roleId = existingUser.role?.id
 
       return token
     },
@@ -87,11 +87,11 @@ export const {
         if (!isValid) return null;
         return {
           id: maybeUser.id,
-          email: maybeUser.email,
-          name: maybeUser.name,
-          role: maybeUser.role?.userRole,
-          superAdmin: maybeUser.role?.superAdmin,
-        };
+          email: maybeUser.email || "",
+          name: maybeUser.name || "",
+          role: maybeUser.role?.userRole || undefined,
+          superAdmin: maybeUser.role?.superAdmin || undefined,
+        } as any;
       },
     }),
   ],

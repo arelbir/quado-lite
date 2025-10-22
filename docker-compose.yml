@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: denetim-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: denetim_user
+      POSTGRES_PASSWORD: denetim_pass_2024
+      POSTGRES_DB: denetim_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U denetim_user -d denetim_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local

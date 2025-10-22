@@ -99,7 +99,7 @@ export const AppearanceForm = ({ initialValues }: AppearanceFormProps) => {
         >
 
         </FormField>
-        <LoadingButton isPending={isPending}>Update preferences</LoadingButton>
+        <LoadingButton loading={isPending}>Update preferences</LoadingButton>
       </form>
     </Form>
   )

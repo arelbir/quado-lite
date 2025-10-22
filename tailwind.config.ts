@@ -54,6 +54,26 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'status-new': {
+          DEFAULT: "hsl(var(--status-new))",
+          foreground: "hsl(var(--status-new-foreground))",
+        },
+        'status-assigned': {
+          DEFAULT: "hsl(var(--status-assigned))",
+          foreground: "hsl(var(--status-assigned-foreground))",
+        },
+        'status-inprogress': {
+          DEFAULT: "hsl(var(--status-inprogress))",
+          foreground: "hsl(var(--status-inprogress-foreground))",
+        },
+        'status-pending': {
+          DEFAULT: "hsl(var(--status-pending))",
+          foreground: "hsl(var(--status-pending-foreground))",
+        },
+        'status-completed': {
+          DEFAULT: "hsl(var(--status-completed))",
+          foreground: "hsl(var(--status-completed-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -111,7 +111,7 @@ export const EmailForm = ({ initialValues }: EmailFormProps) => {
 
                     <FormError message={error} />
                     <FormSuccess message={success} />
-                    <LoadingButton isPending={isPending}>
+                    <LoadingButton loading={isPending}>
                         Update Email
                     </LoadingButton>
                 </form>

@@ -24,7 +24,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
               <Header />
             </Suspense>
           </div>
-          <div className='relative h-full'>
+          <div className='relative h-full p-6'>
             {children}
           </div>
         </div>

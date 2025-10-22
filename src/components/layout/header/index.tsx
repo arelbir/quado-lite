@@ -12,12 +12,16 @@ import { getLatestUser } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 import { getGithubStar } from '@/server/other'
 import { Skeleton } from '@/components/ui/skeleton'
+import { NotificationBell } from '@/components/notifications/notification-bell'
+import { getUnreadCount } from '@/action/notification-actions'
 
 
 
 export const Header = async () => {
 
   const user = await getLatestUser()
+  const unreadCount = await getUnreadCount()
+  
   return (
     <header className=" flex h-[var(--header-height)] items-center gap-4 border-b bg-muted/20 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -114,6 +118,7 @@ export const Header = async () => {
         </Suspense>
       </Link>
 
+      <NotificationBell initialUnreadCount={unreadCount} />
       <ThemeToggle theme={user?.theme!} />
       <UserDropdown />
     </header>

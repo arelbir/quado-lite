@@ -89,7 +89,7 @@ export const ProfileForm = ({ initialValues }: ProfileProps) => {
           )}
         />
 
-        <LoadingButton isPending={isPending}>Update profile</LoadingButton>
+        <LoadingButton loading={isPending}>Update profile</LoadingButton>
       </form>
     </Form>
   )

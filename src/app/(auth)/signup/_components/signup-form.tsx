@@ -157,7 +157,7 @@ export const SignupForm = () => {
 
                     <FormError message={error ?? urlError} />
                     <FormSuccess message={success} />
-                    <LoadingButton isPending={isPending}
+                    <LoadingButton loading={isPending}
                         className="w-full">
                         Create an account
                     </LoadingButton>

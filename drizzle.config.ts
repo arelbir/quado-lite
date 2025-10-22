@@ -1,15 +1,17 @@
-import { env } from '@/env';
-import 'dotenv/config'; // make sure to install dotenv package
+import { config } from 'dotenv';
+import { resolve } from 'path';
 import type { Config } from 'drizzle-kit';
 
-
+// Load .env.local first (higher priority), then .env
+config({ path: resolve(process.cwd(), '.env.local') });
+config({ path: resolve(process.cwd(), '.env') });
 
 export default {
   dialect: "postgresql",
   out: './src/drizzle/migrations',
   schema: './src/drizzle/schema/index.ts',
   dbCredentials: {
-    url: env.DATABASE_URL
+    url: process.env.DATABASE_URL!
   },
   // Print all statements
   verbose: true,

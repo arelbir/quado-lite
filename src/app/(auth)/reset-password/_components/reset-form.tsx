@@ -92,7 +92,7 @@ export const ResetPasswordForm = () => {
 
                     <FormError message={error} />
                     <FormSuccess message={success} />
-                    <LoadingButton isPending={isPending}
+                    <LoadingButton loading={isPending}
                         className="w-full">
 
                         Send reset email

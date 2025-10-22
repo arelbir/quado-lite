@@ -125,7 +125,7 @@ export const LoginForm = () => {
 
                     <FormError message={error ?? urlError} />
                     <FormSuccess message={success} />
-                    <LoadingButton isPending={isPending}
+                    <LoadingButton loading={isPending}
                         className="w-full">
                         Login
                     </LoadingButton>

@@ -1,0 +1,40 @@
+import { getAllAudits } from "@/server/data/audit-list";
+import { getAuditPlans } from "@/action/audit-plan-actions";
+import { UnifiedTableClient } from "./unified-table-client";
+import type { UnifiedRecord } from "./columns";
+
+export async function UnifiedAuditsTable() {
+  const [audits, plans] = await Promise.all([
+    getAllAudits(),
+    getAuditPlans(),
+  ]);
+
+  // Combine all records into unified format
+  const allRecords: UnifiedRecord[] = [
+    ...plans.map((plan) => ({
+      id: plan.id,
+      type: "plan" as const,
+      title: plan.title,
+      description: plan.description,
+      date: plan.scheduledDate || plan.createdAt,
+      status: plan.status,
+      scheduleType: plan.scheduleType,
+      createdBy: plan.createdBy,
+      template: plan.template,
+      createdAudit: plan.createdAudit,
+      createdAt: plan.createdAt,
+    })),
+    ...audits.map((audit) => ({
+      id: audit.id,
+      type: "audit" as const,
+      title: audit.title,
+      description: audit.description,
+      date: audit.auditDate || audit.createdAt,
+      status: "Active" as const,
+      createdBy: audit.createdBy,
+      createdAt: audit.createdAt,
+    })),
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  return <UnifiedTableClient data={allRecords} />;
+}
