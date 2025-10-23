@@ -16,6 +16,7 @@ export interface DataTableFilterField<TData> {
   value: keyof TData
   placeholder?: string
   options?: Option[]
+  type?: "text" | "date"
 }
 
 export interface DataTableFilterOption<TData> {

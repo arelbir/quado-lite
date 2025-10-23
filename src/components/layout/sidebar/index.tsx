@@ -4,27 +4,48 @@ import { getUserPermissions } from "@/server/data/permissions";
 import { LucideIcon } from "lucide-react";
 import { MenuItem, SidebarContainer } from "./sidebar-container";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getTranslations } from 'next-intl/server';
 
-function buildMenu(menus: MenuWithChildren[]): MenuItem[] {
-  return menus.map(menu => {
-    const Icon = Icons[menu.icon as keyof typeof Icons] as LucideIcon || Icons.Package
-    return {
-      path: menu.path,
-      label: menu.label,
-      icon: <Icon className='size-4' />,
-      children: menu.children.length > 0 ? buildMenu(menu.children) : []
-    }
+/**
+ * Helper function to translate menu labels
+ * Database labels are used directly as translation keys
+ */
+function translateLabel(t: any, key: string): string {
+  try {
+    // Try to translate with "menu." prefix
+    const translationKey = `menu.${key}`;
+    return t(translationKey);
+  } catch {
+    // Fallback: return original key if translation not found
+    return key;
   }
-  )
 }
 
-export const Sidebar = async ({ userId }: { userId?: string }) => {
+function buildMenu(menus: MenuWithChildren[], t: any): MenuItem[] {
+  return menus.map(menu => {
+    const Icon = Icons[menu.icon as keyof typeof Icons] as LucideIcon || Icons.Package
+    
+    // Translate label using translation key from database
+    const translatedLabel = translateLabel(t, menu.label);
+    
+    return {
+      path: menu.path,
+      label: translatedLabel,
+      icon: <Icon className='size-4' />,
+      children: menu.children.length > 0 ? buildMenu(menu.children, t) : []
+    }
+  })
+}
+
+export const Sidebar = async ({ userId, locale }: { userId?: string; locale: string }) => {
   const permissions = await getUserPermissions({ userId });
 
   if (!permissions) return null;
 
-
-  const routes = buildMenu(permissions.menus)
+  // Get translations for navigation with explicit locale
+  const t = await getTranslations({ locale, namespace: 'navigation' });
+  
+  const routes = buildMenu(permissions.menus, t)
   return <SidebarContainer routes={routes} />;
 };
 

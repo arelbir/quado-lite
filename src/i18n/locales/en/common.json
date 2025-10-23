@@ -1,0 +1,60 @@
+{
+  "app": {
+    "name": "Audit Management System",
+    "description": "ISO Audit and CAPA Management"
+  },
+  "actions": {
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "submit": "Submit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "close": "Close",
+    "download": "Download",
+    "upload": "Upload",
+    "export": "Export",
+    "import": "Import",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "view": "View",
+    "add": "Add",
+    "remove": "Remove",
+    "update": "Update"
+  },
+  "manager": "Manager",
+  "createdAt": "Created",
+  "updatedAt": "Updated",
+  "date": "Date",
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "success": "Success!",
+    "error": "Error!",
+    "noData": "No data found",
+    "processing": "Processing...",
+    "completed": "Completed",
+    "pending": "Pending",
+    "failed": "Failed"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "confirm": "Confirm",
+    "confirmAction": "Are you sure you want to perform this action?",
+    "confirmDelete": "Are you sure you want to delete?",
+    "areYouSure": "Are you sure?",
+    "cannotBeUndone": "This action cannot be undone.",
+    "selectOption": "Select...",
+    "noResults": "No results found",
+    "allRightsReserved": "All rights reserved"
+  },
+  "total": "Total"
+}

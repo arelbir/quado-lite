@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { db } from "@/drizzle/db";
-import { dofs } from "@/drizzle/schema";
+import { dofs, user } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { DofProgressBar } from "@/components/dof/dof-progress-bar";
 import { DofWizardContent } from "@/components/dof/dof-wizard-content";
+import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: { id: string };
@@ -28,6 +29,7 @@ const stepMap: Record<string, number> = {
 };
 
 export default async function DofDetailPage({ params }: PageProps) {
+  const t = await getTranslations('dof');
   const dof = await db.query.dofs.findFirst({
     where: eq(dofs.id, params.id),
     with: {
@@ -53,12 +55,41 @@ export default async function DofDetailPage({ params }: PageProps) {
           email: true,
         },
       },
+      // HYBRID: DÖF'e bağlı action'ları çek
+      actions: {
+        with: {
+          assignedTo: {
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          manager: {
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
     },
   });
 
   if (!dof) {
     notFound();
   }
+
+  // Fetch all users for user selector in Step 4
+  const users = await db.query.user.findMany({
+    columns: {
+      id: true,
+      name: true,
+      email: true,
+    },
+    orderBy: (user, { asc }) => [asc(user.name)],
+  });
 
   const currentStep = stepMap[dof.status] || 1;
 
@@ -75,7 +106,7 @@ export default async function DofDetailPage({ params }: PageProps) {
           <div>
             <h1 className="text-xl md:text-2xl font-bold">{dof.problemTitle}</h1>
             <p className="text-sm text-muted-foreground">
-              DÖF #{dof.id.substring(0, 8)} • 7 Adımlı CAPA Süreci
+              {t('dofId')}{dof.id.substring(0, 8)} • {t('capaProcess')}
             </p>
           </div>
         </div>
@@ -90,7 +121,7 @@ export default async function DofDetailPage({ params }: PageProps) {
 
       {/* Wizard Content */}
       <Suspense fallback={<div>Yükleniyor...</div>}>
-        <DofWizardContent dof={dof} currentStep={currentStep} />
+        <DofWizardContent dof={dof} currentStep={currentStep} users={users} />
       </Suspense>
     </div>
   );

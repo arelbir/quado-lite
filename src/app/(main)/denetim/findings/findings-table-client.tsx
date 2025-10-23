@@ -3,39 +3,51 @@
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
-import { columns, type Finding } from "./columns";
+import { useFindingColumns, type Finding } from "./columns";
+import { useTranslations } from 'next-intl';
+import { useFindingStatusLabel, useRiskTypeLabel } from "@/lib/i18n/status-helpers";
 
 interface FindingsTableClientProps {
   data: Finding[];
 }
 
 export function FindingsTableClient({ data }: FindingsTableClientProps) {
+  const t = useTranslations('finding');
+  const tCommon = useTranslations('common');
+  const columns = useFindingColumns();
+  const getStatusLabel = useFindingStatusLabel();
+  const getRiskLabel = useRiskTypeLabel();
+
+  const statusOptions = [
+    { label: getStatusLabel('New'), value: 'New' },
+    { label: getStatusLabel('Assigned'), value: 'Assigned' },
+    { label: getStatusLabel('InProgress'), value: 'InProgress' },
+    { label: getStatusLabel('PendingAuditorClosure'), value: 'PendingAuditorClosure' },
+    { label: getStatusLabel('Completed'), value: 'Completed' },
+  ];
+
+  const riskOptions = [
+    { label: getRiskLabel('Kritik'), value: 'Kritik' },
+    { label: getRiskLabel('Yüksek'), value: 'Yüksek' },
+    { label: getRiskLabel('Orta'), value: 'Orta' },
+    { label: getRiskLabel('Düşük'), value: 'Düşük' },
+  ];
+
   const filterFields = [
     {
-      label: "Durum",
+      label: t('fields.status'),
       value: "status" as keyof Finding,
-      options: [
-        { label: "Yeni", value: "New" },
-        { label: "Atandı", value: "Assigned" },
-        { label: "İşlemde", value: "InProgress" },
-        { label: "Onay Bekliyor", value: "PendingAuditorClosure" },
-        { label: "Tamamlandı", value: "Completed" },
-      ],
+      options: statusOptions,
     },
     {
-      label: "Risk",
+      label: t('fields.riskType'),
       value: "riskType" as keyof Finding,
-      options: [
-        { label: "Kritik", value: "Kritik" },
-        { label: "Yüksek", value: "Yüksek" },
-        { label: "Orta", value: "Orta" },
-        { label: "Düşük", value: "Düşük" },
-      ],
+      options: riskOptions,
     },
     {
-      label: "Detay",
+      label: t('fields.details'),
       value: "details" as keyof Finding,
-      placeholder: "Bulgu ara...",
+      placeholder: t('placeholders.searchFinding'),
     },
   ];
 
@@ -51,8 +63,8 @@ export function FindingsTableClient({ data }: FindingsTableClientProps) {
       <DataTableToolbar table={table} filterFields={filterFields} />
       <DataTable
         table={table}
-        title="Tüm Bulgular"
-        description={`Toplam ${data.length} bulgu`}
+        title={t('title')}
+        description={`${tCommon('total')} ${data.length} ${t('singular').toLowerCase()}`}
       />
     </div>
   );

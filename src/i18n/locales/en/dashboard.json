@@ -1,0 +1,30 @@
+{
+  "title": "Audit System",
+  "description": "Findings, Actions and CAPA tracking system",
+  
+  "stats": {
+    "totalFindings": "Total Findings",
+    "activeFindings": "Active findings",
+    "pendingActions": "Pending Actions",
+    "waitingCompletion": "Waiting for completion",
+    "activeDofs": "Active CAPAs",
+    "dofsInProgress": "CAPAs in progress",
+    "completed": "Completed",
+    "closedFindings": "Closed findings"
+  },
+  
+  "recentFindings": {
+    "title": "Recent Findings",
+    "description": "Latest added findings",
+    "noData": "No findings yet",
+    "audit": "Audit"
+  },
+  
+  "myTasks": {
+    "title": "My Tasks",
+    "description": "Pending actions and approvals",
+    "noTasks": "🎉 No pending tasks!",
+    "responsible": "Responsible",
+    "waitingApproval": "Waiting Approval"
+  }
+}

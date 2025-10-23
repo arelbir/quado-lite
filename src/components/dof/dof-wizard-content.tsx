@@ -8,12 +8,19 @@ import { Step5Implementation } from "./wizard/step5-implementation";
 import { Step6Effectiveness } from "./wizard/step6-effectiveness";
 import { Step7Approval } from "./wizard/step7-approval";
 
+interface User {
+  id: string;
+  name: string | null;
+  email: string | null;
+}
+
 interface DofWizardContentProps {
   dof: any;
   currentStep: number;
+  users: User[];
 }
 
-export function DofWizardContent({ dof, currentStep }: DofWizardContentProps) {
+export function DofWizardContent({ dof, currentStep, users }: DofWizardContentProps) {
   // Step routing
   switch (currentStep) {
     case 1:
@@ -23,7 +30,7 @@ export function DofWizardContent({ dof, currentStep }: DofWizardContentProps) {
     case 3:
       return <Step3RootCause dof={dof} />;
     case 4:
-      return <Step4Activities dof={dof} />;
+      return <Step4Activities dof={dof} users={users} />;
     case 5:
       return <Step5Implementation dof={dof} />;
     case 6:

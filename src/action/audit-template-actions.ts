@@ -2,13 +2,14 @@
 
 import { db } from "@/drizzle/db";
 import { auditTemplates } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
 import { eq, and, isNull } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-
-type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
+import type { ActionResponse, User } from "@/lib/types";
+import { 
+  withAuth, 
+  requireAdmin,
+  createPermissionError,
+  revalidateAuditPaths,
+} from "@/lib/helpers";
 
 /**
  * Denetim şablonu oluştur
@@ -17,21 +18,12 @@ export async function createAuditTemplate(data: {
   name: string;
   description?: string;
   category: "Kalite" | "Çevre" | "İSG" | "Bilgi Güvenliği" | "Gıda Güvenliği" | "Diğer";
-  questionBankIds: string[]; // Array of bank IDs
+  questionBankIds?: string[];
   estimatedDurationMinutes?: string;
 }): Promise<ActionResponse<{ id: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can create templates" };
-    }
-
-    if (data.questionBankIds.length === 0) {
-      return { success: false, error: "At least one question bank must be selected" };
+  return withAuth<{ id: string }>(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError<{ id: string }>("Only admins can create templates");
     }
 
     const [template] = await db
@@ -40,30 +32,22 @@ export async function createAuditTemplate(data: {
         name: data.name,
         description: data.description,
         category: data.category,
-        questionBankIds: JSON.stringify(data.questionBankIds),
+        questionBankIds: JSON.stringify(data.questionBankIds || []),
         estimatedDurationMinutes: data.estimatedDurationMinutes,
         createdById: user.id,
       })
       .returning({ id: auditTemplates.id });
 
-    revalidatePath("/denetim/templates");
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: { id: template!.id } };
-  } catch (error) {
-    console.error("Error creating audit template:", error);
-    return { success: false, error: "Failed to create audit template" };
-  }
+  });
 }
 
 /**
  * Tüm şablonları listele
  */
 export async function getAuditTemplates() {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
+  const result = await withAuth(async () => {
     const templates = await db.query.auditTemplates.findMany({
       where: isNull(auditTemplates.deletedAt),
       with: {
@@ -78,27 +62,26 @@ export async function getAuditTemplates() {
       orderBy: (auditTemplates, { desc }) => [desc(auditTemplates.createdAt)],
     });
 
-    // questionBankIds JSON string'den parse et
-    return templates.map((template) => ({
+    const data = templates.map((template) => ({
       ...template,
       questionBankIds: JSON.parse(template.questionBankIds) as string[],
     }));
-  } catch (error) {
-    console.error("Error fetching audit templates:", error);
-    throw error;
+
+    return { success: true, data };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }
 
 /**
  * Tek bir şablonu detaylı getir
  */
 export async function getAuditTemplateById(templateId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
+  const result = await withAuth(async () => {
     const template = await db.query.auditTemplates.findFirst({
       where: and(
         eq(auditTemplates.id, templateId),
@@ -116,17 +99,23 @@ export async function getAuditTemplateById(templateId: string) {
     });
 
     if (!template) {
-      return null;
+      return { success: true, data: null };
     }
 
     return {
-      ...template,
-      questionBankIds: JSON.parse(template.questionBankIds) as string[],
+      success: true,
+      data: {
+        ...template,
+        questionBankIds: JSON.parse(template.questionBankIds) as string[],
+      },
     };
-  } catch (error) {
-    console.error("Error fetching audit template:", error);
-    throw error;
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }
 
 /**
@@ -142,14 +131,9 @@ export async function updateAuditTemplate(
     estimatedDurationMinutes?: string;
   }
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can update templates" };
+  return withAuth(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError("Only admins can update templates");
     }
 
     const questionBankIdsJson = data.questionBankIds
@@ -165,26 +149,18 @@ export async function updateAuditTemplate(
       })
       .where(eq(auditTemplates.id, templateId));
 
-    revalidatePath("/denetim/templates");
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error updating audit template:", error);
-    return { success: false, error: "Failed to update audit template" };
-  }
+  });
 }
 
 /**
  * Şablonu sil (soft delete)
  */
 export async function deleteAuditTemplate(templateId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can delete templates" };
+  return withAuth(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError("Only admins can delete templates");
     }
 
     await db
@@ -194,10 +170,7 @@ export async function deleteAuditTemplate(templateId: string): Promise<ActionRes
       })
       .where(eq(auditTemplates.id, templateId));
 
-    revalidatePath("/denetim/templates");
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error deleting audit template:", error);
-    return { success: false, error: "Failed to delete audit template" };
-  }
+  });
 }

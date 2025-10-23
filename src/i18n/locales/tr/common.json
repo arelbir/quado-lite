@@ -1,0 +1,60 @@
+{
+  "app": {
+    "name": "Denetim Yönetim Sistemi",
+    "description": "ISO Denetim ve CAPA Yönetimi"
+  },
+  "actions": {
+    "create": "Oluştur",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "submit": "Gönder",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "close": "Kapat",
+    "download": "İndir",
+    "upload": "Yükle",
+    "export": "Dışa Aktar",
+    "import": "İçe Aktar",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "clear": "Temizle",
+    "back": "Geri",
+    "next": "İleri",
+    "finish": "Bitir",
+    "view": "Görüntüle",
+    "add": "Ekle",
+    "remove": "Kaldır",
+    "update": "Güncelle"
+  },
+  "manager": "Yönetici",
+  "createdAt": "Oluşturulma",
+  "updatedAt": "Güncellenme",
+  "date": "Tarih",
+  "status": {
+    "loading": "Yükleniyor...",
+    "saving": "Kaydediliyor...",
+    "success": "Başarılı!",
+    "error": "Hata!",
+    "noData": "Veri bulunamadı",
+    "processing": "İşleniyor...",
+    "completed": "Tamamlandı",
+    "pending": "Beklemede",
+    "failed": "Başarısız"
+  },
+  "common": {
+    "yes": "Evet",
+    "no": "Hayır",
+    "ok": "Tamam",
+    "confirm": "Onayla",
+    "confirmAction": "Bu işlemi gerçekleştirmek istediğinizden emin misiniz?",
+    "confirmDelete": "Silmek istediğinizden emin misiniz?",
+    "areYouSure": "Emin misiniz?",
+    "cannotBeUndone": "Bu işlem geri alınamaz.",
+    "selectOption": "Seçiniz...",
+    "noResults": "Sonuç bulunamadı",
+    "allRightsReserved": "Tüm hakları saklıdır"
+  },
+  "total": "Toplam"
+}

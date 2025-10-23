@@ -3,14 +3,17 @@ import { getMyDofs } from "@/action/dof-actions";
 import { DofsTableClient } from "./dofs-table-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getTranslations } from 'next-intl/server';
 
-export default function DofsPage() {
+export default async function DofsPage() {
+  const t = await getTranslations('dof');
+  
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">DÖF Kayıtlarım</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Düzeltici ve Önleyici Faaliyet kayıtları (7 adımlı süreç)
+          {t('description')}
         </p>
       </div>
 

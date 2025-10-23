@@ -3,9 +3,26 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Eye, Play, Edit } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Calendar, Eye, Play, Edit, MoreVertical, Trash2, Ban, Archive, ArchiveRestore } from "lucide-react";
 import Link from "next/link";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { startPlanManually, deletePlan } from "@/action/audit-plan-actions";
+import { archiveAudit, reactivateAudit, deleteAudit } from "@/action/audit-actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { 
+  AUDIT_STATUS_LABELS, 
+  AUDIT_STATUS_COLORS, 
+  PLAN_STATUS_LABELS, 
+  PLAN_STATUS_COLORS 
+} from "@/lib/constants/status-labels";
 
 export type UnifiedRecord = {
   id: string;
@@ -80,21 +97,17 @@ export const columns: ColumnDef<UnifiedRecord>[] = [
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
-      const colors: Record<string, string> = {
-        Pending: "bg-yellow-100 text-yellow-800",
-        Created: "bg-green-100 text-green-800",
-        Cancelled: "bg-red-100 text-red-800",
-        Active: "bg-blue-100 text-blue-800",
-      };
-      const labels: Record<string, string> = {
-        Pending: "Plan Bekliyor",
-        Created: "Oluşturuldu",
-        Cancelled: "İptal",
-        Active: "Aktif",
-      };
+      
+      // Merge audit and plan status configs
+      const allColors = { ...AUDIT_STATUS_COLORS, ...PLAN_STATUS_COLORS };
+      const allLabels = { ...AUDIT_STATUS_LABELS, ...PLAN_STATUS_LABELS };
+      
+      const colorClass = allColors[status as keyof typeof allColors] || "bg-gray-100 text-gray-800";
+      const label = allLabels[status as keyof typeof allLabels] || status;
+      
       return (
-        <Badge className={`text-xs ${colors[status] || ""}`}>
-          {labels[status] || status}
+        <Badge className={`text-xs ${colorClass}`}>
+          {label}
         </Badge>
       );
     },
@@ -115,6 +128,18 @@ export const columns: ColumnDef<UnifiedRecord>[] = [
         </span>
       );
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue) return true;
+      
+      const rowDate = new Date(row.getValue(columnId) as Date);
+      const { from, to } = filterValue as { from?: Date; to?: Date };
+      
+      if (!from && !to) return true;
+      if (from && !to) return rowDate >= from;
+      if (!from && to) return rowDate <= to;
+      
+      return from && to ? rowDate >= from && rowDate <= to : true;
+    },
   },
   {
     accessorKey: "createdBy",
@@ -130,8 +155,59 @@ export const columns: ColumnDef<UnifiedRecord>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    cell: function ActionsCell({ row }) {
       const record = row.original;
+      const router = useRouter();
+
+      const handleStartPlan = async () => {
+        const result = await startPlanManually(record.id);
+        if (result.success) {
+          toast.success("Denetim başlatıldı!");
+          router.refresh();
+        } else {
+          toast.error(result.error);
+        }
+      };
+
+      const handleDeletePlan = async () => {
+        const result = await deletePlan(record.id);
+        if (result.success) {
+          toast.success("Plan silindi!");
+          router.refresh();
+        } else {
+          toast.error(result.error);
+        }
+      };
+
+      const handleArchiveAudit = async () => {
+        const result = await archiveAudit(record.id);
+        if (result.success) {
+          toast.success("Denetim arşivlendi!");
+          router.refresh();
+        } else {
+          toast.error(result.error);
+        }
+      };
+
+      const handleReactivateAudit = async () => {
+        const result = await reactivateAudit(record.id);
+        if (result.success) {
+          toast.success("Denetim aktif edildi!");
+          router.refresh();
+        } else {
+          toast.error(result.error);
+        }
+      };
+
+      const handleDeleteAudit = async () => {
+        const result = await deleteAudit(record.id);
+        if (result.success) {
+          toast.success("Denetim silindi!");
+          router.refresh();
+        } else {
+          toast.error(result.error);
+        }
+      };
 
       if (record.type === "plan") {
         if (record.createdAudit) {
@@ -145,30 +221,76 @@ export const columns: ColumnDef<UnifiedRecord>[] = [
           );
         } else if (record.status === "Pending") {
           return (
-            <div className="flex gap-2">
-              <Button asChild size="sm" variant="outline">
-                <Link href={`/denetim/plans/${record.id}/edit`}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Düzenle
-                </Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link href={`/denetim/plans/${record.id}/start`}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleStartPlan}>
                   <Play className="h-4 w-4 mr-2" />
-                  Başlat
-                </Link>
-              </Button>
-            </div>
+                  Hemen Başlat
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/denetim/plans/${record.id}/edit`}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Düzenle
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleDeletePlan} className="text-destructive">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Sil
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           );
         }
       } else {
+        // Audit
         return (
-          <Button asChild size="sm" variant="outline">
-            <Link href={`/denetim/audits/${record.id}`}>
-              <Eye className="h-4 w-4 mr-2" />
-              Detaylar
-            </Link>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/denetim/audits/${record.id}`}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Detaylar
+                </Link>
+              </DropdownMenuItem>
+              {record.status === "Active" && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleArchiveAudit}>
+                    <Archive className="h-4 w-4 mr-2" />
+                    Pasife Al
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDeleteAudit} className="text-destructive">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Sil
+                  </DropdownMenuItem>
+                </>
+              )}
+              {record.status === "Archived" && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleReactivateAudit}>
+                    <ArchiveRestore className="h-4 w-4 mr-2" />
+                    Aktife Al
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDeleteAudit} className="text-destructive">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Sil
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       }
 

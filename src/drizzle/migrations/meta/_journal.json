@@ -1,26 +1,12 @@
 {
-  "version": "5",
-  "dialect": "pg",
+  "version": "6",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1713929686332,
-      "tag": "0000_calm_black_crow",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1715137621750,
-      "tag": "0001_chunky_imperial_guard",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1715247196016,
-      "tag": "0002_curved_thanos",
+      "version": "6",
+      "when": 1761238411782,
+      "tag": "0000_violet_anthem",
       "breakpoints": true
     }
   ]

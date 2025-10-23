@@ -13,36 +13,49 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { createDofActivity } from "@/action/dof-actions";
+import { createDofAction } from "@/action/action-actions";
+import { UserSelector } from "@/components/user-selector";
+
+interface User {
+  id: string;
+  name: string | null;
+  email: string | null;
+}
 
 interface DofActivityFormProps {
   dofId: string;
+  users: User[];
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export function DofActivityForm({ dofId, onSuccess, onCancel }: DofActivityFormProps) {
+export function DofActivityForm({ dofId, users, onSuccess, onCancel }: DofActivityFormProps) {
   const [isPending, startTransition] = useTransition();
-  const [description, setDescription] = useState("");
-  const [type, setType] = useState<"Düzeltici" | "Önleyici">("Düzeltici");
-  const [responsibleId, setResponsibleId] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [details, setDetails] = useState("");
+  const [type, setType] = useState<"Corrective" | "Preventive">("Corrective");
+  const [assignedToId, setAssignedToId] = useState("");
+  const [managerId, setManagerId] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!description.trim()) {
+    if (!details.trim()) {
       toast.error("Faaliyet açıklaması gerekli");
       return;
     }
 
+    if (!assignedToId) {
+      toast.error("Sorumlu seçimi gerekli");
+      return;
+    }
+
     startTransition(async () => {
-      const result = await createDofActivity({
+      const result = await createDofAction({
         dofId,
-        description,
         type,
-        responsibleId: responsibleId || null,
-        dueDate: dueDate ? new Date(dueDate) : null,
+        details,
+        assignedToId,
+        managerId: managerId || null,
       });
 
       if (result.success) {
@@ -57,38 +70,49 @@ export function DofActivityForm({ dofId, onSuccess, onCancel }: DofActivityFormP
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg bg-background">
       <div className="space-y-2">
-        <Label htmlFor="description">Faaliyet Açıklaması *</Label>
+        <Label htmlFor="details">Aksiyon Açıklaması *</Label>
         <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Yapılacak faaliyeti detaylı açıklayın..."
+          id="details"
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+          placeholder="Yapılacak aksiyonu detaylı açıklayın..."
           rows={3}
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="type">Faaliyet Türü *</Label>
+          <Label htmlFor="type">Aksiyon Türü *</Label>
           <Select value={type} onValueChange={(v: any) => setType(v)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Düzeltici">Düzeltici</SelectItem>
-              <SelectItem value="Önleyici">Önleyici</SelectItem>
+              <SelectItem value="Corrective">Düzeltici (Corrective)</SelectItem>
+              <SelectItem value="Preventive">Önleyici (Preventive)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="due-date">Termin Tarihi</Label>
-          <Input
-            id="due-date"
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+          <Label htmlFor="assigned">Sorumlu *</Label>
+          <UserSelector
+            users={users}
+            value={assignedToId}
+            onValueChange={setAssignedToId}
+            placeholder="Sorumlu kullanıcı seçin..."
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="manager">Yönetici (Opsiyonel)</Label>
+          <UserSelector
+            users={users}
+            value={managerId}
+            onValueChange={setManagerId}
+            placeholder="Yönetici seçin..."
+          />
+          <p className="text-xs text-muted-foreground">Onay verecek yönetici</p>
         </div>
       </div>
 

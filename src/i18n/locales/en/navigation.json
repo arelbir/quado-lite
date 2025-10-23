@@ -1,0 +1,45 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "settings": "Settings",
+    "system": "System",
+    "systemUsers": "Users",
+    "systemMenus": "Menus",
+    "auditSystem": "Audit System",
+    "myTasks": "My Tasks",
+    "myAudits": "My Audits",
+    "allAudits": "Audits & Plans",
+    "operations": "Tracking & Management",
+    "findings": "Findings",
+    "actions": "Actions",
+    "dofs": "CAPAs",
+    "closures": "Closure Approval",
+    "infrastructure": "Infrastructure Definitions",
+    "questionBanks": "Question Banks",
+    "templates": "Templates",
+    "errorPages": "Error Pages",
+    "error404": "404",
+    "error500": "500"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "audits": "Audits",
+    "findings": "Findings",
+    "actions": "Actions",
+    "dofs": "CAPA",
+    "details": "Details",
+    "edit": "Edit",
+    "create": "Create",
+    "reports": "Reports"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "details": "Details",
+    "findings": "Findings",
+    "actions": "Actions",
+    "timeline": "Timeline",
+    "documents": "Documents",
+    "history": "History"
+  }
+}

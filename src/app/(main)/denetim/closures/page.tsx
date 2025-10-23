@@ -6,18 +6,22 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { closeFinding, rejectFinding } from "@/action/finding-actions";
+import { getTranslations } from 'next-intl/server';
 
-export default function ClosuresPage() {
+export default async function ClosuresPage() {
+  const t = await getTranslations('finding');
+  const tCommon = await getTranslations('common');
+  
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Kapanış Onayı</h1>
+        <h1 className="text-3xl font-bold">{t('sections.closureTitle')}</h1>
         <p className="text-muted-foreground">
-          Denetçi onayı bekleyen bulguları görüntüleyin
+          {t('messages.closureRequested')}
         </p>
       </div>
 
-      <Suspense fallback={<div>Yükleniyor...</div>}>
+      <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
         <PendingClosures />
       </Suspense>
     </div>
@@ -25,6 +29,8 @@ export default function ClosuresPage() {
 }
 
 async function PendingClosures() {
+  const t = await getTranslations('finding');
+  const tCommon = await getTranslations('common');
   const findings = await getFindings();
   const pendingFindings = findings.filter(f => f.status === "PendingAuditorClosure");
 
@@ -33,9 +39,9 @@ async function PendingClosures() {
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <CheckCircle2 className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">Onay bekleyen bulgu yok</h3>
+          <h3 className="text-lg font-medium mb-2">{t('messages.closureApproved')}</h3>
           <p className="text-sm text-muted-foreground">
-            Tüm bulgular işlendi
+            {tCommon('status.completed')}
           </p>
         </CardContent>
       </Card>
@@ -45,9 +51,9 @@ async function PendingClosures() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Onay Bekleyen Bulgular</CardTitle>
+        <CardTitle>{t('sections.closureTitle')}</CardTitle>
         <CardDescription>
-          {pendingFindings.length} bulgu denetçi onayı bekliyor
+          {t('common.pendingApproval', { count: pendingFindings.length })}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -65,11 +71,11 @@ async function PendingClosures() {
                   {finding.details}
                 </Link>
                 <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                  <span>Denetim: {finding.audit?.title}</span>
-                  <span>Sorumlu: {finding.assignedTo?.name || "Atanmadı"}</span>
+                  <span>{t('fields.audit')}: {finding.audit?.title}</span>
+                  <span>{t('fields.responsiblePerson')}: {finding.assignedTo?.name || '-'}</span>
                   {finding.riskType && (
                     <span className="font-medium text-orange-600">
-                      {finding.riskType} Risk
+                      {finding.riskType}
                     </span>
                   )}
                 </div>
@@ -81,7 +87,7 @@ async function PendingClosures() {
                 }}>
                   <Button type="submit" size="sm" variant="outline">
                     <XCircle className="h-4 w-4 mr-2" />
-                    Reddet
+                    {tCommon('actions.reject')}
                   </Button>
                 </form>
                 <form action={async () => {
@@ -90,7 +96,7 @@ async function PendingClosures() {
                 }}>
                   <Button type="submit" size="sm">
                     <CheckCircle2 className="h-4 w-4 mr-2" />
-                    Onayla
+                    {tCommon('actions.approve')}
                   </Button>
                 </form>
               </div>

@@ -1,0 +1,10 @@
+{
+  "title": "Question Banks",
+  "description": "Manage audit questions by categories",
+  "create": "New Question Bank",
+  "createNew": "Create New Question Bank",
+  "noBanks": "No question banks yet",
+  "createFirst": "Create your first question bank",
+  "questions": "Questions",
+  "manage": "Manage Questions"
+}

@@ -3,7 +3,11 @@ import { getAuditPlans } from "@/action/audit-plan-actions";
 import { UnifiedTableClient } from "./unified-table-client";
 import type { UnifiedRecord } from "./columns";
 
-export async function UnifiedAuditsTable() {
+interface UnifiedAuditsTableProps {
+  type: "audit" | "plan";
+}
+
+export async function UnifiedAuditsTable({ type }: UnifiedAuditsTableProps) {
   const [audits, plans] = await Promise.all([
     getAllAudits(),
     getAuditPlans(),
@@ -36,5 +40,8 @@ export async function UnifiedAuditsTable() {
     })),
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  return <UnifiedTableClient data={allRecords} />;
+  // Filter by type
+  const filteredRecords = allRecords.filter((record) => record.type === type);
+
+  return <UnifiedTableClient data={filteredRecords} type={type} />;
 }

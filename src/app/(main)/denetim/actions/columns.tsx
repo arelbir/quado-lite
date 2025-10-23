@@ -1,24 +1,27 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
-import { Eye, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
+import { useTranslations } from 'next-intl';
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export type ActionRecord = {
   id: string;
   details: string;
-  status: "Assigned" | "PendingManagerApproval" | "Completed" | "Rejected";
+  status: "Assigned" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
+  type: "Simple" | "Corrective" | "Preventive";
   createdAt: Date;
   updatedAt: Date | null;
   completedAt: Date | null;
   assignedToId: string | null;
   managerId: string | null;
   findingId: string | null;
+  dofId: string | null;
   finding?: {
     id: string;
     details: string;
@@ -35,35 +38,17 @@ export type ActionRecord = {
   } | null;
 };
 
-const statusConfig = {
-  Assigned: {
-    label: "Atandı",
-    color: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
-    icon: Clock,
-  },
-  PendingManagerApproval: {
-    label: "Onay Bekliyor",
-    color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
-    icon: Clock,
-  },
-  Completed: {
-    label: "Tamamlandı",
-    color: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-    icon: CheckCircle2,
-  },
-  Rejected: {
-    label: "Reddedildi",
-    color: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-    icon: XCircle,
-  },
-};
+export function useActionColumns(): ColumnDef<ActionRecord>[] {
+  const t = useTranslations('action');
+  const tCommon = useTranslations('common');
+  const tFinding = useTranslations('finding');
 
-export const columns: ColumnDef<ActionRecord>[] = [
-  {
-    accessorKey: "details",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Aksiyon" />
-    ),
+  return [
+    {
+      accessorKey: "details",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('fields.details')} />
+      ),
     cell: ({ row }) => {
       const details = row.getValue("details") as string;
       return (
@@ -74,7 +59,7 @@ export const columns: ColumnDef<ActionRecord>[] = [
               href={`/denetim/findings/${row.original.finding.id}`}
               className="text-xs text-muted-foreground hover:text-primary mt-1 inline-flex items-center gap-1"
             >
-              Bulgu: {row.original.finding.details.substring(0, 40)}...
+              {tFinding('singular')}: {row.original.finding.details.substring(0, 40)}...
             </Link>
           )}
         </div>
@@ -84,19 +69,11 @@ export const columns: ColumnDef<ActionRecord>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Durum" />
+      <DataTableColumnHeader column={column} title={t('fields.status')} />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as keyof typeof statusConfig;
-      const config = statusConfig[status];
-      const Icon = config.icon;
-
-      return (
-        <Badge className={config.color}>
-          <Icon className="h-3 w-3 mr-1" />
-          {config.label}
-        </Badge>
-      );
+      const status = row.getValue("status") as "Assigned" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
+      return <StatusBadge status={status} type="action" />;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -105,7 +82,7 @@ export const columns: ColumnDef<ActionRecord>[] = [
   {
     accessorKey: "assignedTo",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Sorumlu" />
+      <DataTableColumnHeader column={column} title={t('fields.responsiblePerson')} />
     ),
     cell: ({ row }) => {
       const assignedTo = row.original.assignedTo;
@@ -120,7 +97,7 @@ export const columns: ColumnDef<ActionRecord>[] = [
   {
     accessorKey: "manager",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Yönetici" />
+      <DataTableColumnHeader column={column} title={tCommon('manager')} />
     ),
     cell: ({ row }) => {
       const manager = row.original.manager;
@@ -135,7 +112,7 @@ export const columns: ColumnDef<ActionRecord>[] = [
   {
     accessorKey: "createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Oluşturulma" />
+      <DataTableColumnHeader column={column} title={tCommon('createdAt')} />
     ),
     cell: ({ row }) => {
       const date = row.getValue("createdAt") as Date;
@@ -153,10 +130,11 @@ export const columns: ColumnDef<ActionRecord>[] = [
         <Button asChild size="sm" variant="ghost">
           <Link href={`/denetim/actions/${row.original.id}`}>
             <Eye className="h-4 w-4 mr-2" />
-            Detay
+            {tCommon('view')}
           </Link>
         </Button>
       );
     },
   },
 ];
+}

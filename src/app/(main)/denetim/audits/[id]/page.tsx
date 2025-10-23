@@ -1,19 +1,24 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { db } from "@/drizzle/db";
-import { audits, findings, auditQuestions, user } from "@/drizzle/schema";
+import { audits, findings, auditQuestions, user, questions } from "@/drizzle/schema";
 import { eq, asc } from "drizzle-orm";
+import { currentUser } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, CheckCircle2, Circle, HelpCircle, AlertTriangle, FileText, Calendar, User } from "lucide-react";
+import { ArrowLeft, Plus, CheckCircle2, Circle, HelpCircle, AlertTriangle, FileText, Calendar, User, Edit } from "lucide-react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { AuditQuestionsForm } from "@/components/audit/audit-questions-form";
 import { FindingCard } from "@/components/audit/finding-card";
 import { AuditStatusActions } from "@/components/audit/audit-status-actions";
+import { AuditReportButton } from "@/components/audit/audit-report-button";
+import { AddQuestionDialog } from "@/components/audit/add-question-dialog";
+import { getAuditStatusLabel, getAuditStatusColor } from "@/lib/constants/status-labels";
+import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: { id: string };
@@ -21,6 +26,9 @@ interface PageProps {
 }
 
 export default async function AuditDetailPage({ params, searchParams }: PageProps) {
+  const t = await getTranslations('audit');
+  const loggedInUser = await currentUser();
+  
   const audit = await db.query.audits.findFirst({
     where: eq(audits.id, params.id),
     with: {
@@ -83,6 +91,20 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
     email: user.email,
   }).from(user);
 
+  // Denetimde olmayan sorular (eklenebilecek sorular)
+  const existingQuestionIds = questions.map(q => q.questionId);
+  
+  // Tüm soruları al ve client-side'da filtrele
+  const allQuestions = await db.query.questions.findMany({
+    with: { bank: true },
+    limit: 100,
+  });
+  
+  // Denetimde olmayan soruları filtrele
+  const availableQuestions = allQuestions.filter(
+    q => !existingQuestionIds.includes(q.id)
+  );
+
   return (
     <div className="space-y-6">
       {/* Compact Header */}
@@ -103,14 +125,29 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
             </div>
           </div>
         </div>
-        <AuditStatusActions 
-          audit={{
-            id: audit.id,
-            status: audit.status,
-            title: audit.title,
-          }}
-          openFindingsCount={openFindingsCount}
-        />
+        <div className="flex items-center gap-2">
+          <AuditReportButton auditId={params.id} />
+          {audit.status === "Active" && (
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/denetim/audits/${params.id}/edit`}>
+                <Edit className="h-4 w-4 mr-2" />
+                Düzenle
+              </Link>
+            </Button>
+          )}
+          <AuditStatusActions 
+            audit={{
+              id: audit.id,
+              status: audit.status,
+              title: audit.title,
+              auditorId: audit.auditorId,
+              createdById: audit.createdById,
+            }}
+            openFindingsCount={openFindingsCount}
+            currentUserId={loggedInUser?.id || ""}
+            currentUserRole={loggedInUser?.role || "user"}
+          />
+        </div>
       </div>
 
       {/* Tab-Based Content */}
@@ -126,7 +163,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           </TabsTrigger>
           <TabsTrigger value="findings">
             <AlertTriangle className="h-4 w-4 mr-2" />
-            Bulgular ({auditFindings.length})
+            {t('fields.findings')} ({auditFindings.length})
           </TabsTrigger>
           <TabsTrigger value="details">
             <FileText className="h-4 w-4 mr-2" />
@@ -153,7 +190,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
 
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Bulgular</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('fields.findings')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{auditFindings.length}</div>
@@ -168,7 +205,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 <CardTitle className="text-sm font-medium">Durum</CardTitle>
               </CardHeader>
               <CardContent>
-                <Badge className="text-sm">Devam Ediyor</Badge>
+                <Badge className={getAuditStatusColor(audit.status)}>
+                  {getAuditStatusLabel(audit.status)}
+                </Badge>
                 <p className="text-xs text-muted-foreground mt-2">
                   {new Date(audit.createdAt).toLocaleDateString("tr-TR")} tarihinde başlatıldı
                 </p>
@@ -202,7 +241,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Son Bulgular</CardTitle>
+                <CardTitle className="text-base">{t('common.lastFindings')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {auditFindings.slice(0, 3).length > 0 ? (
@@ -253,15 +292,41 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
             </CardContent>
           </Card>
 
+          {/* Questions Header with Add Button */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Denetim Soruları</CardTitle>
+                  <CardDescription>
+                    {questions.length} soru var
+                  </CardDescription>
+                </div>
+                {audit.status === "Active" && (
+                  <AddQuestionDialog
+                    auditId={params.id}
+                    availableQuestions={availableQuestions as any}
+                  />
+                )}
+              </div>
+            </CardHeader>
+          </Card>
+
           {/* Questions Form */}
           {questions.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <HelpCircle className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">Bu denetimde soru yok</h3>
-                <p className="text-sm text-muted-foreground">
-                  Şablonunuzda soru bulunmuyor
+                <p className="text-sm text-muted-foreground mb-4">
+                  Soru havuzundan soru ekleyerek başlayın
                 </p>
+                {audit.status === "Active" && availableQuestions.length > 0 && (
+                  <AddQuestionDialog
+                    auditId={params.id}
+                    availableQuestions={availableQuestions as any}
+                  />
+                )}
               </CardContent>
             </Card>
           ) : (
@@ -269,7 +334,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           )}
         </TabsContent>
 
-        {/* TAB 3: Bulgular (Yeni tasarım - sorular gibi) */}
+        {/* TAB 3: Bulgular */}
         <TabsContent value="findings" className="space-y-4">
           {/* Stats Card */}
           <Card>
@@ -277,7 +342,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <p className="text-2xl font-bold">{auditFindings.length}</p>
-                  <p className="text-xs text-muted-foreground">Toplam Bulgu</p>
+                  <p className="text-xs text-muted-foreground">{t('common.totalFindings')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-success">
@@ -306,9 +371,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Bulgular</CardTitle>
+                  <CardTitle>{t('fields.findings')}</CardTitle>
                   <CardDescription>
-                    Bu denetimde tespit edilen {auditFindings.length} bulgu
+                    {auditFindings.length} {t('fields.findings').toLowerCase()}
                   </CardDescription>
                 </div>
               </div>

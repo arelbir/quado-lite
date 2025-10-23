@@ -2,24 +2,15 @@
 
 import { db } from "@/drizzle/db";
 import { auditQuestions, findings } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
 import { eq, and } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-
-type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
+import type { ActionResponse, User } from "@/lib/types";
+import { withAuth, revalidateAuditPaths } from "@/lib/helpers";
 
 /**
  * Denetim sorularını getir
  */
 export async function getAuditQuestions(auditId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
+  const result = await withAuth(async () => {
     const auditQuestionsData = await db.query.auditQuestions.findMany({
       where: eq(auditQuestions.auditId, auditId),
       with: {
@@ -44,8 +35,7 @@ export async function getAuditQuestions(auditId: string) {
       orderBy: (auditQuestions, { asc }) => [asc(auditQuestions.createdAt)],
     });
 
-    // checklistOptions'ı parse et
-    return auditQuestionsData.map((aq) => ({
+    const data = auditQuestionsData.map((aq) => ({
       ...aq,
       question: {
         ...aq.question,
@@ -54,10 +44,15 @@ export async function getAuditQuestions(auditId: string) {
           : null,
       },
     }));
-  } catch (error) {
-    console.error("Error fetching audit questions:", error);
-    throw error;
+
+    return { success: true, data };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }
 
 /**
@@ -69,13 +64,7 @@ export async function answerAuditQuestion(data: {
   notes?: string;
   isNonCompliant: boolean;
 }): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Soruyu güncelle
+  return withAuth(async (user: User) => {
     await db
       .update(auditQuestions)
       .set({
@@ -88,7 +77,6 @@ export async function answerAuditQuestion(data: {
       })
       .where(eq(auditQuestions.id, data.auditQuestionId));
 
-    // Eğer uygunsuzluk varsa, otomatik Finding oluştur
     if (data.isNonCompliant) {
       const auditQuestion = await db.query.auditQuestions.findFirst({
         where: eq(auditQuestions.id, data.auditQuestionId),
@@ -103,18 +91,15 @@ export async function answerAuditQuestion(data: {
           auditId: auditQuestion.auditId,
           details: `[Otomatik Bulgu] Soru: ${auditQuestion.question?.questionText}\nCevap: ${data.answer}\n${data.notes ? `Not: ${data.notes}` : ""}`,
           status: "New",
-          riskType: "Orta", // Default risk
+          riskType: "Orta",
           createdById: user.id,
         });
       }
     }
 
-    revalidatePath(`/denetim/audits`);
+    revalidateAuditPaths({ audits: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error answering audit question:", error);
-    return { success: false, error: "Failed to answer question" };
-  }
+  });
 }
 
 /**
@@ -128,12 +113,7 @@ export async function answerMultipleQuestions(
     isNonCompliant: boolean;
   }>
 ): Promise<ActionResponse<{ nonCompliantCount: number }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+  return withAuth<{ nonCompliantCount: number }>(async (user: User) => {
     let nonCompliantCount = 0;
 
     for (const answerData of answers) {
@@ -149,7 +129,6 @@ export async function answerMultipleQuestions(
         })
         .where(eq(auditQuestions.id, answerData.auditQuestionId));
 
-      // Uygunsuzluk varsa Finding oluştur
       if (answerData.isNonCompliant) {
         nonCompliantCount++;
 
@@ -172,15 +151,12 @@ export async function answerMultipleQuestions(
       }
     }
 
-    revalidatePath("/denetim/audits");
+    revalidateAuditPaths({ audits: true });
     return {
       success: true,
       data: { nonCompliantCount },
     };
-  } catch (error) {
-    console.error("Error answering multiple questions:", error);
-    return { success: false, error: "Failed to answer questions" };
-  }
+  });
 }
 
 /**
@@ -194,12 +170,7 @@ export async function updateQuestionAnswer(
     isNonCompliant?: boolean;
   }
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+  return withAuth(async () => {
     await db
       .update(auditQuestions)
       .set({
@@ -208,12 +179,9 @@ export async function updateQuestionAnswer(
       })
       .where(eq(auditQuestions.id, auditQuestionId));
 
-    revalidatePath("/denetim/audits");
+    revalidateAuditPaths({ audits: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error updating question answer:", error);
-    return { success: false, error: "Failed to update answer" };
-  }
+  });
 }
 
 /**
@@ -228,18 +196,12 @@ export async function saveAllAuditAnswers(data: {
     isNonCompliant: boolean;
   }>;
 }): Promise<ActionResponse<{ saved: number; nonCompliantCount: number }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+  return withAuth<{ saved: number; nonCompliantCount: number }>(async (user: User) => {
     let nonCompliantCount = 0;
     let saved = 0;
 
-    // Batch update için hazırla
     for (const answerData of data.answers) {
-      if (!answerData.answer) continue; // Boş cevapları atla
+      if (!answerData.answer) continue;
 
       await db
         .update(auditQuestions)
@@ -255,7 +217,6 @@ export async function saveAllAuditAnswers(data: {
 
       saved++;
 
-      // Uygunsuzluk varsa ve daha önce bulgu oluşturulmamışsa Finding oluştur
       if (answerData.isNonCompliant) {
         const auditQuestion = await db.query.auditQuestions.findFirst({
           where: eq(auditQuestions.id, answerData.auditQuestionId),
@@ -265,7 +226,6 @@ export async function saveAllAuditAnswers(data: {
         });
 
         if (auditQuestion) {
-          // Aynı soru için bulgu var mı kontrol et
           const existingFinding = await db.query.findings.findFirst({
             where: and(
               eq(findings.auditId, data.auditId),
@@ -287,30 +247,19 @@ export async function saveAllAuditAnswers(data: {
       }
     }
 
-    revalidatePath(`/denetim/audits/${data.auditId}`);
-    revalidatePath(`/denetim/audits/${data.auditId}/questions`);
-    revalidatePath("/denetim/audits");
-    
+    revalidateAuditPaths({ audits: true, specificAudit: data.auditId });
     return {
       success: true,
       data: { saved, nonCompliantCount },
     };
-  } catch (error) {
-    console.error("Error saving audit answers:", error);
-    return { success: false, error: "Cevaplar kaydedilirken hata oluştu" };
-  }
+  });
 }
 
 /**
  * Denetim tamamlama durumunu kontrol et
  */
 export async function checkAuditCompletion(auditId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
+  const result = await withAuth(async () => {
     const allQuestions = await db.query.auditQuestions.findMany({
       where: eq(auditQuestions.auditId, auditId),
     });
@@ -318,7 +267,7 @@ export async function checkAuditCompletion(auditId: string) {
     const answeredQuestions = allQuestions.filter((q) => q.answer !== null);
     const nonCompliantQuestions = allQuestions.filter((q) => q.isNonCompliant);
 
-    return {
+    const data = {
       total: allQuestions.length,
       answered: answeredQuestions.length,
       unanswered: allQuestions.length - answeredQuestions.length,
@@ -327,8 +276,13 @@ export async function checkAuditCompletion(auditId: string) {
         ? Math.round((answeredQuestions.length / allQuestions.length) * 100)
         : 0,
     };
-  } catch (error) {
-    console.error("Error checking audit completion:", error);
-    throw error;
+
+    return { success: true, data };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }

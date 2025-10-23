@@ -3,28 +3,37 @@
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
-import { columns, type ActionRecord } from "./columns";
+import { useActionColumns, type ActionRecord } from "./columns";
+import { useTranslations } from 'next-intl';
+import { useActionStatusLabel } from "@/lib/i18n/status-helpers";
 
 interface ActionsTableClientProps {
   data: ActionRecord[];
 }
 
 export function ActionsTableClient({ data }: ActionsTableClientProps) {
+  const t = useTranslations('action');
+  const tCommon = useTranslations('common');
+  const columns = useActionColumns();
+  const getStatusLabel = useActionStatusLabel();
+
+  const statusOptions = [
+    { label: getStatusLabel('Assigned'), value: 'Assigned' },
+    { label: getStatusLabel('PendingManagerApproval'), value: 'PendingManagerApproval' },
+    { label: getStatusLabel('Completed'), value: 'Completed' },
+    { label: getStatusLabel('Cancelled'), value: 'Cancelled' },
+  ];
+
   const filterFields = [
     {
-      label: "Durum",
+      label: t('fields.status'),
       value: "status" as keyof ActionRecord,
-      options: [
-        { label: "Atandı", value: "Assigned" },
-        { label: "Onay Bekliyor", value: "PendingManagerApproval" },
-        { label: "Tamamlandı", value: "Completed" },
-        { label: "Reddedildi", value: "Rejected" },
-      ],
+      options: statusOptions,
     },
     {
-      label: "Aksiyon Ara",
+      label: t('placeholders.searchAction'),
       value: "details" as keyof ActionRecord,
-      placeholder: "Aksiyon detayı ara...",
+      placeholder: t('placeholders.enterDetails'),
     },
   ];
 
@@ -40,8 +49,8 @@ export function ActionsTableClient({ data }: ActionsTableClientProps) {
       <DataTableToolbar table={table} filterFields={filterFields} />
       <DataTable
         table={table}
-        title="Aksiyonlarım"
-        description={`Toplam ${data.length} aksiyon`}
+        title={t('title')}
+        description={`${tCommon('total')} ${data.length} ${t('title').toLowerCase()}`}
       />
     </div>
   );

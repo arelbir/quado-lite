@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Clock, User, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, User, XCircle, MessageSquare, Ban } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
 
@@ -25,6 +25,15 @@ interface ActionTimelineProps {
       name: string | null;
       email: string | null;
     } | null;
+    progressNotes?: Array<{
+      id: string;
+      note: string;
+      createdAt: Date;
+      createdBy?: {
+        name: string | null;
+        email: string | null;
+      } | null;
+    }>;
   };
 }
 
@@ -48,6 +57,19 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
       date: action.createdAt,
       icon: User,
       color: "text-purple-600 dark:text-purple-400",
+    });
+  }
+
+  // 2.5. İlerleme Notları (Progress Notes)
+  if (action.progressNotes && action.progressNotes.length > 0) {
+    action.progressNotes.forEach((progress) => {
+      events.push({
+        title: "İlerleme Notu",
+        description: `${progress.createdBy?.name || progress.createdBy?.email || "Sorumlu"}: "${progress.note}"`,
+        date: progress.createdAt,
+        icon: MessageSquare,
+        color: "text-blue-600 dark:text-blue-400",
+      });
     });
   }
 
@@ -75,19 +97,23 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
       icon: CheckCircle2,
       color: "text-green-600 dark:text-green-400",
     });
-  } else if (action.status === "Rejected" && action.updatedAt) {
-    let description = `${action.manager?.name || action.manager?.email} aksiyonu reddetti`;
-    if (action.rejectionReason) {
-      description += `\n\nNeden: "${action.rejectionReason}"`;
-    }
+  }
+  
+  // Red History - Her zaman göster (döngü takibi için)
+  if (action.rejectionReason) {
+    let description = `${action.manager?.name || action.manager?.email} reddetti ve tekrar atadı`;
+    description += `\n\n📌 Red Nedeni: "${action.rejectionReason}"`;
+    description += `\n\n→ Aksiyon tekrar "Atandı" durumuna döndü`;
     events.push({
-      title: "Yönetici Reddetti",
+      title: "Reddedildi & Geri Atandı",
       description,
-      date: action.updatedAt,
+      date: action.updatedAt || action.createdAt,
       icon: XCircle,
-      color: "text-red-600 dark:text-red-400",
+      color: "text-orange-600 dark:text-orange-400",
     });
-  } else if (action.status === "PendingManagerApproval") {
+  }
+  
+  if (action.status === "PendingManagerApproval") {
     events.push({
       title: "Yönetici Onayı Bekleniyor",
       description: `${action.manager?.name || action.manager?.email} onaylamalı`,
@@ -97,19 +123,47 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
     });
   }
 
+  // Cancelled - İptal edildi (döngüden çıkış)
+  if (action.status === "Cancelled") {
+    let description = "Aksiyon iptal edildi (döngü kırıldı)";
+    if (action.rejectionReason) {
+      description += `\n\n📌 İptal Nedeni: "${action.rejectionReason}"`;
+    }
+    events.push({
+      title: "İptal Edildi",
+      description,
+      date: action.updatedAt || action.createdAt,
+      icon: Ban,
+      color: "text-gray-600 dark:text-gray-400",
+    });
+  }
+
+  // Sort: En yeni üstte, en eski altta (günümüzden geçmişe)
+  const sortedEvents = [...events].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Aksiyon Geçmişi</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Geçmiş</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="relative">
-          {/* Timeline Line */}
-          <div className="absolute left-[11px] top-0 bottom-0 w-0.5 bg-border" />
-
+        {/* Scrollable Timeline Container */}
+        <div 
+          className="relative max-h-[400px] overflow-y-auto pr-2 
+          [&::-webkit-scrollbar]:w-2 
+          [&::-webkit-scrollbar-track]:bg-transparent 
+          [&::-webkit-scrollbar-thumb]:bg-border 
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/20">
+          
           {/* Events */}
-          <div className="space-y-6">
-            {events.map((event, index) => {
+          <div className="space-y-6 relative">
+            {/* Timeline Line - height auto adjusts */}
+            <div className="absolute left-[11px] top-2 bottom-8 w-0.5 bg-border" />
+            
+            {sortedEvents.map((event, index) => {
               const Icon = event.icon;
               return (
                 <div key={index} className="relative flex gap-4">
@@ -119,7 +173,7 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 pb-6">
+                  <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <p className="font-medium text-sm">{event.title}</p>
                       <span className="text-xs text-muted-foreground">

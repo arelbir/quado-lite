@@ -1,3 +1,11 @@
+import { config } from 'dotenv';
+import { resolve } from 'path';
+config({ path: resolve(process.cwd(), '.env.local') });
+config({ path: resolve(process.cwd(), '.env') });
+
+// Skip env validation for migration
+process.env.SKIP_ENV_VALIDATION = 'true';
+
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { db } from "./db";
 

@@ -51,6 +51,7 @@ export function DuplicateQuestionButton({
             size="sm"
             onClick={handleDuplicate}
             disabled={isPending}
+            className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
           >
             {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

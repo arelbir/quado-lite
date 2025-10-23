@@ -1,0 +1,105 @@
+{
+  "title": "Denetimler",
+  "singular": "Denetim",
+  "active": "Aktif Denetimler",
+  "description": "Tüm denetim ve planlarınızı tek yerden yönetin",
+  "create": "Yeni Denetim Oluştur",
+  "edit": "Denetimi Düzenle",
+  "delete": "Denetimi Sil",
+  "view": "Denetimi Görüntüle",
+  
+  "fields": {
+    "title": "Denetim Başlığı",
+    "findings": "Bulgular",
+    "description": "Açıklama",
+    "auditor": "Denetçi",
+    "auditee": "Denetlenen",
+    "department": "Departman",
+    "startDate": "Başlangıç Tarihi",
+    "endDate": "Bitiş Tarihi",
+    "plannedDate": "Planlanan Tarih",
+    "actualDate": "Gerçekleşen Tarih",
+    "status": "Durum",
+    "type": "Denetim Tipi",
+    "scope": "Kapsam",
+    "standard": "Standart",
+    "createdAt": "Oluşturulma Tarihi",
+    "updatedAt": "Güncellenme Tarihi",
+    "createdBy": "Oluşturan",
+    "assignedTo": "Atanan"
+  },
+  
+  "common": {
+    "totalQuestions": "Toplam Soru",
+    "totalFindings": "Toplam Bulgu",
+    "total": "Toplam",
+    "lastFindings": "Son Bulgular",
+    "noFindings": "Henüz bulgu bulunmuyor"
+  },
+  
+  "myAudits": {
+    "title": "Denetimlerim",
+    "description": "Son 1 yıl içinde oluşturduğum aktif denetimler",
+    "stats": {
+      "total": "Toplam",
+      "totalDescription": "Aktif denetim",
+      "active": "Devam Eden",
+      "activeDescription": "Aktif durumda",
+      "inReview": "İncelemede",
+      "inReviewDescription": "Kapanış süreci"
+    },
+    "activeAudits": "Aktif Denetimler",
+    "noAudits": "Aktif denetim yok",
+    "noAuditsDescription": "Son 1 yıl içinde oluşturduğunuz aktif denetim bulunmuyor",
+    "viewAll": "Tüm Denetimler",
+    "auditDate": "Denetim Tarihi",
+    "notSet": "Belirlenmemiş",
+    "createdAt": "Oluşturulma",
+    "startAudit": "Denetimi Başlat",
+    "viewDetails": "Detaylar"
+  },
+  
+  "status": {
+    "draft": "Taslak",
+    "planned": "Planlandı",
+    "inProgress": "Devam Ediyor",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi"
+  },
+  
+  "types": {
+    "internal": "İç Denetim",
+    "external": "Dış Denetim",
+    "supplier": "Tedarikçi Denetimi",
+    "process": "Süreç Denetimi",
+    "compliance": "Uygunluk Denetimi"
+  },
+  
+  "messages": {
+    "created": "Denetim başarıyla oluşturuldu",
+    "updated": "Denetim güncellendi",
+    "deleted": "Denetim silindi",
+    "notFound": "Denetim bulunamadı",
+    "cannotDelete": "Bu denetim silinemez (ilişkili kayıtlar var)",
+    "confirmDelete": "Bu denetimi silmek istediğinizden emin misiniz?",
+    "noAudits": "Henüz denetim bulunmuyor",
+    "loadingAudits": "Denetimler yükleniyor..."
+  },
+  
+  "sections": {
+    "overview": "Genel Bakış",
+    "details": "Denetim Detayları",
+    "findings": "Bulgular",
+    "team": "Denetim Ekibi",
+    "checklist": "Denetim Kontrol Listesi",
+    "timeline": "Zaman Çizelgesi",
+    "reports": "Raporlar"
+  },
+  
+  "placeholders": {
+    "searchAudit": "Denetim ara...",
+    "selectAuditor": "Denetçi seçiniz",
+    "selectDepartment": "Departman seçiniz",
+    "enterDescription": "Açıklama giriniz"
+  }
+}

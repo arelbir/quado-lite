@@ -2,10 +2,17 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { GripVertical, Edit, Copy as CopyIcon } from "lucide-react";
 import Link from "next/link";
 import { CopyQuestionDialog } from "./copy-question-dialog";
 import { DuplicateQuestionButton } from "./duplicate-question-button";
+import { DeleteQuestionButton } from "./delete-question-button";
 
 interface QuestionListItemProps {
   question: any;
@@ -61,7 +68,7 @@ export function QuestionListItem({
         <p className="text-sm font-medium mb-1 line-clamp-2">{question.questionText}</p>
         {question.helpText && (
           <p className="text-xs text-muted-foreground line-clamp-1">
-            💡 {question.helpText}
+            {question.helpText}
           </p>
         )}
         {(question.questionType === "SingleChoice" || question.questionType === "Checklist") && question.checklistOptions && (
@@ -72,19 +79,43 @@ export function QuestionListItem({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={`/denetim/question-banks/${bankId}/questions/${question.id}/edit`}>
-            <Edit className="h-4 w-4" />
-          </Link>
-        </Button>
-        <DuplicateQuestionButton questionId={question.id} bankId={bankId} />
-        <CopyQuestionDialog questionId={question.id} currentBankId={bankId}>
-          <Button variant="ghost" size="sm">
-            <CopyIcon className="h-4 w-4 text-primary" />
-          </Button>
-        </CopyQuestionDialog>
-      </div>
+      <TooltipProvider>
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Edit Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href={`/denetim/question-banks/${bankId}/questions/${question.id}/edit`}>
+                  <Edit className="h-4 w-4" />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Soruyu düzenle</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Duplicate Button */}
+          <DuplicateQuestionButton questionId={question.id} bankId={bankId} />
+
+          {/* Copy Button */}
+          <Tooltip>
+            <CopyQuestionDialog questionId={question.id} currentBankId={bankId}>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <CopyIcon className="h-4 w-4 text-primary" />
+                </Button>
+              </TooltipTrigger>
+            </CopyQuestionDialog>
+            <TooltipContent>
+              <p>Başka havuza kopyala</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Delete Button */}
+          <DeleteQuestionButton questionId={question.id} />
+        </div>
+      </TooltipProvider>
     </div>
   );
 }

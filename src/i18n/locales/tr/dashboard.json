@@ -1,0 +1,30 @@
+{
+  "title": "Denetim Sistemi",
+  "description": "Bulgular, Aksiyonlar ve DÖF takip sistemi",
+  
+  "stats": {
+    "totalFindings": "Toplam Bulgu",
+    "activeFindings": "Aktif bulgular",
+    "pendingActions": "Bekleyen Aksiyonlar",
+    "waitingCompletion": "Tamamlanmayı bekliyor",
+    "activeDofs": "Aktif DÖF",
+    "dofsInProgress": "İşlemde olan DÖF'ler",
+    "completed": "Tamamlanan",
+    "closedFindings": "Kapatılan bulgular"
+  },
+  
+  "recentFindings": {
+    "title": "Son Bulgular",
+    "description": "En son eklenen bulgular",
+    "noData": "Henüz bulgu yok",
+    "audit": "Denetim"
+  },
+  
+  "myTasks": {
+    "title": "Görevlerim",
+    "description": "Bekleyen aksiyon ve onaylar",
+    "noTasks": "🎉 Bekleyen görev yok!",
+    "responsible": "Sorumlu",
+    "waitingApproval": "Onay Bekliyor"
+  }
+}

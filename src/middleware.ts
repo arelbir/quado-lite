@@ -1,4 +1,3 @@
-
 import {
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
@@ -8,6 +7,8 @@ import {
 } from "@/config/routes";
 import { authConfig } from "./config/auth";
 import NextAuth from "next-auth";
+import { defaultLocale } from './i18n/config';
+import { NextResponse } from 'next/server';
 
 const { auth } = NextAuth(authConfig);
 
@@ -18,6 +19,9 @@ export default auth((req) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  
+  // Simple locale detection - get from cookie or use default
+  const locale = req.cookies.get('NEXT_LOCALE')?.value || defaultLocale;
 
   if (isApiAuthRoute) {
     return void 0;

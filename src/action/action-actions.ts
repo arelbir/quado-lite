@@ -2,13 +2,17 @@
 
 import { db } from "@/drizzle/db";
 import { actions, findings, dofs } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
+import { actionProgress } from "@/drizzle/schema/action-progress";
 import { eq, and, not, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-
-type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
+import type { ActionResponse, User, Action } from "@/lib/types";
+import { 
+  withAuth, 
+  createNotFoundError, 
+  createPermissionError,
+  revalidateActionPaths,
+  revalidateFindingPaths,
+  revalidateDOFPaths,
+} from "@/lib/helpers";
 
 /**
  * FR-003: Süreç Sahibi, Aksiyon Oluşturabilir
@@ -20,26 +24,17 @@ export async function createAction(data: {
   assignedToId: string;
   managerId?: string | null;
 }): Promise<ActionResponse<{ id: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Bulgunun Süreç Sahibi olduğunu kontrol et
+  return withAuth<{ id: string }>(async (user: User) => {
     const finding = await db.query.findings.findFirst({
       where: eq(findings.id, data.findingId),
     });
 
     if (!finding) {
-      return { success: false, error: "Finding not found" };
+      return createNotFoundError<{ id: string }>("Finding");
     }
 
     if (finding.assignedToId !== user.id && user.role !== "admin") {
-      return { 
-        success: false, 
-        error: "Only process owner can create actions" 
-      };
+      return createPermissionError<{ id: string }>("Only process owner can create actions");
     }
 
     const [action] = await db
@@ -54,7 +49,6 @@ export async function createAction(data: {
       })
       .returning({ id: actions.id });
 
-    // Finding'i InProgress durumuna getir
     await db
       .update(findings)
       .set({
@@ -63,13 +57,56 @@ export async function createAction(data: {
       })
       .where(eq(findings.id, data.findingId));
 
-    revalidatePath("/findings");
-    revalidatePath("/actions");
+    revalidateFindingPaths({ list: true });
+    revalidateActionPaths({ list: true });
+    
     return { success: true, data: { id: action!.id } };
-  } catch (error) {
-    console.error("Error creating action:", error);
-    return { success: false, error: "Failed to create action" };
-  }
+  });
+}
+
+/**
+ * HYBRID: DÖF'e Aksiyon Ekle (Corrective/Preventive)
+ * DÖF Step 4'te kullanılır - Action modülünü tekrar kullanır (DRY)
+ */
+export async function createDofAction(data: {
+  dofId: string;
+  type: "Corrective" | "Preventive";
+  details: string;
+  assignedToId: string;
+  managerId?: string | null;
+}): Promise<ActionResponse<{ id: string }>> {
+  return withAuth<{ id: string }>(async (user: User) => {
+    const dof = await db.query.dofs.findFirst({
+      where: eq(dofs.id, data.dofId),
+    });
+
+    if (!dof) {
+      return createNotFoundError<{ id: string }>("DÖF");
+    }
+
+    if (dof.assignedToId !== user.id && user.role !== "admin") {
+      return createPermissionError<{ id: string }>("Only DÖF owner can create actions");
+    }
+
+    const [action] = await db
+      .insert(actions)
+      .values({
+        dofId: data.dofId,
+        findingId: null,
+        type: data.type,
+        details: data.details,
+        assignedToId: data.assignedToId,
+        managerId: data.managerId,
+        status: "Assigned",
+        createdById: user.id,
+      })
+      .returning({ id: actions.id });
+
+    revalidateDOFPaths({ list: true, specific: data.dofId });
+    revalidateActionPaths({ list: true });
+    
+    return { success: true, data: { id: action!.id } };
+  });
 }
 
 /**
@@ -80,26 +117,17 @@ export async function completeAction(
   actionId: string,
   completionNotes: string
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+  return withAuth(async (user: User) => {
     const action = await db.query.actions.findFirst({
       where: eq(actions.id, actionId),
     });
 
     if (!action) {
-      return { success: false, error: "Action not found" };
+      return createNotFoundError("Action");
     }
 
-    // Sadece atanan Sorumlu tamamlayabilir
     if (action.assignedToId !== user.id && user.role !== "admin") {
-      return { 
-        success: false, 
-        error: "Only assigned user can complete this action" 
-      };
+      return createPermissionError("Only assigned user can complete this action");
     }
 
     await db
@@ -112,12 +140,9 @@ export async function completeAction(
       })
       .where(eq(actions.id, actionId));
 
-    revalidatePath("/actions");
+    revalidateActionPaths({ list: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error completing action:", error);
-    return { success: false, error: "Failed to complete action" };
-  }
+  });
 }
 
 /**
@@ -126,26 +151,17 @@ export async function completeAction(
 export async function approveAction(
   actionId: string
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+  return withAuth(async (user: User) => {
     const action = await db.query.actions.findFirst({
       where: eq(actions.id, actionId),
     });
 
     if (!action) {
-      return { success: false, error: "Action not found" };
+      return createNotFoundError("Action");
     }
 
-    // Sadece atanan Yönetici onaylayabilir
     if (action.managerId !== user.id && user.role !== "admin") {
-      return { 
-        success: false, 
-        error: "Only assigned manager can approve this action" 
-      };
+      return createPermissionError("Only assigned manager can approve this action");
     }
 
     if (action.status !== "PendingManagerApproval") {
@@ -163,7 +179,7 @@ export async function approveAction(
       })
       .where(eq(actions.id, actionId));
 
-    // Bulgunun diğer alt görevlerini kontrol et (eğer finding varsa)
+    // Bulgunun diğer alt görevlerini kontrol et
     if (action.findingId) {
       const [remainingActionsCount] = await db
         .select({ count: sql<number>`count(*)::int` })
@@ -187,83 +203,147 @@ export async function approveAction(
 
       const remainingTasks = (remainingActionsCount?.count || 0) + (remainingDofsCount?.count || 0);
 
-      // Hiç bekleyen görev yoksa bulguyu güncelle
       if (remainingTasks === 0) {
         await db
           .update(findings)
           .set({
-            status: "InProgress", // Süreç sahibi artık kapanışa gönderebilir
+            status: "InProgress",
             updatedAt: new Date(),
           })
           .where(eq(findings.id, action.findingId));
       }
     }
 
-    revalidatePath("/actions");
+    revalidateActionPaths({ list: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error approving action:", error);
-    return { success: false, error: "Failed to approve action" };
-  }
+  });
 }
 
 /**
  * FR-004: Aksiyon Yöneticisi, Aksiyonu Reddedebilir
+ * 
+ * WORKFLOW: Reject → Assigned (Döngü)
+ * - Status "Assigned"a döner
+ * - Sorumlu tekrar çalışabilir
+ * - Red nedeni kaydedilir (timeline'da görünür)
  */
 export async function rejectAction(
   actionId: string,
   reason?: string
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
+  return withAuth(async (user: User) => {
     const action = await db.query.actions.findFirst({
       where: eq(actions.id, actionId),
     });
 
     if (!action) {
-      return { success: false, error: "Action not found" };
+      return createNotFoundError("Action");
     }
 
-    // Sadece atanan Yönetici reddedebilir
-    if (action.managerId !== user.id && user.role !== "admin") {
-      return { 
-        success: false, 
-        error: "Only assigned manager can reject this action" 
-      };
+    if (action.managerId !== user.id) {
+      return createPermissionError("Only assigned manager can reject this action");
     }
 
     await db
       .update(actions)
       .set({
-        status: "Rejected",
+        status: "Assigned",
+        rejectionReason: reason,
+        completedAt: null,
+        completionNotes: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(actions.id, actionId));
+
+    revalidateActionPaths({ list: true, specific: actionId });
+    return { success: true, data: undefined };
+  });
+}
+
+/**
+ * FR-005: Aksiyon İptal Et
+ * 
+ * EXIT STRATEGY: Döngüyü kırmak için
+ * - Yönetici veya Oluşturan iptal edebilir
+ * - Status "Cancelled" olur (final state)
+ * - Tekrar açılamaz, döngüden çıkış
+ */
+export async function cancelAction(
+  actionId: string,
+  reason?: string
+): Promise<ActionResponse> {
+  return withAuth(async (user: User) => {
+    const action = await db.query.actions.findFirst({
+      where: eq(actions.id, actionId),
+    });
+
+    if (!action) {
+      return createNotFoundError("Action");
+    }
+
+    if (action.managerId !== user.id && action.createdById !== user.id) {
+      return createPermissionError("Only manager or creator can cancel this action");
+    }
+
+    await db
+      .update(actions)
+      .set({
+        status: "Cancelled",
         rejectionReason: reason,
         updatedAt: new Date(),
       })
       .where(eq(actions.id, actionId));
 
-    revalidatePath("/actions");
+    revalidateActionPaths({ list: true, specific: actionId });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error rejecting action:", error);
-    return { success: false, error: "Failed to reject action" };
-  }
+  });
+}
+
+/**
+ * Aksiyon İlerleme Notu Ekle
+ * 
+ * Kullanım: Aksiyon henüz tamamlanmadı ama bir şeyler yapıldı
+ * - "Bugün hata analizi yaptım"
+ * - "Yarın fix uygulayacağım"
+ * - Timeline'da görünür
+ */
+export async function addActionProgress(
+  actionId: string,
+  note: string
+): Promise<ActionResponse<{ id: string }>> {
+  return withAuth<{ id: string }>(async (user: User) => {
+    const action = await db.query.actions.findFirst({
+      where: eq(actions.id, actionId),
+    });
+
+    if (!action) {
+      return createNotFoundError<{ id: string }>("Action");
+    }
+
+    if (action.assignedToId !== user.id) {
+      return createPermissionError<{ id: string }>("Only assigned user can add progress notes");
+    }
+
+    const [progressNote] = await db
+      .insert(actionProgress)
+      .values({
+        actionId,
+        note,
+        createdById: user.id,
+      })
+      .returning({ id: actionProgress.id });
+
+    revalidateActionPaths({ specific: actionId });
+    return { success: true, data: { id: progressNote!.id } };
+  });
 }
 
 /**
  * Belirli bir bulguya ait aksiyonları getir
  */
 export async function getActionsByFinding(findingId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    return await db.query.actions.findMany({
+  const result = await withAuth(async () => {
+    const data = await db.query.actions.findMany({
       where: eq(actions.findingId, findingId),
       with: {
         assignedTo: {
@@ -290,25 +370,23 @@ export async function getActionsByFinding(findingId: string) {
       },
       orderBy: (actions, { desc }) => [desc(actions.createdAt)],
     });
-  } catch (error) {
-    console.error("Error fetching actions:", error);
-    throw error;
+    return { success: true, data };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }
 
 /**
  * Kullanıcının aksiyonlarını getir (Sorumlu veya Yönetici olarak)
  */
 export async function getMyActions() {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Admin tüm aksiyonları görebilir
+  const result = await withAuth(async (user: User) => {
     if (user.role === "admin" || user.role === "superAdmin") {
-      return await db.query.actions.findMany({
+      const data = await db.query.actions.findMany({
         with: {
           finding: true,
           assignedTo: {
@@ -328,10 +406,10 @@ export async function getMyActions() {
         },
         orderBy: (actions, { desc }) => [desc(actions.createdAt)],
       });
+      return { success: true, data };
     }
 
-    // Kullanıcının sorumlusu veya yöneticisi olduğu aksiyonlar
-    return await db.query.actions.findMany({
+    const data = await db.query.actions.findMany({
       where: (actions, { or, eq }) =>
         or(
           eq(actions.assignedToId, user.id),
@@ -356,8 +434,12 @@ export async function getMyActions() {
       },
       orderBy: (actions, { desc }) => [desc(actions.createdAt)],
     });
-  } catch (error) {
-    console.error("Error fetching my actions:", error);
-    throw error;
+    return { success: true, data };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }

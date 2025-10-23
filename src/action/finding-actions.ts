@@ -2,19 +2,41 @@
 
 import { db } from "@/drizzle/db";
 import { findings, actions, dofs } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
 import { eq, and, not, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import type { ActionResponse, User, Finding } from "@/lib/types";
+import { 
+  withAuth, 
+  requireAdmin,
+  requireCreatorOrAdmin,
+  createNotFoundError,
+  createPermissionError,
+  createValidationError,
+  revalidateFindingPaths,
+} from "@/lib/helpers";
 import { checkAuditCompletionStatus } from "./audit-actions";
-
-// Response Types
-type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
 
 /**
  * FR-001: Denetçi, Bulgu Oluşturabilir
- * Yeni bir bulgu oluşturur ve isteğe bağlı olarak Süreç Sahibine atar
+ * 
+ * Yeni bir bulgu oluşturur ve isteğe bağlı olarak Süreç Sahibine atar.
+ * 
+ * @param data - Bulgu bilgileri
+ * @param data.auditId - Denetim ID
+ * @param data.details - Bulgu detayları
+ * @param data.riskType - Risk seviyesi (optional)
+ * @param data.assignedToId - Atanacak kullanıcı ID (optional)
+ * @returns ActionResponse with finding ID
+ * @throws Error if user is not an auditor/admin
+ * 
+ * @example
+ * ```ts
+ * const result = await createFinding({
+ *   auditId: '123',
+ *   details: 'Uygunsuzluk tespit edildi',
+ *   riskType: 'High',
+ *   assignedToId: 'user-456'
+ * });
+ * ```
  */
 export async function createFinding(data: {
   auditId: string;
@@ -22,16 +44,9 @@ export async function createFinding(data: {
   riskType?: string;
   assignedToId?: string;
 }): Promise<ActionResponse<{ id: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Sadece Denetçi veya Admin bulgu oluşturabilir
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      // TODO: Denetçi rolü eklendiğinde kontrol et
-      return { success: false, error: "Only auditors can create findings" };
+  return withAuth<{ id: string }>(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError<{ id: string }>("Only auditors can create findings");
     }
 
     const [finding] = await db
@@ -46,38 +61,41 @@ export async function createFinding(data: {
       })
       .returning({ id: findings.id });
 
-    revalidatePath("/findings");
+    revalidateFindingPaths({ list: true });
     return { success: true, data: { id: finding!.id } };
-  } catch (error) {
-    console.error("Error creating finding:", error);
-    return { success: false, error: "Failed to create finding" };
-  }
+  });
 }
 
 /**
  * FR-002: Denetçi, Bulguyu Süreç Sahibine Atayabilir
+ * 
+ * Bulguyu belirtilen süreç sahibine atar ve durumunu günceller.
+ * 
+ * @param findingId - Bulgu ID
+ * @param assignedToId - Atanacak kullanıcı ID
+ * @returns ActionResponse
+ * @throws Error if finding not found or user lacks permission
+ * 
+ * @example
+ * ```ts
+ * await assignFinding('finding-123', 'user-456');
+ * ```
  */
 export async function assignFinding(
   findingId: string,
   assignedToId: string
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Sadece Denetçi veya bulguyu oluşturan kişi atayabilir
+  return withAuth(async (user: User) => {
     const finding = await db.query.findings.findFirst({
       where: eq(findings.id, findingId),
     });
 
     if (!finding) {
-      return { success: false, error: "Finding not found" };
+      return createNotFoundError("Finding");
     }
 
-    if (finding.createdById !== user.id && user.role !== "admin") {
-      return { success: false, error: "Permission denied" };
+    if (!requireCreatorOrAdmin(user, finding.createdById!)) {
+      return createPermissionError("Permission denied");
     }
 
     await db
@@ -89,40 +107,41 @@ export async function assignFinding(
       })
       .where(eq(findings.id, findingId));
 
-    revalidatePath("/findings");
+    revalidateFindingPaths({ list: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error assigning finding:", error);
-    return { success: false, error: "Failed to assign finding" };
-  }
+  });
 }
 
 /**
- * FR-005: Süreç Sahibi, Tüm Alt Görevler Tamamlandığında Bulguyu Denetçi Onayına Gönderir
+ * FR-005: Süreç Sahibi, Bulguyu Denetçi Onayına Gönderir
+ * 
+ * Tüm aksiyonlar tamamlandığında bulguyu kapatma için denetçi onayına gönderir.
+ * 
+ * @param findingId - Bulgu ID
+ * @returns ActionResponse
+ * @throws Error if finding not found, incomplete actions exist, or user lacks permission
+ * 
+ * @example
+ * ```ts
+ * await submitFindingForClosure('finding-123');
+ * ```
  */
 export async function submitFindingForClosure(
   findingId: string
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Bulgunun Süreç Sahibi olup olmadığını kontrol et
+  return withAuth(async (user: User) => {
     const finding = await db.query.findings.findFirst({
       where: eq(findings.id, findingId),
     });
 
     if (!finding) {
-      return { success: false, error: "Finding not found" };
+      return createNotFoundError("Finding");
     }
 
     if (finding.assignedToId !== user.id && user.role !== "admin") {
-      return { success: false, error: "Only process owner can submit for closure" };
+      return createPermissionError("Only process owner can submit for closure");
     }
 
-    // Tüm alt görevlerin (actions + dofs) tamamlandığını kontrol et
     const [actionsCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(actions)
@@ -146,10 +165,9 @@ export async function submitFindingForClosure(
     const pendingTasks = (actionsCount?.count || 0) + (dofsCount?.count || 0);
 
     if (pendingTasks > 0) {
-      return {
-        success: false,
-        error: `${pendingTasks} alt görev henüz tamamlanmadı. Tüm aksiyonlar ve DÖF'ler tamamlanmalıdır.`
-      };
+      return createValidationError(
+        `${pendingTasks} alt görev henüz tamamlanmadı. Tüm aksiyonlar ve DÖF'ler tamamlanmalıdır.`
+      );
     }
 
     await db
@@ -160,12 +178,9 @@ export async function submitFindingForClosure(
       })
       .where(eq(findings.id, findingId));
 
-    revalidatePath("/findings");
+    revalidateFindingPaths({ list: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error submitting finding for closure:", error);
-    return { success: false, error: "Failed to submit finding" };
-  }
+  });
 }
 
 /**
@@ -174,15 +189,9 @@ export async function submitFindingForClosure(
 export async function closeFinding(
   findingId: string
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Sadece Denetçi veya Admin kapatabilir
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only auditors can close findings" };
+  return withAuth(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError("Only auditors can close findings");
     }
 
     const finding = await db.query.findings.findFirst({
@@ -190,14 +199,11 @@ export async function closeFinding(
     });
 
     if (!finding) {
-      return { success: false, error: "Finding not found" };
+      return createNotFoundError("Finding");
     }
 
     if (finding.status !== "PendingAuditorClosure") {
-      return { 
-        success: false, 
-        error: "Finding must be submitted for closure first" 
-      };
+      return createValidationError("Finding must be submitted for closure first");
     }
 
     await db
@@ -208,17 +214,13 @@ export async function closeFinding(
       })
       .where(eq(findings.id, findingId));
 
-    // Denetim otomatik kontrolü - tüm bulgular tamamlandıysa PendingClosure'a al
     if (finding.auditId) {
       await checkAuditCompletionStatus(finding.auditId);
     }
 
-    revalidatePath("/findings");
+    revalidateFindingPaths({ list: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error closing finding:", error);
-    return { success: false, error: "Failed to close finding" };
-  }
+  });
 }
 
 /**
@@ -228,47 +230,32 @@ export async function rejectFinding(
   findingId: string,
   reason?: string
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Sadece Denetçi veya Admin reddedebilir
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only auditors can reject findings" };
+  return withAuth(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError("Only auditors can reject findings");
     }
 
     await db
       .update(findings)
       .set({
         status: "Rejected",
+        rejectionReason: reason || null,
         updatedAt: new Date(),
-        // TODO: Ret nedeni için ayrı bir alan eklenebilir
       })
       .where(eq(findings.id, findingId));
 
-    revalidatePath("/findings");
+    revalidateFindingPaths({ list: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error rejecting finding:", error);
-    return { success: false, error: "Failed to reject finding" };
-  }
+  });
 }
 
 /**
  * Bulgu listesini getir (Kullanıcı rolüne göre filtrelenmiş)
  */
 export async function getFindings() {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Admin tüm bulguları görebilir
+  const result = await withAuth(async (user: User) => {
     if (user.role === "admin" || user.role === "superAdmin") {
-      return await db.query.findings.findMany({
+      const data = await db.query.findings.findMany({
         with: {
           audit: true,
           assignedTo: {
@@ -288,10 +275,10 @@ export async function getFindings() {
         },
         orderBy: (findings, { desc }) => [desc(findings.createdAt)],
       });
+      return { success: true, data };
     }
 
-    // Kullanıcı sadece kendine atanan bulguları görebilir
-    return await db.query.findings.findMany({
+    const data = await db.query.findings.findMany({
       where: eq(findings.assignedToId, user.id),
       with: {
         audit: true,
@@ -312,10 +299,14 @@ export async function getFindings() {
       },
       orderBy: (findings, { desc }) => [desc(findings.createdAt)],
     });
-  } catch (error) {
-    console.error("Error fetching findings:", error);
-    throw error;
+    return { success: true, data };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }
 
 /**
@@ -329,27 +320,19 @@ export async function updateFinding(
     assignedToId?: string;
   }
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Bulguyu kontrol et
+  return withAuth(async (user: User) => {
     const finding = await db.query.findings.findFirst({
       where: eq(findings.id, findingId),
     });
 
     if (!finding) {
-      return { success: false, error: "Finding not found" };
+      return createNotFoundError("Finding");
     }
 
-    // Yetki kontrolü: Sadece oluşturan veya admin düzenleyebilir
-    if (finding.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Permission denied" };
+    if (!requireCreatorOrAdmin(user, finding.createdById!)) {
+      return createPermissionError("Permission denied");
     }
 
-    // Güncelleme yap
     const updateData: any = {
       updatedAt: new Date(),
     };
@@ -364,7 +347,6 @@ export async function updateFinding(
 
     if (data.assignedToId !== undefined) {
       updateData.assignedToId = data.assignedToId;
-      // Eğer atama yapılıyorsa status'u güncelle
       if (data.assignedToId && finding.status === "New") {
         updateData.status = "Assigned";
       }
@@ -375,25 +357,16 @@ export async function updateFinding(
       .set(updateData)
       .where(eq(findings.id, findingId));
 
-    revalidatePath("/denetim/findings");
-    revalidatePath(`/denetim/findings/${findingId}`);
+    revalidateFindingPaths({ list: true, specific: findingId });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error updating finding:", error);
-    return { success: false, error: "Failed to update finding" };
-  }
+  });
 }
 
 /**
  * Tek bir bulguyu ID ile getir
  */
 export async function getFindingById(findingId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
+  const result = await withAuth(async (user: User) => {
     const finding = await db.query.findings.findFirst({
       where: eq(findings.id, findingId),
       with: {
@@ -419,7 +392,6 @@ export async function getFindingById(findingId: string) {
       throw new Error("Finding not found");
     }
 
-    // Yetki kontrolü
     if (
       user.role !== "admin" &&
       user.role !== "superAdmin" &&
@@ -429,9 +401,12 @@ export async function getFindingById(findingId: string) {
       throw new Error("Permission denied");
     }
 
-    return finding;
-  } catch (error) {
-    console.error("Error fetching finding:", error);
-    throw error;
+    return { success: true, data: finding };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }

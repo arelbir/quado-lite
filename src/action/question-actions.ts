@@ -2,13 +2,15 @@
 
 import { db } from "@/drizzle/db";
 import { questions } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
-import { eq, and, isNull } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-
-type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
+import { eq } from "drizzle-orm";
+import type { ActionResponse, User } from "@/lib/types";
+import { 
+  withAuth, 
+  requireAdmin,
+  createPermissionError,
+  createNotFoundError,
+  revalidateAuditPaths,
+} from "@/lib/helpers";
 
 /**
  * Soru oluştur
@@ -18,21 +20,15 @@ export async function createQuestion(data: {
   questionText: string;
   questionType: "YesNo" | "Scale" | "Text" | "SingleChoice" | "Checklist";
   helpText?: string;
-  checklistOptions?: string[]; // Array olarak gelecek
+  checklistOptions?: string[];
   isMandatory?: boolean;
   orderIndex?: string;
 }): Promise<ActionResponse<{ id: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
+  return withAuth<{ id: string }>(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError<{ id: string }>("Only admins can create questions");
     }
 
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can create questions" };
-    }
-
-    // Checklist options'ı JSON string'e çevir
     const checklistOptionsJson = data.checklistOptions
       ? JSON.stringify(data.checklistOptions)
       : null;
@@ -51,12 +47,9 @@ export async function createQuestion(data: {
       })
       .returning({ id: questions.id });
 
-    revalidatePath(`/denetim/question-banks/${data.bankId}`);
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: { id: question!.id } };
-  } catch (error) {
-    console.error("Error creating question:", error);
-    return { success: false, error: "Failed to create question" };
-  }
+  });
 }
 
 /**
@@ -73,14 +66,9 @@ export async function updateQuestion(
     orderIndex?: string;
   }
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can update questions" };
+  return withAuth(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError("Only admins can update questions");
     }
 
     const checklistOptionsJson = data.checklistOptions
@@ -96,26 +84,18 @@ export async function updateQuestion(
       })
       .where(eq(questions.id, questionId));
 
-    revalidatePath("/denetim/question-banks");
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error updating question:", error);
-    return { success: false, error: "Failed to update question" };
-  }
+  });
 }
 
 /**
  * Soruyu sil (soft delete)
  */
 export async function deleteQuestion(questionId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can delete questions" };
+  return withAuth(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError("Only admins can delete questions");
     }
 
     await db
@@ -125,24 +105,16 @@ export async function deleteQuestion(questionId: string): Promise<ActionResponse
       })
       .where(eq(questions.id, questionId));
 
-    revalidatePath("/denetim/question-banks");
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error deleting question:", error);
-    return { success: false, error: "Failed to delete question" };
-  }
+  });
 }
 
 /**
  * Tek bir soruyu getir (düzenleme için)
  */
 export async function getQuestionById(questionId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
+  const result = await withAuth(async () => {
     const question = await db.query.questions.findFirst({
       where: eq(questions.id, questionId),
       with: {
@@ -162,20 +134,25 @@ export async function getQuestionById(questionId: string) {
     });
 
     if (!question) {
-      return null;
+      return { success: true, data: null };
     }
 
-    // checklistOptions'ı parse et
     return {
-      ...question,
-      checklistOptions: question.checklistOptions
-        ? JSON.parse(question.checklistOptions)
-        : null,
+      success: true,
+      data: {
+        ...question,
+        checklistOptions: question.checklistOptions
+          ? JSON.parse(question.checklistOptions)
+          : null,
+      },
     };
-  } catch (error) {
-    console.error("Error fetching question:", error);
-    throw error;
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }
 
 /**
@@ -184,28 +161,21 @@ export async function getQuestionById(questionId: string) {
 export async function copyQuestion(data: {
   questionId: string;
   targetBankId: string;
-  duplicate?: boolean; // Aynı havuzda türetme mi?
+  duplicate?: boolean;
 }): Promise<ActionResponse<{ id: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
+  return withAuth<{ id: string }>(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError<{ id: string }>("Only admins can copy questions");
     }
 
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can copy questions" };
-    }
-
-    // Orijinal soruyu getir
     const originalQuestion = await db.query.questions.findFirst({
       where: eq(questions.id, data.questionId),
     });
 
     if (!originalQuestion) {
-      return { success: false, error: "Question not found" };
+      return createNotFoundError<{ id: string }>("Question");
     }
 
-    // Yeni soruyu oluştur
     const questionText = data.duplicate 
       ? `${originalQuestion.questionText} (Kopya)`
       : originalQuestion.questionText;
@@ -219,17 +189,14 @@ export async function copyQuestion(data: {
         helpText: originalQuestion.helpText,
         checklistOptions: originalQuestion.checklistOptions,
         isMandatory: originalQuestion.isMandatory,
-        orderIndex: "999", // En sona ekle
+        orderIndex: "999",
         createdById: user.id,
       })
       .returning({ id: questions.id });
 
-    revalidatePath(`/denetim/question-banks/${data.targetBankId}`);
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: { id: newQuestion!.id } };
-  } catch (error) {
-    console.error("Error copying question:", error);
-    return { success: false, error: "Failed to copy question" };
-  }
+  });
 }
 
 /**
@@ -238,17 +205,11 @@ export async function copyQuestion(data: {
 export async function updateQuestionOrder(
   updates: Array<{ id: string; orderIndex: string }>
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
+  return withAuth(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError("Only admins can reorder questions");
     }
 
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can reorder questions" };
-    }
-
-    // Her soruyu ayrı ayrı güncelle
     for (const update of updates) {
       await db
         .update(questions)
@@ -259,10 +220,7 @@ export async function updateQuestionOrder(
         .where(eq(questions.id, update.id));
     }
 
-    revalidatePath("/denetim/question-banks");
+    revalidateAuditPaths({ plans: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error updating question order:", error);
-    return { success: false, error: "Failed to update question order" };
-  }
+  });
 }

@@ -1,14 +1,182 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { auditPlans, audits, auditQuestions, questions } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
-import { eq, and, isNull, lte, gte } from "drizzle-orm";
+import { auditPlans, audits, auditQuestions, questions, auditTemplates } from "@/drizzle/schema";
+import { eq, and, isNull, lte, gte, inArray, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import type { ActionResponse, User, Plan } from "@/lib/types";
+import { 
+  withAuth, 
+  requireCreatorOrAdmin, 
+  createActionError,
+  revalidateAuditPaths,
+} from "@/lib/helpers";
 
-type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
+// ============================================
+// HELPER FUNCTIONS - LOCAL (Plan-specific)
+// ============================================
+
+/**
+ * HELPER: Plan getir ve validate et
+ */
+async function getPlanWithValidation(
+  planId: string,
+  options?: {
+    requirePending?: boolean;
+    requireNotCreated?: boolean;
+    withTemplate?: boolean;
+  }
+): Promise<{ plan: Plan } | { error: string }> {
+  const plan = await db.query.auditPlans.findFirst({
+    where: eq(auditPlans.id, planId),
+    with: options?.withTemplate ? { template: true } : undefined,
+  });
+
+  if (!plan) {
+    return { error: "Plan not found" as string };
+  }
+
+  if (options?.requirePending && plan.status !== "Pending") {
+    return { error: "Only pending plans can be modified" as string };
+  }
+
+  if (options?.requireNotCreated && plan.status === "Created") {
+    return { error: "Plans with created audits cannot be modified" as string };
+  }
+
+  return { plan };
+}
+
+/**
+ * HELPER: Recurring plan için bir sonraki tarihi hesapla
+ */
+function calculateNextScheduledDate(
+  date: Date,
+  type?: "None" | "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly",
+  interval: number = 1
+): Date | null {
+  if (!type || type === "None") return null;
+  
+  const nextDate = new Date(date);
+  switch (type) {
+    case "Daily":
+      nextDate.setDate(nextDate.getDate() + interval);
+      break;
+    case "Weekly":
+      nextDate.setDate(nextDate.getDate() + (7 * interval));
+      break;
+    case "Monthly":
+      nextDate.setMonth(nextDate.getMonth() + interval);
+      break;
+    case "Quarterly":
+      nextDate.setMonth(nextDate.getMonth() + (3 * interval));
+      break;
+    case "Yearly":
+      nextDate.setFullYear(nextDate.getFullYear() + interval);
+      break;
+  }
+  return nextDate;
+}
+
+/**
+ * HELPER: Plan status güncelle
+ */
+async function updatePlanStatus(
+  planId: string,
+  status: "Pending" | "Created" | "Cancelled",
+  auditId?: string
+): Promise<void> {
+  await db
+    .update(auditPlans)
+    .set({
+      status,
+      ...(auditId && { createdAuditId: auditId }),
+      updatedAt: new Date(),
+    })
+    .where(eq(auditPlans.id, planId));
+}
+
+/**
+ * HELPER: Audit oluştur ve soruları yükle
+ */
+async function createAuditFromPlan(plan: {
+  title: string;
+  description?: string | null;
+  auditDate: Date;
+  createdById: string;
+  templateId?: string | null;
+}): Promise<{ auditId: string }> {
+  // 1. Audit oluştur
+  const [audit] = await db
+    .insert(audits)
+    .values({
+      title: plan.title,
+      description: plan.description,
+      auditDate: plan.auditDate,
+      createdById: plan.createdById,
+    })
+    .returning({ id: audits.id });
+
+  // 2. Template varsa soruları yükle
+  if (plan.templateId) {
+    await loadQuestionsFromTemplate(audit!.id, plan.templateId);
+  }
+
+  return { auditId: audit!.id };
+}
+
+/**
+ * HELPER: Template'ten soruları yükle ve audit'e ekle
+ * DRY: startAdhocAudit, startPlanManually, createScheduledAudits tarafından kullanılır
+ */
+async function loadQuestionsFromTemplate(
+  auditId: string, 
+  templateId: string
+): Promise<{ success: boolean; questionCount: number }> {
+  try {
+    // 1. Template'i getir
+    const template = await db.query.auditTemplates.findFirst({
+      where: eq(auditTemplates.id, templateId),
+    });
+
+    if (!template || !template.questionBankIds) {
+      return { success: false, questionCount: 0 };
+    }
+
+    // 2. Question bank IDs parse et
+    const bankIds = JSON.parse(template.questionBankIds) as string[];
+    
+    if (bankIds.length === 0) {
+      return { success: true, questionCount: 0 };
+    }
+
+    // 3. Her bank'ten soruları çek (aktif ve silinmemiş)
+    const allQuestions = await db.query.questions.findMany({
+      where: and(
+        inArray(questions.bankId, bankIds),
+        isNull(questions.deletedAt)
+      ),
+      orderBy: [asc(questions.orderIndex)],
+    });
+
+    // 4. Soruları audit_questions tablosuna ekle
+    if (allQuestions.length > 0) {
+      await db.insert(auditQuestions).values(
+        allQuestions.map((q) => ({
+          auditId,
+          questionId: q.id,
+          response: null,
+          notes: null,
+        }))
+      );
+    }
+
+    return { success: true, questionCount: allQuestions.length };
+  } catch (error) {
+    console.error("Error loading questions from template:", error);
+    return { success: false, questionCount: 0 };
+  }
+}
 
 /**
  * Planlı denetim planı oluştur (tarih belirtilir)
@@ -18,17 +186,12 @@ export async function createScheduledPlan(data: {
   description?: string;
   templateId: string;
   scheduledDate: Date;
+  auditorId?: string;
+  recurrenceType?: "None" | "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
+  recurrenceInterval?: number;
+  maxOccurrences?: number;
 }): Promise<ActionResponse<{ id: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can create plans" };
-    }
-
+  return withAuth(async (user) => {
     const [plan] = await db
       .insert(auditPlans)
       .values({
@@ -37,17 +200,25 @@ export async function createScheduledPlan(data: {
         scheduleType: "Scheduled",
         status: "Pending",
         templateId: data.templateId,
+        auditorId: data.auditorId,
         scheduledDate: data.scheduledDate,
+        recurrenceType: data.recurrenceType || "None",
+        recurrenceInterval: data.recurrenceInterval || 1,
+        nextScheduledDate: calculateNextScheduledDate(
+          data.scheduledDate, 
+          data.recurrenceType, 
+          data.recurrenceInterval
+        ),
+        maxOccurrences: data.maxOccurrences,
+        occurrenceCount: 0,
         createdById: user.id,
       })
       .returning({ id: auditPlans.id });
 
-    revalidatePath("/denetim/plans");
+    revalidateAuditPaths({ plans: true });
+    
     return { success: true, data: { id: plan!.id } };
-  } catch (error) {
-    console.error("Error creating scheduled plan:", error);
-    return { success: false, error: "Failed to create scheduled plan" };
-  }
+  }, { requireAdmin: true });
 }
 
 /**
@@ -59,59 +230,15 @@ export async function startAdhocAudit(data: {
   templateId: string;
   auditDate?: Date;
 }): Promise<ActionResponse<{ auditId: string; planId: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only auditors can start audits" };
-    }
-
-    // 1. Şablonu getir
-    const template = await db.query.auditTemplates.findFirst({
-      where: eq(audits.id, data.templateId),
+  return withAuth(async (user) => {
+    const { auditId } = await createAuditFromPlan({
+      title: data.title,
+      description: data.description,
+      auditDate: data.auditDate || new Date(),
+      createdById: user.id,
+      templateId: data.templateId,
     });
 
-    if (!template) {
-      return { success: false, error: "Template not found" };
-    }
-
-    const questionBankIds = JSON.parse(template.questionBankIds) as string[];
-
-    // 2. Denetim oluştur
-    const [audit] = await db
-      .insert(audits)
-      .values({
-        title: data.title,
-        description: data.description,
-        auditDate: data.auditDate || new Date(),
-        createdById: user.id,
-      })
-      .returning({ id: audits.id });
-
-    // 3. Şablondaki soru havuzlarından soruları çek ve denetim'e ekle
-    const allQuestions = await db.query.questions.findMany({
-      where: (questions, { inArray, and, isNull }) =>
-        and(
-          inArray(questions.bankId, questionBankIds),
-          isNull(questions.deletedAt)
-        ),
-      orderBy: (questions, { asc }) => [asc(questions.orderIndex)],
-    });
-
-    // 4. Soruları audit_questions tablosuna ekle
-    if (allQuestions.length > 0) {
-      await db.insert(auditQuestions).values(
-        allQuestions.map((q) => ({
-          auditId: audit!.id,
-          questionId: q.id,
-        }))
-      );
-    }
-
-    // 5. Plan kaydı oluştur
     const [plan] = await db
       .insert(auditPlans)
       .values({
@@ -120,24 +247,21 @@ export async function startAdhocAudit(data: {
         scheduleType: "Adhoc",
         status: "Created",
         templateId: data.templateId,
-        createdAuditId: audit!.id,
+        createdAuditId: auditId,
         createdById: user.id,
       })
       .returning({ id: auditPlans.id });
 
-    revalidatePath("/denetim/audits");
-    revalidatePath("/denetim/plans");
+    revalidateAuditPaths({ audits: true, plans: true });
+    
     return {
       success: true,
       data: {
-        auditId: audit!.id,
+        auditId,
         planId: plan!.id,
       },
     };
-  } catch (error) {
-    console.error("Error starting adhoc audit:", error);
-    return { success: false, error: "Failed to start adhoc audit" };
-  }
+  }, { requireAdmin: true });
 }
 
 /**
@@ -169,54 +293,23 @@ export async function createScheduledAudits(): Promise<ActionResponse<{ created:
     let createdCount = 0;
 
     for (const plan of pendingPlans) {
-      if (!plan.template) continue;
-
-      const questionBankIds = JSON.parse(plan.template.questionBankIds) as string[];
-
-      // Denetim oluştur
-      const [audit] = await db
-        .insert(audits)
-        .values({
-          title: plan.title,
-          description: plan.description,
-          auditDate: plan.scheduledDate,
-          createdById: plan.createdById,
-        })
-        .returning({ id: audits.id });
-
-      // Soruları çek ve ekle
-      const allQuestions = await db.query.questions.findMany({
-        where: (questions, { inArray, and, isNull }) =>
-          and(
-            inArray(questions.bankId, questionBankIds),
-            isNull(questions.deletedAt)
-          ),
+      // DRY: Audit oluştur ve soruları yükle
+      const { auditId } = await createAuditFromPlan({
+        title: plan.title,
+        description: plan.description,
+        auditDate: plan.scheduledDate || new Date(),
+        createdById: plan.createdById!,
+        templateId: plan.templateId,
       });
 
-      if (allQuestions.length > 0) {
-        await db.insert(auditQuestions).values(
-          allQuestions.map((q) => ({
-            auditId: audit!.id,
-            questionId: q.id,
-          }))
-        );
-      }
-
-      // Plan durumunu güncelle
-      await db
-        .update(auditPlans)
-        .set({
-          status: "Created",
-          createdAuditId: audit!.id,
-          updatedAt: new Date(),
-        })
-        .where(eq(auditPlans.id, plan.id));
+      // DRY: Plan durumunu güncelle
+      await updatePlanStatus(plan.id, "Created", auditId);
 
       createdCount++;
     }
 
-    revalidatePath("/denetim/audits");
-    revalidatePath("/denetim/plans");
+    // DRY: Revalidate paths
+    revalidateAuditPaths({ audits: true, plans: true });
     
     return { success: true, data: { created: createdCount } };
   } catch (error) {
@@ -227,14 +320,10 @@ export async function createScheduledAudits(): Promise<ActionResponse<{ created:
 
 /**
  * Tüm planları listele
+ * Note: Bu fonksiyon ActionResponse yerine direkt data döndürüyor (eski API uyumluluğu için)
  */
 export async function getAuditPlans() {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
+  const user = await withAuth(async (user) => {
     const plans = await db.query.auditPlans.findMany({
       where: isNull(auditPlans.deletedAt),
       with: {
@@ -261,39 +350,118 @@ export async function getAuditPlans() {
       orderBy: (auditPlans, { desc }) => [desc(auditPlans.createdAt)],
     });
 
-    return plans;
-  } catch (error) {
-    console.error("Error fetching audit plans:", error);
-    throw error;
+    return { success: true, data: plans };
+  });
+
+  if (!user.success) {
+    throw new Error(user.error);
   }
+
+  return user.data;
 }
 
 /**
  * Planı iptal et
  */
 export async function cancelAuditPlan(planId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
+  return withAuth(async () => {
+    await updatePlanStatus(planId, "Cancelled");
+    revalidateAuditPaths({ plans: true, all: true });
+    return { success: true, data: undefined };
+  }, { requireAdmin: true });
+}
+
+/**
+ * Planı manuel olarak başlat (vaktinden önce)
+ */
+export async function startPlanManually(planId: string): Promise<ActionResponse<{ auditId: string }>> {
+  return withAuth(async (user) => {
+    const planResult = await getPlanWithValidation(planId, { requirePending: true });
+    if ('error' in planResult) {
+      return { success: false, error: planResult.error };
+    }
+    const { plan } = planResult;
+
+    if (!requireCreatorOrAdmin(user, plan.createdById!)) {
+      return { success: false, error: "Only plan creator or admin can start manually" };
     }
 
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only admins can cancel plans" };
+    const { auditId } = await createAuditFromPlan({
+      title: plan.title,
+      description: plan.description,
+      auditDate: new Date(),
+      createdById: user.id,
+      templateId: plan.templateId,
+    });
+
+    await updatePlanStatus(planId, "Created", auditId);
+    revalidateAuditPaths({ plans: true, all: true, audits: true });
+
+    return { success: true, data: { auditId } };
+  });
+}
+
+/**
+ * Planı güncelle
+ */
+export async function updateAuditPlan(
+  planId: string,
+  data: {
+    title?: string;
+    description?: string;
+    scheduledDate?: Date;
+    templateId?: string;
+  }
+): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    const planResult = await getPlanWithValidation(planId, { requirePending: true });
+    if ('error' in planResult) {
+      return { success: false, error: planResult.error };
+    }
+    const { plan } = planResult;
+
+    if (!requireCreatorOrAdmin(user, plan.createdById!)) {
+      return { success: false, error: "Only plan creator or admin can update" };
     }
 
     await db
       .update(auditPlans)
       .set({
-        status: "Cancelled",
+        ...data,
         updatedAt: new Date(),
       })
       .where(eq(auditPlans.id, planId));
 
-    revalidatePath("/denetim/plans");
+    revalidateAuditPaths({ plans: true, all: true, specificPlan: planId });
+
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error cancelling audit plan:", error);
-    return { success: false, error: "Failed to cancel audit plan" };
-  }
+  });
+}
+
+/**
+ * Planı sil (soft delete)
+ */
+export async function deletePlan(planId: string): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    const planResult = await getPlanWithValidation(planId, { requireNotCreated: true });
+    if ('error' in planResult) {
+      return { success: false, error: planResult.error };
+    }
+    const { plan } = planResult;
+
+    if (!requireCreatorOrAdmin(user, plan.createdById!)) {
+      return { success: false, error: "Only plan creator or admin can delete" };
+    }
+
+    await db
+      .update(auditPlans)
+      .set({
+        deletedAt: new Date(),
+      })
+      .where(eq(auditPlans.id, planId));
+
+    revalidateAuditPaths({ plans: true, all: true });
+
+    return { success: true, data: undefined };
+  });
 }

@@ -1,0 +1,45 @@
+{
+  "menu": {
+    "dashboard": "Kontrol Paneli",
+    "tasks": "Görevler",
+    "settings": "Ayarlar",
+    "system": "Sistem",
+    "systemUsers": "Kullanıcılar",
+    "systemMenus": "Menüler",
+    "auditSystem": "Denetim Sistemi",
+    "myTasks": "Görevlerim",
+    "myAudits": "Denetimlerim",
+    "allAudits": "Denetimler & Planlar",
+    "operations": "Takip ve Yönetim",
+    "findings": "Bulgular",
+    "actions": "Aksiyonlar",
+    "dofs": "DÖF'ler",
+    "closures": "Kapanış Onayı",
+    "infrastructure": "Altyapı Tanımları",
+    "questionBanks": "Soru Havuzu",
+    "templates": "Şablonlar",
+    "errorPages": "Hata Sayfaları",
+    "error404": "404",
+    "error500": "500"
+  },
+  "breadcrumb": {
+    "home": "Ana Sayfa",
+    "audits": "Denetimler",
+    "findings": "Bulgular",
+    "actions": "Aksiyonlar",
+    "dofs": "DÖF",
+    "details": "Detaylar",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "reports": "Raporlar"
+  },
+  "tabs": {
+    "overview": "Genel Bakış",
+    "details": "Detaylar",
+    "findings": "Bulgular",
+    "actions": "Aksiyonlar",
+    "timeline": "Zaman Çizelgesi",
+    "documents": "Dökümanlar",
+    "history": "Geçmiş"
+  }
+}

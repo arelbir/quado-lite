@@ -3,7 +3,7 @@ import { questionBanks, questions, auditTemplates } from "@/drizzle/schema";
 
 const superAdminId = process.env.SUPER_ADMIN_UUID as string;
 
-async function runSeed() {
+export async function seedQuestionBanks() {
   console.log("🌱 Seeding question bank data...");
 
   try {
@@ -175,9 +175,25 @@ async function runSeed() {
         orderIndex: "4",
         createdById: superAdminId,
       },
+      {
+        bankId: cevreBank!.id,
+        questionText: "Atık bertaraf yöntemi nedir?",
+        questionType: "SingleChoice",
+        checklistOptions: JSON.stringify([
+          "Geri dönüşüm",
+          "Yakma",
+          "Düzenli depolama",
+          "Kompost",
+          "Tehlikeli atık tesisi",
+        ]),
+        helpText: "Tek seçenek işaretleyiniz",
+        isMandatory: true,
+        orderIndex: "5",
+        createdById: superAdminId,
+      },
     ]);
 
-    console.log("   ✅ Created 14 questions (5 Kalite + 5 İSG + 4 Çevre)");
+    console.log("   ✅ Created 15 questions (5 Kalite + 5 İSG + 5 Çevre)");
 
     // 5. Denetim Şablonları
     console.log("📑 Creating audit templates...");
@@ -214,17 +230,12 @@ async function runSeed() {
 
     console.log("   ✅ Created 3 audit templates");
 
-    console.log("\n✅ Question bank seed completed!");
-    console.log("\n📊 Summary:");
+    console.log("✅ Question bank seed completed!");
     console.log("   - 3 Question Banks");
-    console.log("   - 14 Questions");
+    console.log("   - 15 Questions (YesNo, Scale, SingleChoice, Checklist)");
     console.log("   - 3 Audit Templates");
-
-    process.exit(0);
   } catch (error) {
     console.error("❌ Seed failed:", error);
-    process.exit(1);
+    throw error;
   }
 }
-
-runSeed();
