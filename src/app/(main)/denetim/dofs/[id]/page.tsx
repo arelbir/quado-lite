@@ -10,6 +10,8 @@ import Link from "next/link";
 import { DofProgressBar } from "@/components/dof/dof-progress-bar";
 import { DofWizardContent } from "@/components/dof/dof-wizard-content";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
   params: { id: string };
@@ -29,7 +31,13 @@ const stepMap: Record<string, number> = {
 };
 
 export default async function DofDetailPage({ params }: PageProps) {
-  const t = await getTranslations('dof');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'dof' });
   const dof = await db.query.dofs.findFirst({
     where: eq(dofs.id, params.id),
     with: {

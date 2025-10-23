@@ -1,0 +1,29 @@
+{
+  "types": {
+    "yesNo": "Yes/No",
+    "scale": "1-5 Scale",
+    "text": "Text",
+    "singleChoice": "Single Choice",
+    "checklist": "Multiple Choice"
+  },
+  "fields": {
+    "questionText": "Question Text",
+    "questionType": "Question Type",
+    "helpText": "Help Text",
+    "isRequired": "Required",
+    "weight": "Weight",
+    "options": "Options"
+  },
+  "placeholders": {
+    "enterQuestion": "Enter question text",
+    "selectType": "Select question type",
+    "helpTextOptional": "Hint for auditor (optional)",
+    "enterOption": "Enter option"
+  },
+  "actions": {
+    "addOption": "Add Option",
+    "removeOption": "Remove",
+    "createQuestion": "Create Question",
+    "updateQuestion": "Update Question"
+  }
+}

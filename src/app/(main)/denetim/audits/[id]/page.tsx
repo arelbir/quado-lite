@@ -19,6 +19,8 @@ import { AuditReportButton } from "@/components/audit/audit-report-button";
 import { AddQuestionDialog } from "@/components/audit/add-question-dialog";
 import { getAuditStatusLabel, getAuditStatusColor } from "@/lib/constants/status-labels";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
   params: { id: string };
@@ -26,7 +28,13 @@ interface PageProps {
 }
 
 export default async function AuditDetailPage({ params, searchParams }: PageProps) {
-  const t = await getTranslations('audit');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'audit' });
   const loggedInUser = await currentUser();
   
   const audit = await db.query.audits.findFirst({

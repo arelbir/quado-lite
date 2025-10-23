@@ -28,6 +28,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2, Plus, X, CheckCircle2, BarChart3, FileText, Circle, CheckSquare } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 /**
  * Validation Schema (Conditional)
@@ -63,6 +64,7 @@ interface CreateQuestionFormProps {
  * Features: Dynamic options based on question type
  */
 export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
+  const t = useTranslations('questions');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [options, setOptions] = useState<string[]>([""]);
@@ -149,31 +151,31 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
                   <SelectItem value="YesNo">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4" />
-                      <span>Evet/Hayır</span>
+                      <span>{t('types.yesNo')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="Scale">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4" />
-                      <span>1-5 Ölçek</span>
+                      <span>{t('types.scale')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="Text">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      <span>Metin</span>
+                      <span>{t('types.text')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="SingleChoice">
                     <div className="flex items-center gap-2">
                       <Circle className="h-4 w-4" />
-                      <span>Tek Seçim</span>
+                      <span>{t('types.singleChoice')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="Checklist">
                     <div className="flex items-center gap-2">
                       <CheckSquare className="h-4 w-4" />
-                      <span>Çoklu Seçim</span>
+                      <span>{t('types.checklist')}</span>
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -210,10 +212,10 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
           name="helpText"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Yardımcı Metin</FormLabel>
+              <FormLabel>{t('fields.helpText')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Denetçiye ipucu (opsiyonel)"
+                  placeholder={t('placeholders.helpTextOptional')}
                   {...field}
                   disabled={isPending}
                 />

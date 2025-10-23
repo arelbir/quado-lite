@@ -1,0 +1,29 @@
+{
+  "types": {
+    "yesNo": "Evet/Hayır",
+    "scale": "1-5 Ölçek",
+    "text": "Metin",
+    "singleChoice": "Tek Seçim",
+    "checklist": "Çoklu Seçim"
+  },
+  "fields": {
+    "questionText": "Soru Metni",
+    "questionType": "Soru Tipi",
+    "helpText": "Yardımcı Metin",
+    "isRequired": "Zorunlu",
+    "weight": "Ağırlık",
+    "options": "Seçenekler"
+  },
+  "placeholders": {
+    "enterQuestion": "Soru metnini giriniz",
+    "selectType": "Soru tipini seçiniz",
+    "helpTextOptional": "Denetçiye ipucu (opsiyonel)",
+    "enterOption": "Seçenek giriniz"
+  },
+  "actions": {
+    "addOption": "Seçenek Ekle",
+    "removeOption": "Kaldır",
+    "createQuestion": "Soru Oluştur",
+    "updateQuestion": "Soruyu Güncelle"
+  }
+}

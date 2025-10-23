@@ -9,6 +9,8 @@ import { ArrowLeft, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { DeleteTemplateButton } from "@/components/templates/delete-template-button";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
   params: {
@@ -22,7 +24,13 @@ interface PageProps {
  * Features: Soru havuzlarını görüntüleme ve yönetme
  */
 export default async function TemplateDetailPage({ params }: PageProps) {
-  const t = await getTranslations('audit.common');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'audit.common' });
   const template = await db.query.auditTemplates.findFirst({
     where: and(
       eq(auditTemplates.id, params.id),

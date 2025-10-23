@@ -10,14 +10,22 @@ import { ArrowLeft, Plus, Clock, CheckCircle2, XCircle, Edit } from "lucide-reac
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
   params: { id: string };
 }
 
 export default async function FindingDetailPage({ params }: PageProps) {
-  const t = await getTranslations('finding');
-  const tCommon = await getTranslations('common');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   try {
     const finding = await getFindingById(params.id);
@@ -118,7 +126,13 @@ export default async function FindingDetailPage({ params }: PageProps) {
 }
 
 async function ActionsCard({ findingId }: { findingId: string }) {
-  const t = await getTranslations('finding');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
   const actions = await getActionsByFinding(findingId);
 
   const statusIcons: Record<string, any> = {
@@ -172,8 +186,14 @@ async function ActionsCard({ findingId }: { findingId: string }) {
 }
 
 async function DofsCard({ findingId }: { findingId: string }) {
-  const t = await getTranslations('finding');
-  const tDof = await getTranslations('dof');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
+  const tDof = await getTranslations({ locale, namespace: 'dof' });
   const dofs = await getDofsByFinding(findingId);
 
   return (
