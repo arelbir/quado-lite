@@ -47,7 +47,7 @@ const runAdmin = async () => {
 
   await db.transaction(async (tx) => {
     const userinfo = await tx.query.user.findFirst({
-      where: eq(user.email, "admin@test.com")
+      where: eq(user.email, "admin@example.com")
     })
     let uid = userinfo?.id
     if (!userinfo) {
@@ -55,8 +55,8 @@ const runAdmin = async () => {
 
       const start = Date.now()
       const insertUserResult = await tx.insert(user).values({
-        name: "admin",
-        email: "admin@test.com",
+        name: "Ahmet Yılmaz",
+        email: "admin@example.com",
         password: await bcrypt.hash("admin1234", 10),
         emailVerified: new Date(),
         createdById: process.env.SUPER_ADMIN_UUID,

@@ -1,15 +1,17 @@
 // Actions (Basit Aksiyonlar) - Kurumsal Denetim Sistemi
-import { pgTable, timestamp, text, uuid, pgEnum } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { user } from "./user";
+import { pgTable, uuid, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { findings } from "./finding";
+import { user } from "./user";
+import { relations } from "drizzle-orm";
+import { actionProgress } from "./action-progress";
 
 // Action Status Enum
 export const actionStatusEnum = pgEnum("action_status", [
   "Assigned",              // Sorumluya atandı
   "PendingManagerApproval", // Sorumlu tamamladı, Yönetici onayı bekliyor
   "Completed",             // Yönetici onayladı, kapandı
-  "Rejected"               // Yönetici reddetti, Sorumluya geri döndü
+  "Rejected",              // Yönetici reddetti, Sorumluya geri döndü (artık kullanılmıyor, döngü için Assigned'a dönüyor)
+  "Cancelled"              // İptal edildi, döngüden çıkış (Final state)
 ]);
 
 export const actions = pgTable("actions", {
@@ -30,7 +32,7 @@ export const actions = pgTable("actions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const actionsRelations = relations(actions, ({ one }) => ({
+export const actionsRelations = relations(actions, ({ one, many }) => ({
   finding: one(findings, {
     fields: [actions.findingId],
     references: [findings.id],
@@ -50,6 +52,7 @@ export const actionsRelations = relations(actions, ({ one }) => ({
     references: [user.id],
     relationName: 'action_creator',
   }),
+  progressNotes: many(actionProgress),
 }));
 
 export type ActionRecord = typeof actions.$inferSelect;

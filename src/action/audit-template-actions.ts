@@ -17,7 +17,7 @@ export async function createAuditTemplate(data: {
   name: string;
   description?: string;
   category: "Kalite" | "Çevre" | "İSG" | "Bilgi Güvenliği" | "Gıda Güvenliği" | "Diğer";
-  questionBankIds: string[]; // Array of bank IDs
+  questionBankIds?: string[]; // Optional - can be added later
   estimatedDurationMinutes?: string;
 }): Promise<ActionResponse<{ id: string }>> {
   try {
@@ -30,17 +30,13 @@ export async function createAuditTemplate(data: {
       return { success: false, error: "Only admins can create templates" };
     }
 
-    if (data.questionBankIds.length === 0) {
-      return { success: false, error: "At least one question bank must be selected" };
-    }
-
     const [template] = await db
       .insert(auditTemplates)
       .values({
         name: data.name,
         description: data.description,
         category: data.category,
-        questionBankIds: JSON.stringify(data.questionBankIds),
+        questionBankIds: JSON.stringify(data.questionBankIds || []),
         estimatedDurationMinutes: data.estimatedDurationMinutes,
         createdById: user.id,
       })

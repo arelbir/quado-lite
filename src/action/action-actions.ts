@@ -2,6 +2,7 @@
 
 import { db } from "@/drizzle/db";
 import { actions, findings, dofs } from "@/drizzle/schema";
+import { actionProgress } from "@/drizzle/schema/action-progress";
 import { currentUser } from "@/lib/auth";
 import { eq, and, not, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -209,6 +210,11 @@ export async function approveAction(
 
 /**
  * FR-004: Aksiyon Yöneticisi, Aksiyonu Reddedebilir
+ * 
+ * WORKFLOW: Reject → Assigned (Döngü)
+ * - Status "Assigned"a döner
+ * - Sorumlu tekrar çalışabilir
+ * - Red nedeni kaydedilir (timeline'da görünür)
  */
 export async function rejectAction(
   actionId: string,
@@ -228,28 +234,137 @@ export async function rejectAction(
       return { success: false, error: "Action not found" };
     }
 
-    // Sadece atanan Yönetici reddedebilir
-    if (action.managerId !== user.id && user.role !== "admin") {
+    if (action.managerId !== user.id) {
       return { 
         success: false, 
         error: "Only assigned manager can reject this action" 
       };
     }
 
+    // DÖNGÜ: Reject → Assigned (Sorumlu tekrar çalışabilir)
     await db
       .update(actions)
       .set({
-        status: "Rejected",
+        status: "Assigned", // ⚠️ Rejected değil, Assigned!
         rejectionReason: reason,
+        completedAt: null, // Tamamlanma tarihini sıfırla
+        completionNotes: null, // Eski notları temizle
         updatedAt: new Date(),
       })
       .where(eq(actions.id, actionId));
 
     revalidatePath("/actions");
+    revalidatePath(`/denetim/actions/${actionId}`);
     return { success: true, data: undefined };
   } catch (error) {
     console.error("Error rejecting action:", error);
     return { success: false, error: "Failed to reject action" };
+  }
+}
+
+/**
+ * FR-005: Aksiyon İptal Et
+ * 
+ * EXIT STRATEGY: Döngüyü kırmak için
+ * - Yönetici veya Oluşturan iptal edebilir
+ * - Status "Cancelled" olur (final state)
+ * - Tekrar açılamaz, döngüden çıkış
+ */
+export async function cancelAction(
+  actionId: string,
+  reason?: string
+): Promise<ActionResponse> {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const action = await db.query.actions.findFirst({
+      where: eq(actions.id, actionId),
+    });
+
+    if (!action) {
+      return { success: false, error: "Action not found" };
+    }
+
+    // Yönetici veya Oluşturan iptal edebilir
+    if (action.managerId !== user.id && action.createdById !== user.id) {
+      return { 
+        success: false, 
+        error: "Only manager or creator can cancel this action" 
+      };
+    }
+
+    // Final state - tekrar açılamaz
+    await db
+      .update(actions)
+      .set({
+        status: "Cancelled",
+        rejectionReason: reason, // İptal nedeni
+        updatedAt: new Date(),
+      })
+      .where(eq(actions.id, actionId));
+
+    revalidatePath("/actions");
+    revalidatePath(`/denetim/actions/${actionId}`);
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("Error cancelling action:", error);
+    return { success: false, error: "Failed to cancel action" };
+  }
+}
+
+/**
+ * Aksiyon İlerleme Notu Ekle
+ * 
+ * Kullanım: Aksiyon henüz tamamlanmadı ama bir şeyler yapıldı
+ * - "Bugün hata analizi yaptım"
+ * - "Yarın fix uygulayacağım"
+ * - Timeline'da görünür
+ */
+export async function addActionProgress(
+  actionId: string,
+  note: string
+): Promise<ActionResponse<{ id: string }>> {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Aksiyonun varlığını ve yetkiyi kontrol et
+    const action = await db.query.actions.findFirst({
+      where: eq(actions.id, actionId),
+    });
+
+    if (!action) {
+      return { success: false, error: "Action not found" };
+    }
+
+    // Sadece aksiyonun sorumlusu progress ekleyebilir
+    if (action.assignedToId !== user.id) {
+      return { 
+        success: false, 
+        error: "Only assigned user can add progress notes" 
+      };
+    }
+
+    // Progress notu ekle
+    const [progressNote] = await db
+      .insert(actionProgress)
+      .values({
+        actionId,
+        note,
+        createdById: user.id,
+      })
+      .returning({ id: actionProgress.id });
+
+    revalidatePath(`/denetim/actions/${actionId}`);
+    return { success: true, data: { id: progressNote!.id } };
+  } catch (error) {
+    console.error("Error adding action progress:", error);
+    return { success: false, error: "Failed to add progress note" };
   }
 }
 

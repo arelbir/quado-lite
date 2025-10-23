@@ -27,7 +27,17 @@ export function UnifiedTableClient({ data }: UnifiedTableClientProps) {
         { label: "Oluşturuldu", value: "Created" },
         { label: "İptal", value: "Cancelled" },
         { label: "Aktif", value: "Active" },
+        { label: "Arşivlendi", value: "Archived" },
+        { label: "İncelemede", value: "InReview" },
+        { label: "Kapatma Bekliyor", value: "PendingClosure" },
+        { label: "Kapalı", value: "Closed" },
       ],
+    },
+    {
+      label: "Tarih",
+      value: "date" as keyof UnifiedRecord,
+      type: "date" as const,
+      placeholder: "Tarih aralığı seçin",
     },
     {
       label: "Başlık",

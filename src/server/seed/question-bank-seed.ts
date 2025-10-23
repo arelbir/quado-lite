@@ -3,7 +3,7 @@ import { questionBanks, questions, auditTemplates } from "@/drizzle/schema";
 
 const superAdminId = process.env.SUPER_ADMIN_UUID as string;
 
-async function runSeed() {
+export async function seedQuestionBanks() {
   console.log("🌱 Seeding question bank data...");
 
   try {
@@ -214,17 +214,12 @@ async function runSeed() {
 
     console.log("   ✅ Created 3 audit templates");
 
-    console.log("\n✅ Question bank seed completed!");
-    console.log("\n📊 Summary:");
+    console.log("✅ Question bank seed completed!");
     console.log("   - 3 Question Banks");
     console.log("   - 14 Questions");
     console.log("   - 3 Audit Templates");
-
-    process.exit(0);
   } catch (error) {
     console.error("❌ Seed failed:", error);
-    process.exit(1);
+    throw error;
   }
 }
-
-runSeed();

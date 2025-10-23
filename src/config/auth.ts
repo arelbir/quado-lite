@@ -67,6 +67,11 @@ export const authConfig = {
 
       if (data.superAdmin) return true
 
+      // Menus kontrolü
+      if (!data.menus || !Array.isArray(data.menus)) {
+        return NextResponse.redirect(new URL("/not-found", request.url))
+      }
+
       const hasPermission = getMatchMenus(data.menus, pathname)
 
       if (!hasPermission) {

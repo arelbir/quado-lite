@@ -131,11 +131,12 @@ export function useDataTable<TData, TValue>({
   const sort = search.sort ?? defaultSort
   const [column, order] = sort?.split(".") ?? []
 
-  // Memoize computation of searchableColumns and filterableColumns
-  const { searchableColumns, filterableColumns } = React.useMemo(() => {
+  // Memoize computation of searchableColumns, filterableColumns, and dateColumns
+  const { searchableColumns, filterableColumns, dateColumns } = React.useMemo(() => {
     return {
-      searchableColumns: filterFields.filter((field) => !field.options),
+      searchableColumns: filterFields.filter((field) => !field.options && field.type !== "date"),
       filterableColumns: filterFields.filter((field) => field.options),
+      dateColumns: filterFields.filter((field) => field.type === "date"),
     }
   }, [filterFields])
 
@@ -167,6 +168,9 @@ export function useDataTable<TData, TValue>({
         const searchableColumn = searchableColumns.find(
           (column) => column.value === key
         )
+        const dateColumn = dateColumns.find(
+          (column) => column.value === key
+        )
 
         if (filterableColumn) {
           filters.push({
@@ -178,13 +182,17 @@ export function useDataTable<TData, TValue>({
             id: key,
             value: [value],
           })
+        } else if (dateColumn) {
+          // Date range filter için
+          // URL format: date=from:2025-01-10,to:2025-01-20
+          // Şimdilik skip et, client-side filter otomatik çalışacak
         }
 
         return filters
       },
       []
     )
-  }, [filterableColumns, searchableColumns, searchParams])
+  }, [filterableColumns, searchableColumns, dateColumns, searchParams])
 
   // Table states
   const [rowSelection, setRowSelection] = React.useState({})
@@ -260,6 +268,10 @@ export function useDataTable<TData, TValue>({
     return filterableColumns.find((column) => column.value === filter.id)
   })
 
+  const dateColumnFilters = columnFilters.filter((filter) => {
+    return dateColumns.find((column) => column.value === filter.id)
+  })
+
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
@@ -293,6 +305,9 @@ export function useDataTable<TData, TValue>({
       }
     }
 
+    // Handle date column filters (skip URL sync for now, client-side works fine)
+    // Date filters will work without URL persistence
+
     // Remove deleted values
     for (const key of searchParams.keys()) {
       if (
@@ -301,7 +316,9 @@ export function useDataTable<TData, TValue>({
             (column) => column.id === key
           )) ||
         (filterableColumns.find((column) => column.value === key) &&
-          !filterableColumnFilters.find((column) => column.id === key))
+          !filterableColumnFilters.find((column) => column.id === key)) ||
+        (dateColumns.find((column) => column.value === key) &&
+          !dateColumnFilters.find((column) => column.id === key))
       ) {
         Object.assign(newParamsObject, { [key]: null })
       }
@@ -318,6 +335,8 @@ export function useDataTable<TData, TValue>({
     JSON.stringify(debouncedSearchableColumnFilters),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     JSON.stringify(filterableColumnFilters),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    JSON.stringify(dateColumnFilters),
   ])
 
   const table = useReactTable({
@@ -349,7 +368,7 @@ export function useDataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     manualPagination: true,
     manualSorting: true,
-    manualFiltering: true,
+    manualFiltering: false, // Client-side filtering için false
   })
 
   return { table }

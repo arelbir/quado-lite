@@ -3,9 +3,9 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, Ban } from "lucide-react";
 import { toast } from "sonner";
-import { completeAction, approveAction, rejectAction } from "@/action/action-actions";
+import { completeAction, approveAction, rejectAction, cancelAction } from "@/action/action-actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +32,7 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
   const [isPending, startTransition] = useTransition();
   const [completionNotes, setCompletionNotes] = useState("");
   const [rejectReason, setRejectReason] = useState("");
+  const [cancelReason, setCancelReason] = useState("");
 
   const handleComplete = () => {
     if (!completionNotes.trim()) {
@@ -65,14 +66,14 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
 
   const handleReject = () => {
     if (!rejectReason.trim()) {
-      toast.error("Lütfen ret nedeni girin");
+      toast.error("Lütfen ret nedenini açıklayın");
       return;
     }
 
     startTransition(async () => {
       const result = await rejectAction(actionId, rejectReason);
       if (result.success) {
-        toast.success("Aksiyon reddedildi");
+        toast.success("Aksiyon reddedildi ve tekrar atandı");
         setRejectReason("");
         router.refresh();
       } else {
@@ -81,16 +82,35 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
     });
   };
 
-  // Assigned durumunda - Sadece sorumlu tamamlayabilir
+  const handleCancel = () => {
+    if (!cancelReason.trim()) {
+      toast.error("Lütfen iptal nedenini açıklayın");
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await cancelAction(actionId, cancelReason);
+      if (result.success) {
+        toast.success("Aksiyon iptal edildi");
+        setCancelReason("");
+        router.refresh();
+      } else {
+        toast.error(result.error);
+      }
+    });
+  };
+
+  // Assigned durumunda - Tamamla + İptal
   if (status === "Assigned") {
     return (
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button disabled={isPending}>
-            <CheckCircle2 className="h-4 w-4 mr-2" />
-            Tamamladım
-          </Button>
-        </AlertDialogTrigger>
+      <div className="flex items-center gap-2">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button disabled={isPending}>
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Tamamladım
+            </Button>
+          </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Aksiyonu Tamamla</AlertDialogTitle>
@@ -112,13 +132,48 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
             </p>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCompletionNotes("")}>İptal</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setCompletionNotes("")}>Vazgeç</AlertDialogCancel>
             <AlertDialogAction onClick={handleComplete} disabled={isPending}>
               Tamamla ve Gönder
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* İptal Butonu */}
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="outline" disabled={isPending}>
+            <Ban className="h-4 w-4 mr-2" />
+            İptal Et
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Aksiyonu İptal Et</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bu aksiyon kalıcı olarak iptal edilecek. İptal nedeni belirtin.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="cancel-reason">İptal Nedeni *</Label>
+            <Textarea
+              id="cancel-reason"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Neden iptal ediliyor?"
+              className="mt-2"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCancelReason("")}>Vazgeç</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancel} disabled={isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              İptal Et
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
     );
   }
 
@@ -176,9 +231,43 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
               />
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel>İptal</AlertDialogCancel>
+              <AlertDialogCancel>Vazgeç</AlertDialogCancel>
               <AlertDialogAction onClick={handleReject} disabled={isPending}>
                 Reddet
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* İptal Butonu - Yönetici döngüyü kırabilir */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" disabled={isPending}>
+              <Ban className="h-4 w-4 mr-2" />
+              İptal Et
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Aksiyonu İptal Et</AlertDialogTitle>
+              <AlertDialogDescription>
+                Bu aksiyon kalıcı olarak iptal edilecek. İptal nedeni belirtin.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="py-4">
+              <Label htmlFor="cancel-reason-manager">İptal Nedeni *</Label>
+              <Textarea
+                id="cancel-reason-manager"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Neden iptal ediliyor?"
+                className="mt-2"
+              />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setCancelReason("")}>Vazgeç</AlertDialogCancel>
+              <AlertDialogAction onClick={handleCancel} disabled={isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                İptal Et
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -187,7 +276,7 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
     );
   }
 
-  // Completed veya Rejected - Aksiyon bitti, buton yok
+  // Completed - Başarıyla tamamlandı
   if (status === "Completed") {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -202,6 +291,16 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <AlertCircle className="h-4 w-4 text-red-600" />
         <span>Reddedildi</span>
+      </div>
+    );
+  }
+
+  // Cancelled - İptal edildi (döngüden çıkış)
+  if (status === "Cancelled") {
+    return (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Ban className="h-4 w-4 text-gray-600" />
+        <span>İptal Edildi</span>
       </div>
     );
   }

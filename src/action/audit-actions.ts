@@ -205,3 +205,201 @@ export async function checkAuditCompletionStatus(auditId: string): Promise<Actio
     return { success: false, error: "Failed to check completion status" };
   }
 }
+
+/**
+ * Denetimi güncelle
+ */
+export async function updateAudit(
+  auditId: string,
+  data: {
+    title?: string;
+    description?: string;
+    auditDate?: Date;
+  }
+): Promise<ActionResponse> {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Denetimi kontrol et
+    const audit = await db.query.audits.findFirst({
+      where: eq(audits.id, auditId),
+    });
+
+    if (!audit) {
+      return { success: false, error: "Audit not found" };
+    }
+
+    // Sadece creator veya admin düzenleyebilir
+    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
+      return { success: false, error: "Only audit creator or admin can update" };
+    }
+
+    // Closed denetimler düzenlenemez
+    if (audit.status === "Closed") {
+      return { success: false, error: "Closed audits cannot be edited" };
+    }
+
+    await db
+      .update(audits)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(audits.id, auditId));
+
+    revalidatePath(`/denetim/audits/${auditId}`);
+    revalidatePath("/denetim/audits");
+    revalidatePath("/denetim/all");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("Error updating audit:", error);
+    return { success: false, error: "Failed to update audit" };
+  }
+}
+
+/**
+ * Denetimi arşivle (pasife al)
+ */
+export async function archiveAudit(auditId: string): Promise<ActionResponse> {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Denetimi kontrol et
+    const audit = await db.query.audits.findFirst({
+      where: eq(audits.id, auditId),
+    });
+
+    if (!audit) {
+      return { success: false, error: "Audit not found" };
+    }
+
+    // Sadece creator veya admin arşivleyebilir
+    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
+      return { success: false, error: "Only audit creator or admin can archive" };
+    }
+
+    // Sadece Active veya InReview durumundaki denetimler arşivlenebilir
+    if (audit.status !== "Active" && audit.status !== "InReview") {
+      return { success: false, error: "Only active or in-review audits can be archived" };
+    }
+
+    await db
+      .update(audits)
+      .set({
+        status: "Archived",
+        updatedAt: new Date(),
+      })
+      .where(eq(audits.id, auditId));
+
+    revalidatePath(`/denetim/audits/${auditId}`);
+    revalidatePath("/denetim/audits");
+    revalidatePath("/denetim/all");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("Error archiving audit:", error);
+    return { success: false, error: "Failed to archive audit" };
+  }
+}
+
+/**
+ * Denetimi aktife al (arşivden çıkar)
+ */
+export async function reactivateAudit(auditId: string): Promise<ActionResponse> {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Denetimi kontrol et
+    const audit = await db.query.audits.findFirst({
+      where: eq(audits.id, auditId),
+    });
+
+    if (!audit) {
+      return { success: false, error: "Audit not found" };
+    }
+
+    // Sadece creator veya admin aktive edebilir
+    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
+      return { success: false, error: "Only audit creator or admin can reactivate" };
+    }
+
+    // Sadece Archived durumundaki denetimler aktive edilebilir
+    if (audit.status !== "Archived") {
+      return { success: false, error: "Only archived audits can be reactivated" };
+    }
+
+    await db
+      .update(audits)
+      .set({
+        status: "Active",
+        updatedAt: new Date(),
+      })
+      .where(eq(audits.id, auditId));
+
+    revalidatePath(`/denetim/audits/${auditId}`);
+    revalidatePath("/denetim/audits");
+    revalidatePath("/denetim/all");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("Error reactivating audit:", error);
+    return { success: false, error: "Failed to reactivate audit" };
+  }
+}
+
+/**
+ * Denetimi sil (soft delete)
+ */
+export async function deleteAudit(auditId: string): Promise<ActionResponse> {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Denetimi kontrol et
+    const audit = await db.query.audits.findFirst({
+      where: eq(audits.id, auditId),
+    });
+
+    if (!audit) {
+      return { success: false, error: "Audit not found" };
+    }
+
+    // Sadece creator veya admin silebilir
+    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
+      return { success: false, error: "Only audit creator or admin can delete" };
+    }
+
+    // Closed denetimler silinemez (güvenlik)
+    if (audit.status === "Closed") {
+      return { success: false, error: "Closed audits cannot be deleted" };
+    }
+
+    // Soft delete
+    await db
+      .update(audits)
+      .set({
+        deletedAt: new Date(),
+      })
+      .where(eq(audits.id, auditId));
+
+    revalidatePath("/denetim/audits");
+    revalidatePath("/denetim/all");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("Error deleting audit:", error);
+    return { success: false, error: "Failed to delete audit" };
+  }
+}

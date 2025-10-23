@@ -9,6 +9,7 @@ export const auditStatusEnum = pgEnum("audit_status", [
   "InReview",         // İncelemede - Denetçi tamamladı, bulgular işleniyor
   "PendingClosure",   // Kapanış Bekliyor - Bulgular tamamlandı, denetçi onayı bekliyor
   "Closed",           // Kapalı - Tamamen tamamlandı
+  "Archived",         // Arşivlendi - Pasif/Arşiv
 ]);
 
 export const audits = pgTable("audits", {
@@ -17,12 +18,19 @@ export const audits = pgTable("audits", {
   description: text("description"),
   auditDate: timestamp("audit_date"),
   status: auditStatusEnum("status").default("Active").notNull(),
-  createdById: uuid("created_by_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }),
+  auditorId: uuid("auditor_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }), // Denetçi
+  createdById: uuid("created_by_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }), // Oluşturan
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"), // Soft delete
 });
 
 export const auditsRelations = relations(audits, ({ one }) => ({
+  auditor: one(user, {
+    fields: [audits.auditorId],
+    references: [user.id],
+    relationName: 'audit_auditor',
+  }),
   createdBy: one(user, {
     fields: [audits.createdById],
     references: [user.id],

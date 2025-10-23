@@ -4,12 +4,14 @@ import * as React from "react"
 import type { DataTableFilterField } from "@/types/data-table"
 import { Cross2Icon } from "@radix-ui/react-icons"
 import type { Table } from "@tanstack/react-table"
+import { DateRange } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { DateRangePicker } from "@/components/ui/date-range-picker"
 
 interface DataTableToolbarProps<TData>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -26,11 +28,12 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
-  // Memoize computation of searchableColumns and filterableColumns
-  const { searchableColumns, filterableColumns } = React.useMemo(() => {
+  // Memoize computation of searchableColumns, filterableColumns, and dateColumns
+  const { searchableColumns, filterableColumns, dateColumns } = React.useMemo(() => {
     return {
-      searchableColumns: filterFields.filter((field) => !field.options),
+      searchableColumns: filterFields.filter((field) => !field.options && field.type !== "date"),
       filterableColumns: filterFields.filter((field) => field.options),
+      dateColumns: filterFields.filter((field) => field.type === "date"),
     }
   }, [filterFields])
 
@@ -75,6 +78,26 @@ export function DataTableToolbar<TData>({
                   )}
                   title={column.label}
                   options={column.options ?? []}
+                />
+              )
+          )}
+        {dateColumns.length > 0 &&
+          dateColumns.map(
+            (column) =>
+              table.getColumn(column.value ? String(column.value) : "") && (
+                <DateRangePicker
+                  key={String(column.value)}
+                  value={
+                    table
+                      .getColumn(String(column.value))
+                      ?.getFilterValue() as DateRange | undefined
+                  }
+                  onChange={(range) =>
+                    table
+                      .getColumn(String(column.value))
+                      ?.setFilterValue(range)
+                  }
+                  placeholder={column.placeholder || "Tarih aralığı seçin"}
                 />
               )
           )}

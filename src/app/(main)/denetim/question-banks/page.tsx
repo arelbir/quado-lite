@@ -78,7 +78,7 @@ async function QuestionBanksGrid() {
               </Badge>
               <Button asChild size="sm" variant="outline">
                 <Link href={`/denetim/question-banks/${bank.id}`}>
-                  Görüntüle
+                  Soruları Yönet
                 </Link>
               </Button>
             </div>

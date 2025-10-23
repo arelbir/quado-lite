@@ -8,6 +8,7 @@ export * from "./user";
 export * from "./audit";
 export * from "./finding";
 export * from "./action";
+export * from "./action-progress";
 export * from "./dof";
 export * from "./question-bank";
 export * from "./notification";

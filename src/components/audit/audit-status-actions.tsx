@@ -24,13 +24,28 @@ interface AuditStatusActionsProps {
     id: string;
     status: string;
     title: string;
+    auditorId: string | null; // Denetçi
+    createdById: string | null; // Oluşturan
   };
   openFindingsCount: number;
+  currentUserId: string;
+  currentUserRole: string;
 }
 
-export function AuditStatusActions({ audit, openFindingsCount }: AuditStatusActionsProps) {
+export function AuditStatusActions({ 
+  audit, 
+  openFindingsCount,
+  currentUserId,
+  currentUserRole
+}: AuditStatusActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  // Yetki kontrolü: Sadece atanan denetçi veya admin
+  const canManageAudit = 
+    audit.auditorId === currentUserId || 
+    currentUserRole === "admin" || 
+    currentUserRole === "superAdmin";
 
   const handleCompleteAudit = async () => {
     startTransition(async () => {
@@ -91,8 +106,8 @@ export function AuditStatusActions({ audit, openFindingsCount }: AuditStatusActi
         {currentStatus.label}
       </Badge>
 
-      {/* Action Buttons */}
-      {audit.status === "Active" && (
+      {/* Action Buttons - Sadece yetkililer görebilir */}
+      {canManageAudit && audit.status === "Active" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button size="sm" disabled={isPending}>
@@ -136,7 +151,7 @@ export function AuditStatusActions({ audit, openFindingsCount }: AuditStatusActi
         </div>
       )}
 
-      {audit.status === "PendingClosure" && (
+      {canManageAudit && audit.status === "PendingClosure" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button size="sm" disabled={isPending}>

@@ -74,13 +74,24 @@ async function TemplatesGrid() {
           <CardContent>
             <div className="flex items-center justify-between">
               <Badge variant="secondary">
-                {template.questionBankIds.length > 0 
-                  ? `${template.questionBankIds.length} Soru Havuzu` 
-                  : "Soru Havuzu Yok"}
+                {(() => {
+                  try {
+                    const bankIds = template.questionBankIds 
+                      ? (typeof template.questionBankIds === 'string' 
+                          ? JSON.parse(template.questionBankIds) as string[]
+                          : template.questionBankIds as string[])
+                      : [];
+                    return bankIds.length > 0 
+                      ? `${bankIds.length} Soru Havuzu` 
+                      : "Soru Havuzu Yok";
+                  } catch {
+                    return "Soru Havuzu Yok";
+                  }
+                })()}
               </Badge>
               <Button asChild size="sm" variant="outline">
                 <Link href={`/denetim/templates/${template.id}`}>
-                  Görüntüle
+                  Şablonu Yönet
                 </Link>
               </Button>
             </div>

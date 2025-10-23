@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, pgEnum, boolean } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, pgEnum, boolean, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
 import { audits } from "./audit";
@@ -99,6 +99,15 @@ export const auditScheduleStatusEnum = pgEnum("audit_schedule_status", [
   "Cancelled"    // İptal edildi
 ]);
 
+export const recurrenceTypeEnum = pgEnum("recurrence_type", [
+  "None",        // Tekrarlanmaz
+  "Daily",       // Günlük
+  "Weekly",      // Haftalık
+  "Monthly",     // Aylık
+  "Quarterly",   // 3 Aylık
+  "Yearly"       // Yıllık
+]);
+
 export const auditPlans = pgTable("audit_plans", {
   id: uuid("id").defaultRandom().primaryKey(),
   
@@ -111,8 +120,18 @@ export const auditPlans = pgTable("audit_plans", {
   // Şablon referansı
   templateId: uuid("template_id").references(() => auditTemplates.id),
   
+  // Denetçi (oluşturulan audit'e atanacak)
+  auditorId: uuid("auditor_id").references(() => user.id),
+  
   // Planlı denetim için tarih
   scheduledDate: timestamp("scheduled_date"),
+  
+  // Periyodik tekrarlama
+  recurrenceType: recurrenceTypeEnum("recurrence_type").default("None"),
+  recurrenceInterval: integer("recurrence_interval").default(1), // Her kaç günde/ayda/yılda
+  nextScheduledDate: timestamp("next_scheduled_date"), // Bir sonraki oluşturulma tarihi
+  maxOccurrences: integer("max_occurrences"), // Maksimum kaç kez oluşturulacak
+  occurrenceCount: integer("occurrence_count").default(0), // Kaç kez oluşturuldu
   
   // Oluşturulan denetim referansı
   createdAuditId: uuid("created_audit_id").references(() => audits.id),
@@ -176,6 +195,10 @@ export const auditPlansRelations = relations(auditPlans, ({ one }) => ({
   template: one(auditTemplates, {
     fields: [auditPlans.templateId],
     references: [auditTemplates.id],
+  }),
+  auditor: one(user, {
+    fields: [auditPlans.auditorId],
+    references: [user.id],
   }),
   createdAudit: one(audits, {
     fields: [auditPlans.createdAuditId],
