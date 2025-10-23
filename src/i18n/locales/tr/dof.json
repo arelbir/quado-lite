@@ -1,8 +1,10 @@
 {
   "title": "DÖF (Düzeltici Önleyici Faaliyet)",
-  "titleShort": "DÖF",
+  "titleShort": "DÖF'ler",
   "singular": "DÖF",
-  "description": "Düzeltici ve Önleyici Faaliyet kayıtları (7 adımlı süreç)",
+  "description": "Düzeltici ve Önleyici Faaliyet yönetimi",
+  "dofId": "DÖF #",
+  "capaProcess": "7 Adımlı CAPA Süreci",
   "create": "Yeni DÖF Oluştur",
   "edit": "DÖF'ü Düzenle",
   "delete": "DÖF'ü Sil",

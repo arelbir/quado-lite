@@ -10,6 +10,7 @@
   
   "fields": {
     "title": "Audit Title",
+    "findings": "Findings",
     "description": "Description",
     "auditor": "Auditor",
     "auditee": "Auditee",
@@ -26,6 +27,36 @@
     "updatedAt": "Updated At",
     "createdBy": "Created By",
     "assignedTo": "Assigned To"
+  },
+  
+  "common": {
+    "totalQuestions": "Total Questions",
+    "totalFindings": "Total Findings",
+    "total": "Total",
+    "lastFindings": "Recent Findings",
+    "noFindings": "No findings yet"
+  },
+  
+  "myAudits": {
+    "title": "My Audits",
+    "description": "Active audits created in the last year",
+    "stats": {
+      "total": "Total",
+      "totalDescription": "Active audits",
+      "active": "Active",
+      "activeDescription": "Currently active",
+      "inReview": "In Review",
+      "inReviewDescription": "Closure process"
+    },
+    "activeAudits": "Active Audits",
+    "noAudits": "No active audits",
+    "noAuditsDescription": "You have no active audits created in the last year",
+    "viewAll": "All Audits",
+    "auditDate": "Audit Date",
+    "notSet": "Not set",
+    "createdAt": "Created",
+    "startAudit": "Start Audit",
+    "viewDetails": "Details"
   },
   
   "status": {

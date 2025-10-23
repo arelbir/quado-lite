@@ -9,27 +9,22 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Plus, Clock, CheckCircle2, XCircle, Edit } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: { id: string };
 }
 
 export default async function FindingDetailPage({ params }: PageProps) {
+  const t = await getTranslations('finding');
+  const tCommon = await getTranslations('common');
+  
   try {
     const finding = await getFindingById(params.id);
 
     if (!finding) {
       notFound();
     }
-
-    const statusLabels: Record<string, string> = {
-      New: "Yeni",
-      Assigned: "Atandı",
-      InProgress: "İşlemde",
-      PendingAuditorClosure: "Onay Bekliyor",
-      Completed: "Tamamlandı",
-      Rejected: "Reddedildi",
-    };
 
     return (
       <div className="space-y-6">
@@ -39,11 +34,11 @@ export default async function FindingDetailPage({ params }: PageProps) {
             <Button variant="ghost" size="sm" asChild>
               <Link href={finding.auditId ? `/denetim/audits/${finding.auditId}?tab=findings` : "/denetim/findings"}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {finding.audit?.title ? `${finding.audit.title} Denetimine Dön` : "Geri"}
+                {tCommon('actions.back')}
               </Link>
             </Button>
             <div>
-              <h1 className="text-2xl font-bold">Bulgu Detayı</h1>
+              <h1 className="text-2xl font-bold">{t('view')}</h1>
               <p className="text-sm text-muted-foreground">
                 {finding.audit?.title}
               </p>
@@ -53,7 +48,7 @@ export default async function FindingDetailPage({ params }: PageProps) {
             <Button size="sm" variant="outline" asChild>
               <Link href={`/denetim/findings/${params.id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
-                Düzenle
+                {tCommon('actions.edit')}
               </Link>
             </Button>
             <StatusBadge status={finding.status as any} type="finding" />
@@ -63,11 +58,11 @@ export default async function FindingDetailPage({ params }: PageProps) {
         {/* Finding Info */}
         <Card>
           <CardHeader>
-            <CardTitle>Bulgu Bilgileri</CardTitle>
+            <CardTitle>{t('sections.details')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="text-sm font-medium mb-2">Detaylar</h3>
+              <h3 className="text-sm font-medium mb-2">{t('fields.details')}</h3>
               <p className="text-sm text-muted-foreground">
                 {finding.details}
               </p>
@@ -77,25 +72,25 @@ export default async function FindingDetailPage({ params }: PageProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <h3 className="text-sm font-medium mb-1">Risk Seviyesi</h3>
+                <h3 className="text-sm font-medium mb-1">{t('fields.riskType')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {finding.riskType || "Belirtilmemiş"}
+                  {finding.riskType || tCommon('status.noData')}
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium mb-1">Süreç Sahibi</h3>
+                <h3 className="text-sm font-medium mb-1">{t('fields.processOwner')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {finding.assignedTo?.name || "Atanmadı"}
+                  {finding.assignedTo?.name || tCommon('status.noData')}
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium mb-1">Oluşturan</h3>
+                <h3 className="text-sm font-medium mb-1">{t('fields.identifiedBy')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {finding.createdBy?.name || "Bilinmiyor"}
+                  {finding.createdBy?.name || tCommon('status.noData')}
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium mb-1">Oluşturulma Tarihi</h3>
+                <h3 className="text-sm font-medium mb-1">{tCommon('createdAt')}</h3>
                 <p className="text-sm text-muted-foreground">
                   {new Date(finding.createdAt).toLocaleString("tr-TR")}
                 </p>
@@ -106,11 +101,11 @@ export default async function FindingDetailPage({ params }: PageProps) {
 
         {/* Actions & DOFs */}
         <div className="grid gap-6 md:grid-cols-2">
-          <Suspense fallback={<div>Yükleniyor...</div>}>
+          <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
             <ActionsCard findingId={params.id} />
           </Suspense>
 
-          <Suspense fallback={<div>Yükleniyor...</div>}>
+          <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
             <DofsCard findingId={params.id} />
           </Suspense>
         </div>
@@ -123,6 +118,7 @@ export default async function FindingDetailPage({ params }: PageProps) {
 }
 
 async function ActionsCard({ findingId }: { findingId: string }) {
+  const t = await getTranslations('finding');
   const actions = await getActionsByFinding(findingId);
 
   const statusIcons: Record<string, any> = {
@@ -137,8 +133,8 @@ async function ActionsCard({ findingId }: { findingId: string }) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Aksiyonlar</CardTitle>
-            <CardDescription>Basit aksiyon kayıtları</CardDescription>
+            <CardTitle>{t('sections.actionsTitle')}</CardTitle>
+            <CardDescription>{t('sections.actionsDescription')}</CardDescription>
           </div>
           <Button size="sm" variant="outline" asChild>
             <Link href={`/denetim/findings/${findingId}/actions/new`}>
@@ -150,7 +146,7 @@ async function ActionsCard({ findingId }: { findingId: string }) {
       <CardContent>
         {actions.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Henüz aksiyon eklenmemiş
+            {t('common.noActions')}
           </p>
         ) : (
           <div className="space-y-3">
@@ -162,7 +158,7 @@ async function ActionsCard({ findingId }: { findingId: string }) {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium line-clamp-2">{action.details}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {action.assignedTo?.name || "Atanmadı"}
+                      {action.assignedTo?.name || '-'}
                     </p>
                   </div>
                 </div>
@@ -176,6 +172,8 @@ async function ActionsCard({ findingId }: { findingId: string }) {
 }
 
 async function DofsCard({ findingId }: { findingId: string }) {
+  const t = await getTranslations('finding');
+  const tDof = await getTranslations('dof');
   const dofs = await getDofsByFinding(findingId);
 
   return (
@@ -183,8 +181,8 @@ async function DofsCard({ findingId }: { findingId: string }) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>DÖF'ler</CardTitle>
-            <CardDescription>7 adımlı düzeltici faaliyetler</CardDescription>
+            <CardTitle>{t('sections.dofsTitle')}</CardTitle>
+            <CardDescription>{t('sections.dofsDescription')}</CardDescription>
           </div>
           <Button size="sm" variant="outline" asChild>
             <Link href={`/denetim/findings/${findingId}/dof/new`}>
@@ -196,7 +194,7 @@ async function DofsCard({ findingId }: { findingId: string }) {
       <CardContent>
         {dofs.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Henüz DÖF eklenmemiş
+            {t('common.noDofs')}
           </p>
         ) : (
           <div className="space-y-3">
@@ -207,9 +205,9 @@ async function DofsCard({ findingId }: { findingId: string }) {
                 className="flex items-start gap-3 p-3 border rounded-lg hover:bg-accent transition-colors"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">DÖF #{dof.id.slice(0, 8)}</p>
+                  <p className="text-sm font-medium">{tDof('dofId')}{dof.id.slice(0, 8)}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {dof.assignedTo?.name || "Atanmadı"}
+                    {dof.assignedTo?.name || '-'}
                   </p>
                 </div>
                 <StatusBadge status={dof.status as any} type="dof" />

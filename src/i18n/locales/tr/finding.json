@@ -12,12 +12,15 @@
   "fields": {
     "title": "Bulgu Başlığı",
     "description": "Açıklama",
+    "details": "Detaylar",
     "audit": "İlgili Denetim",
     "type": "Bulgu Tipi",
     "severity": "Önem Derecesi",
+    "riskType": "Risk Tipi",
     "status": "Durum",
     "department": "Departman",
     "processOwner": "Süreç Sahibi",
+    "responsiblePerson": "Sorumlu Kişi",
     "identifiedBy": "Tespit Eden",
     "identifiedDate": "Tespit Tarihi",
     "dueDate": "Kapatma Termin Tarihi",
@@ -73,11 +76,22 @@
   "sections": {
     "details": "Bulgu Detayları",
     "actions": "Aksiyonlar",
+    "actionsTitle": "Aksiyonlar",
+    "actionsDescription": "Basit aksiyon kayıtları",
     "dofs": "DÖF'ler",
+    "dofsTitle": "DÖF'ler",
+    "dofsDescription": "7 adımlı düzeltici faaliyetler",
     "rootCauseAnalysis": "Kök Neden Analizi",
     "closure": "Kapatma Bilgileri",
+    "closureTitle": "Onay Bekleyen Bulgular",
     "timeline": "Zaman Çizelgesi",
     "attachments": "Ekler"
+  },
+  
+  "common": {
+    "noDofs": "Henüz DÖF eklenmemiş",
+    "noActions": "Henüz aksiyon eklenmemiş",
+    "pendingApproval": "{count} bulgu denetçi onayı bekliyor"
   },
   
   "placeholders": {

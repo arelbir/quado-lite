@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { DeleteTemplateButton } from "@/components/templates/delete-template-button";
+import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: {
@@ -21,6 +22,7 @@ interface PageProps {
  * Features: Soru havuzlarını görüntüleme ve yönetme
  */
 export default async function TemplateDetailPage({ params }: PageProps) {
+  const t = await getTranslations('audit.common');
   const template = await db.query.auditTemplates.findFirst({
     where: and(
       eq(auditTemplates.id, params.id),
@@ -107,7 +109,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Soru</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('totalQuestions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalQuestions}</div>

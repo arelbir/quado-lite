@@ -1,8 +1,10 @@
 {
   "title": "CAPA (Corrective and Preventive Action)",
-  "titleShort": "CAPA",
+  "titleShort": "CAPAs",
   "singular": "CAPA",
-  "description": "Corrective and Preventive Action records (7-step process)",
+  "description": "Corrective and Preventive Action management",
+  "dofId": "CAPA #",
+  "capaProcess": "7-Step CAPA Process",
   "create": "Create New CAPA",
   "edit": "Edit CAPA",
   "delete": "Delete CAPA",

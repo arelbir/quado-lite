@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Calendar, ClipboardCheck, AlertCircle, Play, Eye } from "lucide-react";
 import Link from "next/link";
 import { AUDIT_STATUS_LABELS, AUDIT_STATUS_COLORS } from "@/lib/constants/status-labels";
+import { getTranslations } from 'next-intl/server';
 
 /**
  * My Audits Page - Denetimlerim
  * Sadece benim denetimlerim, son 1 yıl içinde, aktif olanlar
  */
 export default async function MyAuditsPage() {
+  const t = await getTranslations('audit.myAudits');
   const user = await currentUser();
   
   if (!user) {
@@ -42,9 +44,9 @@ export default async function MyAuditsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Denetimlerim</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Son 1 yıl içinde oluşturduğum aktif denetimler
+          {t('description')}
         </p>
       </div>
 
@@ -52,33 +54,33 @@ export default async function MyAuditsPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Toplam</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('stats.total')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{myAudits.length}</div>
-            <p className="text-xs text-muted-foreground">Aktif denetim</p>
+            <p className="text-xs text-muted-foreground">{t('stats.totalDescription')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Devam Eden</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('stats.active')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {myAudits.filter(a => a.status === "Active").length}
             </div>
-            <p className="text-xs text-muted-foreground">Aktif durumda</p>
+            <p className="text-xs text-muted-foreground">{t('stats.activeDescription')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">İncelemede</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('stats.inReview')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {myAudits.filter(a => a.status === "InReview" || a.status === "PendingClosure").length}
             </div>
-            <p className="text-xs text-muted-foreground">Kapanış süreci</p>
+            <p className="text-xs text-muted-foreground">{t('stats.inReviewDescription')}</p>
           </CardContent>
         </Card>
       </div>
@@ -86,19 +88,19 @@ export default async function MyAuditsPage() {
       {/* Denetim Listesi */}
       <Card>
         <CardHeader>
-          <CardTitle>Aktif Denetimler</CardTitle>
+          <CardTitle>{t('activeAudits')}</CardTitle>
         </CardHeader>
         <CardContent>
           {myAudits.length === 0 ? (
             <div className="text-center py-12">
               <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Aktif denetim yok</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('noAudits')}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Son 1 yıl içinde oluşturduğunuz aktif denetim bulunmuyor
+                {t('noAuditsDescription')}
               </p>
               <Button asChild>
                 <Link href="/denetim/all">
-                  Tüm Denetimler
+                  {t('viewAll')}
                 </Link>
               </Button>
             </div>
@@ -122,14 +124,14 @@ export default async function MyAuditsPage() {
                         )}
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
                           <span>
-                            Denetim Tarihi: {audit.auditDate 
+                            {t('auditDate')}: {audit.auditDate 
                               ? new Date(audit.auditDate).toLocaleDateString("tr-TR")
-                              : "Belirlenmemiş"
+                              : t('notSet')
                             }
                           </span>
                           <span>•</span>
                           <span>
-                            Oluşturulma: {new Date(audit.createdAt).toLocaleDateString("tr-TR")}
+                            {t('createdAt')}: {new Date(audit.createdAt).toLocaleDateString("tr-TR")}
                           </span>
                         </div>
                       </div>
@@ -139,12 +141,12 @@ export default async function MyAuditsPage() {
                             {audit.status === "Active" ? (
                               <>
                                 <Play className="h-4 w-4 mr-2" />
-                                Denetimi Başlat
+                                {t('startAudit')}
                               </>
                             ) : (
                               <>
                                 <Eye className="h-4 w-4 mr-2" />
-                                Detaylar
+                                {t('viewDetails')}
                               </>
                             )}
                           </Link>

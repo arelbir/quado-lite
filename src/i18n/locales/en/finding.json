@@ -12,12 +12,15 @@
   "fields": {
     "title": "Finding Title",
     "description": "Description",
+    "details": "Details",
     "audit": "Related Audit",
     "type": "Finding Type",
     "severity": "Severity",
+    "riskType": "Risk Type",
     "status": "Status",
     "department": "Department",
     "processOwner": "Process Owner",
+    "responsiblePerson": "Responsible Person",
     "identifiedBy": "Identified By",
     "identifiedDate": "Identified Date",
     "dueDate": "Closure Due Date",
@@ -73,11 +76,22 @@
   "sections": {
     "details": "Finding Details",
     "actions": "Actions",
+    "actionsTitle": "Actions",
+    "actionsDescription": "Simple action records",
     "dofs": "CAPAs",
+    "dofsTitle": "CAPAs",
+    "dofsDescription": "7-step corrective activities",
     "rootCauseAnalysis": "Root Cause Analysis",
     "closure": "Closure Information",
+    "closureTitle": "Pending Closure Findings",
     "timeline": "Timeline",
     "attachments": "Attachments"
+  },
+  
+  "common": {
+    "noDofs": "No CAPAs added yet",
+    "noActions": "No actions added yet",
+    "pendingApproval": "{count} findings pending auditor approval"
   },
   
   "placeholders": {

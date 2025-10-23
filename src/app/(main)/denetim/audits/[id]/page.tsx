@@ -18,6 +18,7 @@ import { AuditStatusActions } from "@/components/audit/audit-status-actions";
 import { AuditReportButton } from "@/components/audit/audit-report-button";
 import { AddQuestionDialog } from "@/components/audit/add-question-dialog";
 import { getAuditStatusLabel, getAuditStatusColor } from "@/lib/constants/status-labels";
+import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: { id: string };
@@ -25,6 +26,7 @@ interface PageProps {
 }
 
 export default async function AuditDetailPage({ params, searchParams }: PageProps) {
+  const t = await getTranslations('audit');
   const loggedInUser = await currentUser();
   
   const audit = await db.query.audits.findFirst({
@@ -161,7 +163,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           </TabsTrigger>
           <TabsTrigger value="findings">
             <AlertTriangle className="h-4 w-4 mr-2" />
-            Bulgular ({auditFindings.length})
+            {t('fields.findings')} ({auditFindings.length})
           </TabsTrigger>
           <TabsTrigger value="details">
             <FileText className="h-4 w-4 mr-2" />
@@ -188,7 +190,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
 
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Bulgular</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('fields.findings')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{auditFindings.length}</div>
@@ -239,7 +241,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Son Bulgular</CardTitle>
+                <CardTitle className="text-base">{t('common.lastFindings')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {auditFindings.slice(0, 3).length > 0 ? (
@@ -340,7 +342,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <p className="text-2xl font-bold">{auditFindings.length}</p>
-                  <p className="text-xs text-muted-foreground">Toplam Bulgu</p>
+                  <p className="text-xs text-muted-foreground">{t('common.totalFindings')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-success">
@@ -369,9 +371,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Bulgular</CardTitle>
+                  <CardTitle>{t('fields.findings')}</CardTitle>
                   <CardDescription>
-                    Bu denetimde tespit edilen {auditFindings.length} bulgu
+                    {auditFindings.length} {t('fields.findings').toLowerCase()}
                   </CardDescription>
                 </div>
               </div>

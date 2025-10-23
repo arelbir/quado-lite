@@ -10,6 +10,7 @@
   
   "fields": {
     "title": "Denetim Başlığı",
+    "findings": "Bulgular",
     "description": "Açıklama",
     "auditor": "Denetçi",
     "auditee": "Denetlenen",
@@ -26,6 +27,36 @@
     "updatedAt": "Güncellenme Tarihi",
     "createdBy": "Oluşturan",
     "assignedTo": "Atanan"
+  },
+  
+  "common": {
+    "totalQuestions": "Toplam Soru",
+    "totalFindings": "Toplam Bulgu",
+    "total": "Toplam",
+    "lastFindings": "Son Bulgular",
+    "noFindings": "Henüz bulgu bulunmuyor"
+  },
+  
+  "myAudits": {
+    "title": "Denetimlerim",
+    "description": "Son 1 yıl içinde oluşturduğum aktif denetimler",
+    "stats": {
+      "total": "Toplam",
+      "totalDescription": "Aktif denetim",
+      "active": "Devam Eden",
+      "activeDescription": "Aktif durumda",
+      "inReview": "İncelemede",
+      "inReviewDescription": "Kapanış süreci"
+    },
+    "activeAudits": "Aktif Denetimler",
+    "noAudits": "Aktif denetim yok",
+    "noAuditsDescription": "Son 1 yıl içinde oluşturduğunuz aktif denetim bulunmuyor",
+    "viewAll": "Tüm Denetimler",
+    "auditDate": "Denetim Tarihi",
+    "notSet": "Belirlenmemiş",
+    "createdAt": "Oluşturulma",
+    "startAudit": "Denetimi Başlat",
+    "viewDetails": "Detaylar"
   },
   
   "status": {

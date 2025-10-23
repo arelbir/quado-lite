@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, BookOpen } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from 'next-intl/server';
 import { QuestionListItem } from "@/components/questions/question-list-item";
 
 interface PageProps {
@@ -21,6 +22,7 @@ interface PageProps {
  * Features: Soru listesi, soru ekleme, soru düzenleme
  */
 export default async function QuestionBankDetailPage({ params }: PageProps) {
+  const t = await getTranslations('audit.common');
   const bank = await db.query.questionBanks.findFirst({
     where: and(
       eq(questionBanks.id, params.id),
@@ -78,7 +80,7 @@ export default async function QuestionBankDetailPage({ params }: PageProps) {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Soru</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('totalQuestions')}</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>

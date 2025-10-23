@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { DofProgressBar } from "@/components/dof/dof-progress-bar";
 import { DofWizardContent } from "@/components/dof/dof-wizard-content";
+import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: { id: string };
@@ -28,6 +29,7 @@ const stepMap: Record<string, number> = {
 };
 
 export default async function DofDetailPage({ params }: PageProps) {
+  const t = await getTranslations('dof');
   const dof = await db.query.dofs.findFirst({
     where: eq(dofs.id, params.id),
     with: {
@@ -104,7 +106,7 @@ export default async function DofDetailPage({ params }: PageProps) {
           <div>
             <h1 className="text-xl md:text-2xl font-bold">{dof.problemTitle}</h1>
             <p className="text-sm text-muted-foreground">
-              DÖF #{dof.id.substring(0, 8)} • 7 Adımlı CAPA Süreci
+              {t('dofId')}{dof.id.substring(0, 8)} • {t('capaProcess')}
             </p>
           </div>
         </div>

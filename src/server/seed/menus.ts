@@ -5,7 +5,7 @@ const superAdminId = process.env.SUPER_ADMIN_UUID as string
 const menus = [
   {
     path: '/',
-    label: "Dashboard",
+    label: "dashboard",
     icon: "Home",
     parentId: null,
     status: "active",
@@ -14,7 +14,7 @@ const menus = [
   },
   {
     path: '/tasks',
-    label: 'Tasks',
+    label: 'tasks',
     icon: "Package",
     parentId: null,
     status: "active",
@@ -41,19 +41,19 @@ const menus = [
     children: [
       {
         path: '/system/users',
-        label: "System Users",
+        label: "systemUsers",
         icon: "Users",
       },
       {
         path: '/system/menus',
-        label: "System Menus",
+        label: "systemMenus",
         icon: "Menu",
       }
     ],
   },
   {
     path: "/denetim",
-    label: "Denetim Sistemi",
+    label: "auditSystem",
     icon: "ClipboardCheck",
     parentId: null,
     status: "active",
@@ -62,7 +62,7 @@ const menus = [
     children: [
       {
         path: "/denetim",
-        label: "Dashboard",
+        label: "dashboard",
         icon: "LayoutDashboard",
         status: "active",
         createBy: superAdminId,
@@ -70,7 +70,7 @@ const menus = [
       },
       {
         path: "/denetim/my-tasks",
-        label: "Bekleyen İşlerim",
+        label: "myTasks",
         icon: "ClipboardCheck",
         status: "active",
         createBy: superAdminId,
@@ -78,7 +78,7 @@ const menus = [
       },
       {
         path: "/denetim/my-audits",
-        label: "Denetimlerim",
+        label: "myAudits",
         icon: "FileCheck",
         status: "active",
         createBy: superAdminId,
@@ -86,7 +86,7 @@ const menus = [
       },
       {
         path: "/denetim/all",
-        label: "Denetimler & Planlar",
+        label: "allAudits",
         icon: "ListChecks",
         status: "active",
         createBy: superAdminId,
@@ -96,7 +96,7 @@ const menus = [
   },
   {
     path: "/operations",
-    label: "Takip ve Yönetim",
+    label: "operations",
     icon: "Workflow",
     parentId: null,
     status: "active",
@@ -105,7 +105,7 @@ const menus = [
     children: [
       {
         path: "/denetim/findings",
-        label: "Bulgular",
+        label: "findings",
         icon: "AlertCircle",
         status: "active",
         createBy: superAdminId,
@@ -113,7 +113,7 @@ const menus = [
       },
       {
         path: "/denetim/actions",
-        label: "Aksiyonlar",
+        label: "actions",
         icon: "CheckCircle2",
         status: "active",
         createBy: superAdminId,
@@ -121,7 +121,7 @@ const menus = [
       },
       {
         path: "/denetim/dofs",
-        label: "DÖF (CAPA)",
+        label: "dofs",
         icon: "Target",
         status: "active",
         createBy: superAdminId,
@@ -129,7 +129,7 @@ const menus = [
       },
       {
         path: "/denetim/closures",
-        label: "Kapanış Onayı",
+        label: "closures",
         icon: "FileCheck",
         status: "active",
         createBy: superAdminId,
@@ -139,7 +139,7 @@ const menus = [
   },
   {
     path: "/infrastructure",
-    label: "Altyapı Tanımları",
+    label: "infrastructure",
     icon: "Database",
     parentId: null,
     status: "active",
@@ -148,7 +148,7 @@ const menus = [
     children: [
       {
         path: "/denetim/question-banks",
-        label: "Soru Havuzu",
+        label: "questionBanks",
         icon: "HelpCircle",
         status: "active",
         createBy: superAdminId,
@@ -156,7 +156,7 @@ const menus = [
       },
       {
         path: "/denetim/templates",
-        label: "Denetim Şablonları",
+        label: "templates",
         icon: "FileText",
         status: "active",
         createBy: superAdminId,
@@ -166,7 +166,7 @@ const menus = [
   },
   {
     path: "/error",
-    label: "error pages",
+    label: "errorPages",
     icon: "AlertCircle",
     parentId: null,
     status: "active",
@@ -175,7 +175,7 @@ const menus = [
     children: [
       {
         path: "/error/404",
-        label: "404",
+        label: "error404",
         icon: "AlertTriangle",
         status: "active",
         createBy: superAdminId,
@@ -183,7 +183,7 @@ const menus = [
       },
       {
         path: "/error/500",
-        label: "500",
+        label: "error500",
         icon: "ShieldAlert",
         status: "active",
         createBy: superAdminId,
