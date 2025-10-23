@@ -175,9 +175,25 @@ export async function seedQuestionBanks() {
         orderIndex: "4",
         createdById: superAdminId,
       },
+      {
+        bankId: cevreBank!.id,
+        questionText: "Atık bertaraf yöntemi nedir?",
+        questionType: "SingleChoice",
+        checklistOptions: JSON.stringify([
+          "Geri dönüşüm",
+          "Yakma",
+          "Düzenli depolama",
+          "Kompost",
+          "Tehlikeli atık tesisi",
+        ]),
+        helpText: "Tek seçenek işaretleyiniz",
+        isMandatory: true,
+        orderIndex: "5",
+        createdById: superAdminId,
+      },
     ]);
 
-    console.log("   ✅ Created 14 questions (5 Kalite + 5 İSG + 4 Çevre)");
+    console.log("   ✅ Created 15 questions (5 Kalite + 5 İSG + 5 Çevre)");
 
     // 5. Denetim Şablonları
     console.log("📑 Creating audit templates...");
@@ -216,7 +232,7 @@ export async function seedQuestionBanks() {
 
     console.log("✅ Question bank seed completed!");
     console.log("   - 3 Question Banks");
-    console.log("   - 14 Questions");
+    console.log("   - 15 Questions (YesNo, Scale, SingleChoice, Checklist)");
     console.log("   - 3 Audit Templates");
   } catch (error) {
     console.error("❌ Seed failed:", error);

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { db } from "@/drizzle/db";
-import { dofs } from "@/drizzle/schema";
+import { dofs, user } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,12 +53,41 @@ export default async function DofDetailPage({ params }: PageProps) {
           email: true,
         },
       },
+      // HYBRID: DÖF'e bağlı action'ları çek
+      actions: {
+        with: {
+          assignedTo: {
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          manager: {
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
     },
   });
 
   if (!dof) {
     notFound();
   }
+
+  // Fetch all users for user selector in Step 4
+  const users = await db.query.user.findMany({
+    columns: {
+      id: true,
+      name: true,
+      email: true,
+    },
+    orderBy: (user, { asc }) => [asc(user.name)],
+  });
 
   const currentStep = stepMap[dof.status] || 1;
 
@@ -90,7 +119,7 @@ export default async function DofDetailPage({ params }: PageProps) {
 
       {/* Wizard Content */}
       <Suspense fallback={<div>Yükleniyor...</div>}>
-        <DofWizardContent dof={dof} currentStep={currentStep} />
+        <DofWizardContent dof={dof} currentStep={currentStep} users={users} />
       </Suspense>
     </div>
   );

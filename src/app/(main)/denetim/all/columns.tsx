@@ -17,6 +17,12 @@ import { startPlanManually, deletePlan } from "@/action/audit-plan-actions";
 import { archiveAudit, reactivateAudit, deleteAudit } from "@/action/audit-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { 
+  AUDIT_STATUS_LABELS, 
+  AUDIT_STATUS_COLORS, 
+  PLAN_STATUS_LABELS, 
+  PLAN_STATUS_COLORS 
+} from "@/lib/constants/status-labels";
 
 export type UnifiedRecord = {
   id: string;
@@ -91,29 +97,17 @@ export const columns: ColumnDef<UnifiedRecord>[] = [
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
-      const colors: Record<string, string> = {
-        Pending: "bg-yellow-100 text-yellow-800",
-        Created: "bg-green-100 text-green-800",
-        Cancelled: "bg-red-100 text-red-800",
-        Active: "bg-blue-100 text-blue-800",
-        Archived: "bg-gray-100 text-gray-800",
-        InReview: "bg-purple-100 text-purple-800",
-        PendingClosure: "bg-orange-100 text-orange-800",
-        Closed: "bg-green-100 text-green-800",
-      };
-      const labels: Record<string, string> = {
-        Pending: "Plan Bekliyor",
-        Created: "Oluşturuldu",
-        Cancelled: "İptal",
-        Active: "Aktif",
-        Archived: "Arşivlendi",
-        InReview: "İncelemede",
-        PendingClosure: "Kapatma Bekliyor",
-        Closed: "Kapalı",
-      };
+      
+      // Merge audit and plan status configs
+      const allColors = { ...AUDIT_STATUS_COLORS, ...PLAN_STATUS_COLORS };
+      const allLabels = { ...AUDIT_STATUS_LABELS, ...PLAN_STATUS_LABELS };
+      
+      const colorClass = allColors[status as keyof typeof allColors] || "bg-gray-100 text-gray-800";
+      const label = allLabels[status as keyof typeof allLabels] || status;
+      
       return (
-        <Badge className={`text-xs ${colors[status] || ""}`}>
-          {labels[status] || status}
+        <Badge className={`text-xs ${colorClass}`}>
+          {label}
         </Badge>
       );
     },

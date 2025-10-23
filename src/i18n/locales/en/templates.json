@@ -1,0 +1,11 @@
+{
+  "title": "Audit Templates",
+  "description": "Manage templates for audits",
+  "create": "New Template",
+  "createNew": "Create New Template",
+  "noTemplates": "No templates yet",
+  "createFirst": "Create your first audit template",
+  "questionBanks": "Question Banks",
+  "noQuestionBanks": "No Question Banks",
+  "manage": "Manage Template"
+}

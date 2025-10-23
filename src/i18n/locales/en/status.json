@@ -1,0 +1,55 @@
+{
+  "audit": {
+    "Active": "In Progress",
+    "InReview": "Under Review",
+    "PendingClosure": "Pending Closure",
+    "Closed": "Completed",
+    "Archived": "Archived"
+  },
+  "plan": {
+    "Pending": "Plan Pending",
+    "Created": "Created",
+    "Cancelled": "Cancelled"
+  },
+  "finding": {
+    "New": "New",
+    "Assigned": "Assigned",
+    "InProgress": "In Progress",
+    "PendingAuditorClosure": "Pending Auditor Closure",
+    "Completed": "Completed",
+    "Rejected": "Rejected"
+  },
+  "action": {
+    "Assigned": "Assigned",
+    "PendingManagerApproval": "Pending Manager Approval",
+    "Completed": "Completed",
+    "Rejected": "Rejected",
+    "Cancelled": "Cancelled"
+  },
+  "actionType": {
+    "Simple": "Simple",
+    "Corrective": "Corrective",
+    "Preventive": "Preventive"
+  },
+  "dof": {
+    "Step1_Problem": "1. Problem Definition",
+    "Step2_TempMeasures": "2. Temporary Measures",
+    "Step3_RootCause": "3. Root Cause",
+    "Step4_Activities": "4. Activities",
+    "Step5_Implementation": "5. Implementation",
+    "Step6_EffectivenessCheck": "6. Effectiveness",
+    "PendingManagerApproval": "Pending Manager Approval",
+    "Completed": "Completed",
+    "Rejected": "Rejected"
+  },
+  "risk": {
+    "Kritik": "Critical",
+    "Yüksek": "High",
+    "Orta": "Medium",
+    "Düşük": "Low"
+  },
+  "activity": {
+    "Düzeltici": "Corrective",
+    "Önleyici": "Preventive"
+  }
+}

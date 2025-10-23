@@ -3,6 +3,7 @@ import { pgTable, timestamp, text, uuid, pgEnum, boolean } from "drizzle-orm/pg-
 import { relations } from "drizzle-orm";
 import { user } from "./user";
 import { findings } from "./finding";
+import { actions } from "./action";
 
 // DOF Status Enum (7 Adım)
 export const dofStatusEnum = pgEnum("dof_status", [
@@ -58,7 +59,7 @@ export const dofs = pgTable("dofs", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const dofsRelations = relations(dofs, ({ one }) => ({
+export const dofsRelations = relations(dofs, ({ one, many }) => ({
   finding: one(findings, {
     fields: [dofs.findingId],
     references: [findings.id],
@@ -78,6 +79,10 @@ export const dofsRelations = relations(dofs, ({ one }) => ({
     references: [user.id],
     relationName: 'dof_creator',
   }),
+  // YENİ: DÖF actions (hibrit yaklaşım)
+  // actions tablosundan dofId ile bağlı action'lar
+  // NOT: dofActivities yerine actions kullanılıyor
+  actions: many(actions),
 }));
 
 // DOF Activities (Adım 4: Faaliyetler)

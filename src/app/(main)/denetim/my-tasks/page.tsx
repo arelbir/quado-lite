@@ -1,5 +1,6 @@
 import { getMyPendingTasks } from "@/action/my-tasks-actions";
 import { TaskDashboard } from "./task-dashboard";
+import { getTranslations } from 'next-intl/server';
 
 /**
  * SOLID Architecture - Server Component
@@ -16,15 +17,16 @@ import { TaskDashboard } from "./task-dashboard";
  */
 
 export default async function MyTasksPage() {
+  const t = await getTranslations('myTasks');
   const data = await getMyPendingTasks();
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Bekleyen İşlerim</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Üzerime atanmış tüm görevler ve onay bekleyen işler
+          {t('description')}
         </p>
       </div>
 

@@ -193,6 +193,28 @@ KÖK NEDEN: Sistematik bilgi güvenliği eğitim programı eksikliği ve parola 
         .returning();
 
       if (dof1) {
+        // DÖF'e bağlı Corrective/Preventive Actions
+        await db.insert(actions).values([
+          {
+            dofId: dof1.id,
+            type: "Corrective",
+            details: "AD Parola Politikası Konfigürasyonu: Minimum 12 karakter, büyük/küçük harf, rakam ve özel karakter zorunluluğu aktif edilecek",
+            status: "Assigned",
+            assignedToId: can?.id,
+            managerId: ayse?.id,
+            createdById: admin.id,
+          },
+          {
+            dofId: dof1.id,
+            type: "Preventive",
+            details: "Kurumsal Parola Yöneticisi tedariki ve tüm personele eğitim verilmesi",
+            status: "Assigned",
+            assignedToId: can?.id,
+            managerId: ayse?.id,
+            createdById: admin.id,
+          },
+        ]);
+
         // DÖF Activities
         await db.insert(dofActivities).values([
           {
@@ -500,9 +522,9 @@ KÖK NEDEN: Sistematik bilgi güvenliği eğitim programı eksikliği ve parola 
     console.log(`   - ISO 14001 (Çevre)`);
     console.log(`   - İSG (İş Sağlığı)`);
     console.log(`   Created 13 findings`);
-    console.log(`   Created 11+ actions`);
-    console.log(`   Created 1 DOF with root cause analysis`);
-    console.log(`   Created 3 progress notes`);
+    console.log(`   Created 13+ actions (Simple, Corrective, Preventive)`);
+    console.log(`   Created 1 DOF with root cause analysis + 2 DOF actions`);
+    console.log(`   Created 3 action progress notes`);
     
   } catch (error) {
     console.error("❌ Seed failed:", error);

@@ -1,0 +1,11 @@
+{
+  "title": "Denetim Şablonları",
+  "description": "Denetimler için kullanılacak şablonları yönetin",
+  "create": "Yeni Şablon",
+  "createNew": "Yeni Şablon Oluştur",
+  "noTemplates": "Henüz şablon yok",
+  "createFirst": "İlk denetim şablonunu oluşturun",
+  "questionBanks": "Soru Havuzu",
+  "noQuestionBanks": "Soru Havuzu Yok",
+  "manage": "Şablonu Yönet"
+}

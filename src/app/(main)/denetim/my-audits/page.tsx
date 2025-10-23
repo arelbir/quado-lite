@@ -3,11 +3,12 @@ import { audits } from "@/drizzle/schema";
 import { currentUser } from "@/lib/auth";
 import { eq, and, isNull, gte, inArray, not } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Calendar, Play } from "lucide-react";
+import { Calendar, ClipboardCheck, AlertCircle, Play, Eye } from "lucide-react";
 import Link from "next/link";
+import { AUDIT_STATUS_LABELS, AUDIT_STATUS_COLORS } from "@/lib/constants/status-labels";
 
 /**
  * My Audits Page - Denetimlerim
@@ -35,17 +36,7 @@ export default async function MyAuditsPage() {
     orderBy: (audits, { desc }) => [desc(audits.createdAt)],
   });
 
-  const statusColors: Record<string, string> = {
-    Active: "bg-blue-100 text-blue-800",
-    InReview: "bg-purple-100 text-purple-800",
-    PendingClosure: "bg-orange-100 text-orange-800",
-  };
-
-  const statusLabels: Record<string, string> = {
-    Active: "Aktif",
-    InReview: "İncelemede",
-    PendingClosure: "Kapatma Bekliyor",
-  };
+  // Status colors ve labels merkezi constants'tan alınıyor
 
   return (
     <div className="space-y-6">
@@ -120,8 +111,8 @@ export default async function MyAuditsPage() {
                       <div className="space-y-2 flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-semibold">{audit.title}</h4>
-                          <Badge className={`text-xs ${statusColors[audit.status]}`}>
-                            {statusLabels[audit.status] || audit.status}
+                          <Badge className={`text-xs ${AUDIT_STATUS_COLORS[audit.status as keyof typeof AUDIT_STATUS_COLORS] || ""}`}>
+                            {AUDIT_STATUS_LABELS[audit.status as keyof typeof AUDIT_STATUS_LABELS] || audit.status}
                           </Badge>
                         </div>
                         {audit.description && (

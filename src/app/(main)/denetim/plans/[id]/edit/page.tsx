@@ -29,11 +29,14 @@ export default async function EditPlanPage({ params }: { params: { id: string } 
     email: user.email,
   }).from(user);
 
+  // scheduleType'ı lowercase'e çevir
+  const planTypeForForm = plan.scheduleType.toLowerCase() as "adhoc" | "scheduled";
+
   return (
     <div className="w-full py-6">
       <CreatePlanForm 
         mode="edit"
-        defaultType={plan.scheduleType as "adhoc" | "scheduled"}
+        defaultType={planTypeForForm}
         availableUsers={users}
         initialData={{
           id: plan.id,

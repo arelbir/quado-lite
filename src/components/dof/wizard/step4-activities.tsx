@@ -9,11 +9,18 @@ import { toast } from "sonner";
 import { updateDofStep } from "@/action/dof-actions";
 import { DofActivityForm } from "../dof-activity-form";
 
-interface Step4ActivitiesProps {
-  dof: any;
+interface User {
+  id: string;
+  name: string | null;
+  email: string | null;
 }
 
-export function Step4Activities({ dof }: Step4ActivitiesProps) {
+interface Step4ActivitiesProps {
+  dof: any;
+  users: User[];
+}
+
+export function Step4Activities({ dof, users }: Step4ActivitiesProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showForm, setShowForm] = useState(false);
@@ -87,6 +94,7 @@ export function Step4Activities({ dof }: Step4ActivitiesProps) {
           {showForm && (
             <DofActivityForm
               dofId={dof.id}
+              users={users}
               onSuccess={() => {
                 setShowForm(false);
                 router.refresh();
@@ -95,13 +103,43 @@ export function Step4Activities({ dof }: Step4ActivitiesProps) {
             />
           )}
 
-          {/* TODO: Activities list will come from database query */}
+          {/* Actions Listesi */}
           <div className="space-y-3 mt-4">
-            <div className="p-4 rounded-lg border bg-muted/50">
-              <p className="text-sm text-muted-foreground text-center">
-                Henüz faaliyet eklenmemiş. "Faaliyet Ekle" butonuna tıklayın.
-              </p>
-            </div>
+            {dof.actions && dof.actions.length > 0 ? (
+              dof.actions.map((action: any) => (
+                <div key={action.id} className="p-4 rounded-lg border bg-card">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          action.type === 'Corrective' 
+                            ? 'bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300'
+                            : 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                        }`}>
+                          {action.type === 'Corrective' ? 'Düzeltici' : 'Önleyici'}
+                        </span>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          action.status === 'Completed' 
+                            ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300'
+                            : action.status === 'PendingManagerApproval'
+                            ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
+                            : 'bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-300'
+                        }`}>
+                          {action.status}
+                        </span>
+                      </div>
+                      <p className="text-sm">{action.details}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 rounded-lg border bg-muted/50">
+                <p className="text-sm text-muted-foreground text-center">
+                  Henüz aksiyon eklenmemiş. "Faaliyet Ekle" butonuna tıklayın.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="mt-4 p-4 rounded-lg bg-muted">

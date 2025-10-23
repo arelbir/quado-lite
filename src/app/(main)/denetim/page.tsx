@@ -11,14 +11,19 @@ import {
   Clock 
 } from "lucide-react";
 import Link from "next/link";
+import { FINDING_STATUS_LABELS, FINDING_STATUS_COLORS } from "@/lib/constants/status-labels";
+import { getTranslations } from 'next-intl/server';
 
 export default async function DenetimDashboard() {
+  const t = await getTranslations('dashboard');
+  const tCommon = await getTranslations('common');
+  
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Denetim Sistemi</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Bulgular, Aksiyonlar ve DÖF takip sistemi
+          {t('description')}
         </p>
       </div>
 
@@ -27,11 +32,11 @@ export default async function DenetimDashboard() {
       </Suspense>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Suspense fallback={<div>Yükleniyor...</div>}>
+        <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
           <RecentFindings />
         </Suspense>
 
-        <Suspense fallback={<div>Yükleniyor...</div>}>
+        <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
           <MyTasks />
         </Suspense>
       </div>
@@ -40,36 +45,37 @@ export default async function DenetimDashboard() {
 }
 
 async function StatsCards() {
+  const t = await getTranslations('dashboard.stats');
   const findings = await getFindings();
   const actions = await getMyActions();
   const dofs = await getMyDofs();
 
   const stats = [
     {
-      title: "Toplam Bulgu",
+      title: t('totalFindings'),
       value: findings.length,
-      description: "Aktif bulgular",
+      description: t('activeFindings'),
       icon: AlertCircle,
       color: "text-orange-600",
     },
     {
-      title: "Bekleyen Aksiyonlar",
+      title: t('pendingActions'),
       value: actions.filter(a => a.status !== "Completed").length,
-      description: "Tamamlanmayı bekliyor",
+      description: t('waitingCompletion'),
       icon: Clock,
       color: "text-yellow-600",
     },
     {
-      title: "Aktif DÖF",
+      title: t('activeDofs'),
       value: dofs.filter(d => d.status !== "Completed").length,
-      description: "İşlemde olan DÖF'ler",
+      description: t('dofsInProgress'),
       icon: ClipboardCheck,
       color: "text-primary",
     },
     {
-      title: "Tamamlanan",
+      title: t('completed'),
       value: findings.filter(f => f.status === "Completed").length,
-      description: "Kapatılan bulgular",
+      description: t('closedFindings'),
       icon: CheckCircle2,
       color: "text-green-600",
     },
@@ -101,36 +107,20 @@ async function StatsCards() {
 }
 
 async function RecentFindings() {
+  const t = await getTranslations('dashboard');
   const findings = await getFindings();
   const recentFindings = findings.slice(0, 5);
-
-  const statusColors: Record<string, string> = {
-    New: "bg-gray-100 text-gray-800",
-    Assigned: "bg-blue-100 text-blue-800",
-    InProgress: "bg-yellow-100 text-yellow-800",
-    PendingAuditorClosure: "bg-purple-100 text-purple-800",
-    Completed: "bg-green-100 text-green-800",
-  };
-
-  const statusLabels: Record<string, string> = {
-    New: "Yeni",
-    Assigned: "Atandı",
-    InProgress: "İşlemde",
-    PendingAuditorClosure: "Onay Bekliyor",
-    Completed: "Tamamlandı",
-    Rejected: "Reddedildi",
-  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Son Bulgular</CardTitle>
-        <CardDescription>En son eklenen bulgular</CardDescription>
+        <CardTitle>{t('recentFindings.title')}</CardTitle>
+        <CardDescription>{t('recentFindings.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {recentFindings.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Henüz bulgu yok</p>
+            <p className="text-sm text-muted-foreground">{t('recentFindings.noData')}</p>
           ) : (
             recentFindings.map((finding) => (
               <Link
@@ -144,11 +134,11 @@ async function RecentFindings() {
                       {finding.details.substring(0, 60)}...
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {finding.audit?.title || "Denetim"}
+                      {finding.audit?.title || t('recentFindings.audit')}
                     </p>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${statusColors[finding.status]}`}>
-                    {statusLabels[finding.status]}
+                  <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${FINDING_STATUS_COLORS[finding.status as keyof typeof FINDING_STATUS_COLORS]}`}>
+                    {FINDING_STATUS_LABELS[finding.status as keyof typeof FINDING_STATUS_LABELS]}
                   </span>
                 </div>
               </Link>
@@ -161,6 +151,7 @@ async function RecentFindings() {
 }
 
 async function MyTasks() {
+  const t = await getTranslations('dashboard');
   const actions = await getMyActions();
   const myPendingActions = actions.filter(a => 
     a.status === "Assigned" || a.status === "PendingManagerApproval"
@@ -169,14 +160,14 @@ async function MyTasks() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Görevlerim</CardTitle>
-        <CardDescription>Bekleyen aksiyon ve onaylar</CardDescription>
+        <CardTitle>{t('myTasks.title')}</CardTitle>
+        <CardDescription>{t('myTasks.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {myPendingActions.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              🎉 Bekleyen görev yok!
+              {t('myTasks.noTasks')}
             </p>
           ) : (
             myPendingActions.map((action) => (
@@ -189,7 +180,7 @@ async function MyTasks() {
                     {action.details.substring(0, 50)}...
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {action.status === "Assigned" ? "Sorumlu" : "Onay Bekliyor"}
+                    {action.status === "Assigned" ? t('myTasks.responsible') : t('myTasks.waitingApproval')}
                   </p>
                 </div>
                 {action.status === "Assigned" ? (

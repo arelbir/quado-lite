@@ -1,0 +1,36 @@
+{
+  "menu": {
+    "dashboard": "Ana Sayfa",
+    "audits": "Denetimler",
+    "myAudits": "Denetimlerim",
+    "allAudits": "Tüm Denetimler",
+    "auditPlans": "Denetim Planları",
+    "findings": "Bulgular",
+    "actions": "Aksiyonlar",
+    "dofs": "DÖF (CAPA)",
+    "reports": "Raporlar",
+    "settings": "Ayarlar",
+    "profile": "Profil",
+    "logout": "Çıkış"
+  },
+  "breadcrumb": {
+    "home": "Ana Sayfa",
+    "audits": "Denetimler",
+    "findings": "Bulgular",
+    "actions": "Aksiyonlar",
+    "dofs": "DÖF",
+    "details": "Detaylar",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "reports": "Raporlar"
+  },
+  "tabs": {
+    "overview": "Genel Bakış",
+    "details": "Detaylar",
+    "findings": "Bulgular",
+    "actions": "Aksiyonlar",
+    "timeline": "Zaman Çizelgesi",
+    "documents": "Dökümanlar",
+    "history": "Geçmiş"
+  }
+}

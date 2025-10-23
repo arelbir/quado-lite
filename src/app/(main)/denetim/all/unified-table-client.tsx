@@ -4,45 +4,50 @@ import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
 import { columns, type UnifiedRecord } from "./columns";
+import { useTranslations } from 'next-intl';
+import { useAuditStatusLabel, usePlanStatusLabel } from "@/lib/i18n/status-helpers";
 
 interface UnifiedTableClientProps {
   data: UnifiedRecord[];
+  type: "audit" | "plan";
 }
 
-export function UnifiedTableClient({ data }: UnifiedTableClientProps) {
+export function UnifiedTableClient({ data, type }: UnifiedTableClientProps) {
+  const t = useTranslations('audit');
+  const tPlan = useTranslations('audit.plans');
+  const tCommon = useTranslations('common');
+  const getAuditStatusLabel = useAuditStatusLabel();
+  const getPlanStatusLabel = usePlanStatusLabel();
+  
+  // Status options based on type
+  const statusOptions = type === "plan" 
+    ? [
+        { label: getPlanStatusLabel('Active'), value: 'Active' },
+        { label: getPlanStatusLabel('Completed'), value: 'Completed' },
+        { label: getPlanStatusLabel('Cancelled'), value: 'Cancelled' },
+      ]
+    : [
+        { label: getAuditStatusLabel('InProgress'), value: 'InProgress' },
+        { label: getAuditStatusLabel('Completed'), value: 'Completed' },
+        { label: getAuditStatusLabel('Archived'), value: 'Archived' },
+      ];
+  
   const filterFields = [
     {
-      label: "Tip",
-      value: "type" as keyof UnifiedRecord,
-      options: [
-        { label: "Plan", value: "plan" },
-        { label: "Denetim", value: "audit" },
-      ],
-    },
-    {
-      label: "Durum",
+      label: t('fields.status'),
       value: "status" as keyof UnifiedRecord,
-      options: [
-        { label: "Plan Bekliyor", value: "Pending" },
-        { label: "Oluşturuldu", value: "Created" },
-        { label: "İptal", value: "Cancelled" },
-        { label: "Aktif", value: "Active" },
-        { label: "Arşivlendi", value: "Archived" },
-        { label: "İncelemede", value: "InReview" },
-        { label: "Kapatma Bekliyor", value: "PendingClosure" },
-        { label: "Kapalı", value: "Closed" },
-      ],
+      options: statusOptions,
     },
     {
-      label: "Tarih",
+      label: tCommon('date'),
       value: "date" as keyof UnifiedRecord,
       type: "date" as const,
-      placeholder: "Tarih aralığı seçin",
+      placeholder: t('placeholders.selectDateRange'),
     },
     {
-      label: "Başlık",
+      label: t('fields.title'),
       value: "title" as keyof UnifiedRecord,
-      placeholder: "Başlık ara...",
+      placeholder: t('placeholders.searchTitle'),
     },
   ];
 
@@ -53,13 +58,19 @@ export function UnifiedTableClient({ data }: UnifiedTableClientProps) {
     filterFields,
   });
 
+  // Title ve description type'a göre
+  const title = type === "plan" ? tPlan('title') : t('active');
+  const description = type === "plan" 
+    ? `${tCommon('total')} ${data.length} ${tPlan('singular').toLowerCase()}`
+    : `${tCommon('total')} ${data.length} ${t('singular').toLowerCase()}`;
+
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} filterFields={filterFields} />
       <DataTable
         table={table}
-        title="Denetimler & Planlar"
-        description={`Toplam ${data.length} kayıt`}
+        title={title}
+        description={description}
       />
     </div>
   );

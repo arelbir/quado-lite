@@ -14,6 +14,7 @@ import { getGithubStar } from '@/server/other'
 import { Skeleton } from '@/components/ui/skeleton'
 import { NotificationBell } from '@/components/notifications/notification-bell'
 import { getUnreadCount } from '@/action/notification-actions'
+import { LanguageSwitcher } from '@/components/language-switcher'
 
 
 
@@ -119,6 +120,7 @@ export const Header = async () => {
       </Link>
 
       <NotificationBell initialUnreadCount={unreadCount} />
+      <LanguageSwitcher />
       <ThemeToggle theme={user?.theme!} />
       <UserDropdown />
     </header>

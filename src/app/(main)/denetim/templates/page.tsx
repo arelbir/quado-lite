@@ -5,26 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Plus, FileText } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { getTranslations } from 'next-intl/server';
 
-export default function TemplatesPage() {
+export default async function TemplatesPage() {
+  const t = await getTranslations('templates');
+  const tCommon = await getTranslations('common');
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Denetim Şablonları</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Denetimler için kullanılacak şablonları yönetin
+            {t('description')}
           </p>
         </div>
         <Button asChild>
           <Link href="/denetim/templates/new">
             <Plus className="h-4 w-4 mr-2" />
-            Yeni Şablon
+            {t('create')}
           </Link>
         </Button>
       </div>
 
-      <Suspense fallback={<div>Yükleniyor...</div>}>
+      <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
         <TemplatesGrid />
       </Suspense>
     </div>
@@ -32,6 +36,7 @@ export default function TemplatesPage() {
 }
 
 async function TemplatesGrid() {
+  const t = await getTranslations('templates');
   const templates = await getAuditTemplates();
 
   if (templates.length === 0) {
@@ -39,14 +44,14 @@ async function TemplatesGrid() {
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">Henüz şablon yok</h3>
+          <h3 className="text-lg font-medium mb-2">{t('noTemplates')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            İlk denetim şablonunu oluşturun
+            {t('createFirst')}
           </p>
           <Button asChild>
             <Link href="/denetim/templates/new">
               <Plus className="h-4 w-4 mr-2" />
-              Yeni Şablon Oluştur
+              {t('createNew')}
             </Link>
           </Button>
         </CardContent>
@@ -82,16 +87,16 @@ async function TemplatesGrid() {
                           : template.questionBankIds as string[])
                       : [];
                     return bankIds.length > 0 
-                      ? `${bankIds.length} Soru Havuzu` 
-                      : "Soru Havuzu Yok";
+                      ? `${bankIds.length} ${t('questionBanks')}` 
+                      : t('noQuestionBanks');
                   } catch {
-                    return "Soru Havuzu Yok";
+                    return t('noQuestionBanks');
                   }
                 })()}
               </Badge>
               <Button asChild size="sm" variant="outline">
                 <Link href={`/denetim/templates/${template.id}`}>
-                  Şablonu Yönet
+                  {t('manage')}
                 </Link>
               </Button>
             </div>

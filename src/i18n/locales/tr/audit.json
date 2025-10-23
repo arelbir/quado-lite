@@ -1,0 +1,74 @@
+{
+  "title": "Denetimler",
+  "singular": "Denetim",
+  "active": "Aktif Denetimler",
+  "description": "Tüm denetim ve planlarınızı tek yerden yönetin",
+  "create": "Yeni Denetim Oluştur",
+  "edit": "Denetimi Düzenle",
+  "delete": "Denetimi Sil",
+  "view": "Denetimi Görüntüle",
+  
+  "fields": {
+    "title": "Denetim Başlığı",
+    "description": "Açıklama",
+    "auditor": "Denetçi",
+    "auditee": "Denetlenen",
+    "department": "Departman",
+    "startDate": "Başlangıç Tarihi",
+    "endDate": "Bitiş Tarihi",
+    "plannedDate": "Planlanan Tarih",
+    "actualDate": "Gerçekleşen Tarih",
+    "status": "Durum",
+    "type": "Denetim Tipi",
+    "scope": "Kapsam",
+    "standard": "Standart",
+    "createdAt": "Oluşturulma Tarihi",
+    "updatedAt": "Güncellenme Tarihi",
+    "createdBy": "Oluşturan",
+    "assignedTo": "Atanan"
+  },
+  
+  "status": {
+    "draft": "Taslak",
+    "planned": "Planlandı",
+    "inProgress": "Devam Ediyor",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi"
+  },
+  
+  "types": {
+    "internal": "İç Denetim",
+    "external": "Dış Denetim",
+    "supplier": "Tedarikçi Denetimi",
+    "process": "Süreç Denetimi",
+    "compliance": "Uygunluk Denetimi"
+  },
+  
+  "messages": {
+    "created": "Denetim başarıyla oluşturuldu",
+    "updated": "Denetim güncellendi",
+    "deleted": "Denetim silindi",
+    "notFound": "Denetim bulunamadı",
+    "cannotDelete": "Bu denetim silinemez (ilişkili kayıtlar var)",
+    "confirmDelete": "Bu denetimi silmek istediğinizden emin misiniz?",
+    "noAudits": "Henüz denetim bulunmuyor",
+    "loadingAudits": "Denetimler yükleniyor..."
+  },
+  
+  "sections": {
+    "overview": "Genel Bakış",
+    "details": "Denetim Detayları",
+    "findings": "Bulgular",
+    "team": "Denetim Ekibi",
+    "checklist": "Denetim Kontrol Listesi",
+    "timeline": "Zaman Çizelgesi",
+    "reports": "Raporlar"
+  },
+  
+  "placeholders": {
+    "searchAudit": "Denetim ara...",
+    "selectAuditor": "Denetçi seçiniz",
+    "selectDepartment": "Departman seçiniz",
+    "enterDescription": "Açıklama giriniz"
+  }
+}

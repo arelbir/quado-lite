@@ -1,8 +1,10 @@
 // Findings (Bulgular) - Kurumsal Denetim Sistemi
-import { pgTable, timestamp, text, uuid, pgEnum } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { user } from "./user";
+import { pgEnum, pgTable, timestamp, text, uuid } from "drizzle-orm/pg-core";
 import { audits } from "./audit";
+import { user } from "./user";
+import { actions } from "./action";
+import { dofs } from "./dof";
+import { relations } from "drizzle-orm";
 
 // Finding Status Enum
 export const findingStatusEnum = pgEnum("finding_status", [
@@ -20,6 +22,7 @@ export const findings = pgTable("findings", {
   details: text("details").notNull(),
   status: findingStatusEnum("status").notNull().default("New"),
   riskType: text("risk_type"), // Örn: "Kritik", "Yüksek", "Orta", "Düşük"
+  rejectionReason: text("rejection_reason"), // Denetçi tarafından reddedilme nedeni
   // Bu, ana Süreç Sahibidir (Bulguyu ilk alan kişi)
   assignedToId: uuid("assigned_to_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }),
   createdById: uuid("created_by_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }),
@@ -27,7 +30,7 @@ export const findings = pgTable("findings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const findingsRelations = relations(findings, ({ one }) => ({
+export const findingsRelations = relations(findings, ({ one, many }) => ({
   audit: one(audits, {
     fields: [findings.auditId],
     references: [audits.id],
@@ -42,6 +45,9 @@ export const findingsRelations = relations(findings, ({ one }) => ({
     references: [user.id],
     relationName: 'finding_creator',
   }),
+  // Many relations (bulguya bağlı aksiyonlar ve DÖF'ler)
+  actions: many(actions), // Basit aksiyonlar (type: "Simple")
+  dofs: many(dofs), // DÖF'ler (kompleks aksiyonlar)
 }));
 
 export type Finding = typeof findings.$inferSelect;

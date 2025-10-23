@@ -3,14 +3,17 @@ import { getMyActions } from "@/action/action-actions";
 import { ActionsTableClient } from "./actions-table-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getTranslations } from 'next-intl/server';
 
-export default function ActionsPage() {
+export default async function ActionsPage() {
+  const t = await getTranslations('action');
+  
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Aksiyonlarım</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Bana atanan aksiyonlar ve onay bekleyenler
+          {t('sections.details')}
         </p>
       </div>
 

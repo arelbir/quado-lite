@@ -1,0 +1,92 @@
+{
+  "title": "Findings",
+  "singular": "Finding",
+  "description": "View all audit findings",
+  "create": "Create New Finding",
+  "edit": "Edit Finding",
+  "delete": "Delete Finding",
+  "view": "View Finding",
+  "assign": "Assign",
+  "close": "Close",
+  
+  "fields": {
+    "title": "Finding Title",
+    "description": "Description",
+    "audit": "Related Audit",
+    "type": "Finding Type",
+    "severity": "Severity",
+    "status": "Status",
+    "department": "Department",
+    "processOwner": "Process Owner",
+    "identifiedBy": "Identified By",
+    "identifiedDate": "Identified Date",
+    "dueDate": "Closure Due Date",
+    "closedDate": "Closed Date",
+    "rootCause": "Root Cause",
+    "immediateAction": "Immediate Action",
+    "clause": "Clause",
+    "standard": "Standard",
+    "evidence": "Evidence"
+  },
+  
+  "status": {
+    "open": "Open",
+    "assigned": "Assigned",
+    "inProgress": "In Progress",
+    "pendingClosure": "Pending Closure",
+    "closed": "Closed",
+    "rejected": "Rejected"
+  },
+  
+  "types": {
+    "majorNC": "Major Non-Conformity",
+    "minorNC": "Minor Non-Conformity",
+    "observation": "Observation",
+    "opportunity": "Improvement Opportunity",
+    "compliance": "Compliance"
+  },
+  
+  "severity": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  
+  "messages": {
+    "created": "Finding created successfully",
+    "updated": "Finding updated",
+    "deleted": "Finding deleted",
+    "assigned": "Finding assigned",
+    "closed": "Finding closed",
+    "rejected": "Finding rejected",
+    "notFound": "Finding not found",
+    "confirmClose": "Are you sure you want to close this finding?",
+    "confirmReject": "Are you sure you want to reject this finding?",
+    "enterRejectionReason": "Please enter rejection reason",
+    "noFindings": "No findings yet",
+    "loadingFindings": "Loading findings...",
+    "closureRequested": "Closure requested",
+    "closureApproved": "Closure approved"
+  },
+  
+  "sections": {
+    "details": "Finding Details",
+    "actions": "Actions",
+    "dofs": "CAPAs",
+    "rootCauseAnalysis": "Root Cause Analysis",
+    "closure": "Closure Information",
+    "timeline": "Timeline",
+    "attachments": "Attachments"
+  },
+  
+  "placeholders": {
+    "enterDetails": "Enter finding details",
+    "selectAudit": "Select audit",
+    "selectResponsible": "Select responsible person",
+    "searchFinding": "Search finding...",
+    "enterDescription": "Enter description",
+    "enterRootCause": "Enter root cause",
+    "enterImmediate": "Enter immediate action"
+  }
+}

@@ -1,6 +1,8 @@
-// Actions (Basit Aksiyonlar) - Kurumsal Denetim Sistemi
+// Actions (Basit Aksiyonlar + DÖF Alt Aksiyonları) - Kurumsal Denetim Sistemi
+// Hibrit Yaklaşım: DRY prensibiyle tek action modülü hem basit hem DÖF aksiyonları için
 import { pgTable, uuid, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { findings } from "./finding";
+import { dofs } from "./dof";
 import { user } from "./user";
 import { relations } from "drizzle-orm";
 import { actionProgress } from "./action-progress";
@@ -14,19 +16,38 @@ export const actionStatusEnum = pgEnum("action_status", [
   "Cancelled"              // İptal edildi, döngüden çıkış (Final state)
 ]);
 
+// Action Type Enum (YENİ: Hibrit yaklaşım için)
+export const actionTypeEnum = pgEnum("action_type", [
+  "Simple",      // Basit aksiyon (direkt bulguya bağlı)
+  "Corrective",  // Düzeltici aksiyon (DÖF altında)
+  "Preventive"   // Önleyici aksiyon (DÖF altında)
+]);
+
 export const actions = pgTable("actions", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  findingId: uuid("finding_id").references(() => findings.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  
+  // Parent Referansları (En az biri NULL olmamalı - CHECK constraint DB'de)
+  findingId: uuid("finding_id").references(() => findings.id, { onDelete: "cascade", onUpdate: "cascade" }), // Basit aksiyon için
+  dofId: uuid("dof_id").references(() => dofs.id, { onDelete: "cascade", onUpdate: "cascade" }), // DÖF aksiyonu için (Step 4)
+  
+  // Aksiyon Tipi (YENİ)
+  type: actionTypeEnum("type").notNull().default("Simple"),
+  
+  // Aksiyon Detayları
   details: text("details").notNull(),
   status: actionStatusEnum("status").notNull().default("Assigned"),
-  // Esnek atama: Herhangi bir kullanıcı olabilir
+  
+  // Kullanıcı Referansları
   assignedToId: uuid("assigned_to_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }),
-  // Esnek atama: Herhangi bir kullanıcı olabilir
   managerId: uuid("manager_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }),
   createdById: uuid("created_by_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" }),
-  // Tamamlama ve ret notları
-  completionNotes: text("completion_notes"), // Sorumlu ne yaptığını açıklar
-  rejectionReason: text("rejection_reason"), // Yönetici ret nedeni
+  
+  // Notlar ve Kanıtlar
+  completionNotes: text("completion_notes"),
+  rejectionReason: text("rejection_reason"),
+  evidenceUrls: text("evidence_urls").array(), // YENİ: Kanıt dosyaları
+  
+  // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   completedAt: timestamp("completed_at"),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -36,6 +57,10 @@ export const actionsRelations = relations(actions, ({ one, many }) => ({
   finding: one(findings, {
     fields: [actions.findingId],
     references: [findings.id],
+  }),
+  dof: one(dofs, { // YENİ: DÖF relation
+    fields: [actions.dofId],
+    references: [dofs.id],
   }),
   assignedTo: one(user, {
     fields: [actions.assignedToId],

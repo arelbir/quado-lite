@@ -2,18 +2,14 @@
 
 import { db } from "@/drizzle/db";
 import { actions, dofs, findings } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
 import { eq, and, or, inArray } from "drizzle-orm";
+import { withAuth } from "@/lib/helpers";
 
 /**
  * Bekleyen İşlerim - Tüm atanan görevleri getir
  */
 export async function getMyPendingTasks() {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
+  const result = await withAuth(async (user) => {
 
     // 1. Aksiyonlarım (Atanan veya Onay Bekleyen)
     const myActions = await db.query.actions.findMany({
@@ -151,27 +147,29 @@ export async function getMyPendingTasks() {
     };
 
     return {
-      actions: myActions,
-      dofs: myDofs,
-      approvals: myApprovals,
-      findings: myFindings,
-      summary,
+      success: true,
+      data: {
+        actions: myActions,
+        dofs: myDofs,
+        approvals: myApprovals,
+        findings: myFindings,
+        summary,
+      },
     };
-  } catch (error) {
-    console.error("Error fetching my pending tasks:", error);
-    throw error;
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
   }
+
+  return result.data;
 }
 
 /**
  * Quick stats - sadece sayılar
  */
 export async function getMyTasksCount() {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { actions: 0, dofs: 0, approvals: 0, findings: 0 };
-    }
+  const result = await withAuth(async (user) => {
 
     const [actionsCount, dofsCount, approvalsCount, findingsCount] = await Promise.all([
       db.query.actions.findMany({
@@ -210,13 +208,19 @@ export async function getMyTasksCount() {
     ]);
 
     return {
-      actions: actionsCount.length,
-      dofs: dofsCount.length,
-      approvals: approvalsCount.length,
-      findings: findingsCount.length,
+      success: true,
+      data: {
+        actions: actionsCount.length,
+        dofs: dofsCount.length,
+        approvals: approvalsCount.length,
+        findings: findingsCount.length,
+      },
     };
-  } catch (error) {
-    console.error("Error fetching task counts:", error);
+  });
+
+  if (!result.success) {
     return { actions: 0, dofs: 0, approvals: 0, findings: 0 };
   }
+
+  return result.data;
 }

@@ -22,12 +22,12 @@ async function runAllSeeds() {
     console.log("");
     console.log("📊 Summary:");
     console.log("   - 12 Turkish users");
-    console.log("   - 3 question banks + 14 questions");
+    console.log("   - 3 question banks + 15 questions (YesNo, Scale, SingleChoice, Checklist)");
     console.log("   - 3 audit templates");
     console.log("   - 6 audits (ISO 9001, ISO 27001, KVKK, Software, ISO 14001, İSG)");
     console.log("   - 13 findings");
-    console.log("   - 11+ actions with progress notes");
-    console.log("   - 1 DOF with root cause analysis");
+    console.log("   - 13+ actions (Simple, Corrective, Preventive) with progress notes");
+    console.log("   - 1 DOF with root cause analysis + 2 DOF actions");
     console.log("");
     console.log("🔑 Login credentials:");
     console.log("   Admin: admin@example.com / admin1234");

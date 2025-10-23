@@ -28,9 +28,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ArrowLeft, Save, Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { toast } from "sonner";
+import { updateAuditPlan } from "@/action/audit-plan-actions";
+import { cn } from "@/lib/utils";
+import { useTranslations } from 'next-intl';
+import { useButtonLabels } from "@/lib/i18n/button-labels";
 
 interface EditPlanFormProps {
   plan: {
@@ -55,6 +58,8 @@ export function EditPlanForm({ plan, availableUsers }: EditPlanFormProps) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [auditorOpen, setAuditorOpen] = useState(false);
+  const btn = useButtonLabels();
+  const tCommon = useTranslations('common');
 
   const [formData, setFormData] = useState({
     title: plan.title,
@@ -268,11 +273,11 @@ export function EditPlanForm({ plan, availableUsers }: EditPlanFormProps) {
             <div className="flex gap-2 pt-4">
               <Button type="submit" disabled={isPending}>
                 <Save className="h-4 w-4 mr-2" />
-                {isPending ? "Kaydediliyor..." : "Kaydet"}
+                {isPending ? tCommon('status.saving') : btn.save}
               </Button>
               <Button type="button" variant="outline" asChild>
                 <Link href={`/denetim/plans`}>
-                  İptal
+                  {btn.cancel}
                 </Link>
               </Button>
             </div>

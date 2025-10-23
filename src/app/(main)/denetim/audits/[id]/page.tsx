@@ -15,7 +15,9 @@ import { Progress } from "@/components/ui/progress";
 import { AuditQuestionsForm } from "@/components/audit/audit-questions-form";
 import { FindingCard } from "@/components/audit/finding-card";
 import { AuditStatusActions } from "@/components/audit/audit-status-actions";
+import { AuditReportButton } from "@/components/audit/audit-report-button";
 import { AddQuestionDialog } from "@/components/audit/add-question-dialog";
+import { getAuditStatusLabel, getAuditStatusColor } from "@/lib/constants/status-labels";
 
 interface PageProps {
   params: { id: string };
@@ -122,6 +124,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <AuditReportButton auditId={params.id} />
           {audit.status === "Active" && (
             <Button asChild variant="outline" size="sm">
               <Link href={`/denetim/audits/${params.id}/edit`}>
@@ -200,7 +203,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 <CardTitle className="text-sm font-medium">Durum</CardTitle>
               </CardHeader>
               <CardContent>
-                <Badge className="text-sm">Devam Ediyor</Badge>
+                <Badge className={getAuditStatusColor(audit.status)}>
+                  {getAuditStatusLabel(audit.status)}
+                </Badge>
                 <p className="text-xs text-muted-foreground mt-2">
                   {new Date(audit.createdAt).toLocaleDateString("tr-TR")} tarihinde başlatıldı
                 </p>

@@ -66,6 +66,6 @@ function TaskBadge({ task }: { task: TaskItem }) {
       return <Badge variant="destructive">Açık</Badge>;
     
     default:
-      return <Badge>{task.status}</Badge>;
+      return <Badge>Bilinmiyor</Badge>;
   }
 }

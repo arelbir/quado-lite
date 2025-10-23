@@ -5,26 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Plus, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { getTranslations } from 'next-intl/server';
 
-export default function QuestionBanksPage() {
+export default async function QuestionBanksPage() {
+  const t = await getTranslations('questionBanks');
+  const tCommon = await getTranslations('common');
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Soru Havuzu</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Denetim sorularını kategorilere göre yönetin
+            {t('description')}
           </p>
         </div>
         <Button asChild>
           <Link href="/denetim/question-banks/new">
             <Plus className="h-4 w-4 mr-2" />
-            Yeni Soru Havuzu
+            {t('create')}
           </Link>
         </Button>
       </div>
 
-      <Suspense fallback={<div>Yükleniyor...</div>}>
+      <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
         <QuestionBanksGrid />
       </Suspense>
     </div>
@@ -32,6 +36,7 @@ export default function QuestionBanksPage() {
 }
 
 async function QuestionBanksGrid() {
+  const t = await getTranslations('questionBanks');
   const questionBanks = await getQuestionBanks();
 
   if (questionBanks.length === 0) {
@@ -39,14 +44,14 @@ async function QuestionBanksGrid() {
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <HelpCircle className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">Henüz soru havuzu yok</h3>
+          <h3 className="text-lg font-medium mb-2">{t('noBanks')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            İlk soru havuzunu oluşturun
+            {t('createFirst')}
           </p>
           <Button asChild>
             <Link href="/denetim/question-banks/new">
               <Plus className="h-4 w-4 mr-2" />
-              Yeni Soru Havuzu Oluştur
+              {t('createNew')}
             </Link>
           </Button>
         </CardContent>
@@ -74,11 +79,11 @@ async function QuestionBanksGrid() {
           <CardContent>
             <div className="flex items-center justify-between">
               <Badge variant="secondary">
-                {bank.questions?.length || 0} Soru
+                {bank.questions?.length || 0} {t('questions')}
               </Badge>
               <Button asChild size="sm" variant="outline">
                 <Link href={`/denetim/question-banks/${bank.id}`}>
-                  Soruları Yönet
+                  {t('manage')}
                 </Link>
               </Button>
             </div>

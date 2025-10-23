@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { MessageSquarePlus } from "lucide-react";
-import { toast } from "sonner";
+import { useTranslations } from 'next-intl';
+import { useToastMessages } from "@/lib/i18n/toast-messages";
 import { addActionProgress } from "@/action/action-actions";
 
 /**
@@ -28,6 +29,10 @@ export function ActionProgressForm({ actionId, actionStatus }: ActionProgressFor
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [note, setNote] = useState("");
+  
+  // i18n
+  const t = useTranslations('action');
+  const toast = useToastMessages();
 
   // Sadece Assigned durumunda progress eklenebilir
   if (actionStatus !== "Assigned") {
@@ -38,7 +43,7 @@ export function ActionProgressForm({ actionId, actionStatus }: ActionProgressFor
     e.preventDefault();
 
     if (!note.trim()) {
-      toast.error("Lütfen bir not girin");
+      toast.error(t('messages.enterNotes'));
       return;
     }
 
@@ -46,7 +51,7 @@ export function ActionProgressForm({ actionId, actionStatus }: ActionProgressFor
       const result = await addActionProgress(actionId, note.trim());
 
       if (result.success) {
-        toast.success("İlerleme notu eklendi");
+        toast.success();
         setNote("");
         router.refresh();
       } else {
@@ -60,33 +65,30 @@ export function ActionProgressForm({ actionId, actionStatus }: ActionProgressFor
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
           <MessageSquarePlus className="h-5 w-5" />
-          İlerleme Notu Ekle
+          {t('sections.progress')}
         </CardTitle>
         <CardDescription className="text-blue-800 dark:text-blue-200">
-          Aksiyon henüz tamamlanmadı ama bir şeyler yaptınız mı? Buraya not düşün
+          {t('fields.notes')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="progress-note">
-              Ne yaptınız? Sonraki adımlar neler?
+              {t('fields.notes')}
             </Label>
             <Textarea
               id="progress-note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Örnek:&#10;• Bugün hatayı analiz ettim, root cause buldum&#10;• Yarın fix uygulayıp test edeceğim"
+              placeholder={t('placeholders.enterNotes')}
               className="min-h-[100px]"
               disabled={isPending}
             />
-            <p className="text-xs text-muted-foreground">
-              Bu not timeline'da görünecek. Yöneticiniz ilerlemenizi takip edebilir.
-            </p>
           </div>
 
           <Button type="submit" disabled={isPending || !note.trim()}>
-            {isPending ? "Kaydediliyor..." : "İlerleme Notu Ekle"}
+            {isPending ? t('messages.saving') || 'Saving...' : t('sections.progress')}
           </Button>
         </form>
       </CardContent>

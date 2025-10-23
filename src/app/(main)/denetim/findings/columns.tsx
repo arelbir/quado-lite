@@ -2,18 +2,12 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, Eye } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { Eye } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from 'next-intl';
+import { useRiskTypeLabel } from "@/lib/i18n/status-helpers";
 
 export type Finding = {
   id: string;
@@ -31,10 +25,18 @@ export type Finding = {
   } | null;
 };
 
-export const columns: ColumnDef<Finding>[] = [
-  {
-    accessorKey: "details",
-    header: "Bulgu Detayı",
+export function useFindingColumns(): ColumnDef<Finding>[] {
+  const t = useTranslations('finding');
+  const tCommon = useTranslations('common');
+  const tAudit = useTranslations('audit');
+  const getRiskLabel = useRiskTypeLabel();
+
+  return [
+    {
+      accessorKey: "details",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('fields.details')} />
+      ),
     cell: ({ row }) => {
       return (
         <div className="max-w-[500px]">
@@ -45,7 +47,9 @@ export const columns: ColumnDef<Finding>[] = [
   },
   {
     accessorKey: "audit",
-    header: "Denetim",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={tAudit('singular')} />
+    ),
     cell: ({ row }) => {
       const audit = row.original.audit;
       return audit ? (
@@ -57,67 +61,52 @@ export const columns: ColumnDef<Finding>[] = [
   },
   {
     accessorKey: "riskType",
-    header: "Risk",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={t('fields.riskType')} />
+    ),
     cell: ({ row }) => {
       const risk = row.getValue("riskType") as string | null;
-      const colors: Record<string, string> = {
-        "Kritik": "text-red-600",
-        "Yüksek": "text-orange-600",
-        "Orta": "text-yellow-600",
-        "Düşük": "text-green-600",
-      };
-      return risk ? (
-        <span className={`text-sm font-medium ${colors[risk]}`}>{risk}</span>
-      ) : (
-        <span className="text-sm text-muted-foreground">-</span>
+      if (!risk) return <span className="text-sm text-muted-foreground">-</span>;
+      return (
+        <span className="text-sm">{getRiskLabel(risk as any)}</span>
       );
     },
   },
   {
     accessorKey: "status",
-    header: "Durum",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={t('fields.status')} />
+    ),
     cell: ({ row }) => {
       return <StatusBadge status={row.getValue("status")} type="finding" />;
     },
   },
   {
     accessorKey: "assignedTo",
-    header: "Sorumlu",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={t('fields.responsiblePerson')} />
+    ),
     cell: ({ row }) => {
       const assignedTo = row.original.assignedTo;
       return assignedTo ? (
         <span className="text-sm">{assignedTo.name}</span>
       ) : (
-        <span className="text-sm text-muted-foreground">Atanmadı</span>
+        <span className="text-sm text-muted-foreground">-</span>
       );
     },
   },
   {
     id: "actions",
-    enableHiding: false,
     cell: ({ row }) => {
-      const finding = row.original;
-
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Menüyü aç</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href={`/denetim/findings/${finding.id}`} className="cursor-pointer">
-                <Eye className="mr-2 h-4 w-4" />
-                Detayları Görüntüle
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button asChild size="sm" variant="ghost">
+          <Link href={`/denetim/findings/${row.original.id}`}>
+            <Eye className="h-4 w-4 mr-2" />
+            {tCommon('view')}
+          </Link>
+        </Button>
       );
     },
   },
 ];
+}

@@ -1,14 +1,18 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { audits, findings } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
-import { eq, and, not } from "drizzle-orm";
-
-type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
+import { audits, findings, notifications } from "@/drizzle/schema";
+import { eq, and, not, isNull } from "drizzle-orm";
+import type { ActionResponse, User } from "@/lib/types";
+import { 
+  withAuth, 
+  requireAdmin,
+  requireCreatorOrAdmin,
+  createNotFoundError,
+  createPermissionError,
+  createValidationError,
+  revalidateAuditPaths,
+} from "@/lib/helpers";
 
 /**
  * Yeni denetim oluştur
@@ -18,15 +22,9 @@ export async function createAudit(data: {
   description?: string;
   auditDate?: Date;
 }): Promise<ActionResponse<{ id: string }>> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Sadece admin veya denetçi oluşturabilir
-    if (user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only auditors can create audits" };
+  return withAuth<{ id: string }>(async (user: User) => {
+    if (!requireAdmin(user)) {
+      return createPermissionError<{ id: string }>("Only auditors can create audits");
     }
 
     const [audit] = await db
@@ -39,12 +37,9 @@ export async function createAudit(data: {
       })
       .returning({ id: audits.id });
 
-    revalidatePath("/denetim/audits");
+    revalidateAuditPaths({ audits: true });
     return { success: true, data: { id: audit!.id } };
-  } catch (error) {
-    console.error("Error creating audit:", error);
-    return { success: false, error: "Failed to create audit" };
-  }
+  });
 }
 
 /**
@@ -52,32 +47,37 @@ export async function createAudit(data: {
  * Denetçi sorumluluğunu bırakır, bulgular süreç sahiplerince tamamlanır
  */
 export async function completeAudit(auditId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Denetimi kontrol et
+  return withAuth(async (user: User) => {
     const audit = await db.query.audits.findFirst({
       where: eq(audits.id, auditId),
     });
 
     if (!audit) {
-      return { success: false, error: "Audit not found" };
+      return createNotFoundError("Audit");
     }
 
-    // Sadece Active denetimler tamamlanabilir
     if (audit.status !== "Active") {
-      return { success: false, error: "Only active audits can be completed" };
+      return createValidationError("Only active audits can be completed");
     }
 
-    // Denetçi veya admin olmalı
-    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only audit creator can complete the audit" };
+    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
+      return createPermissionError("Only audit creator can complete the audit");
     }
 
-    // Status'u InReview'e al
+    // YENİ: Atanmamış bulgu kontrolü
+    const unassignedFindings = await db.query.findings.findMany({
+      where: and(
+        eq(findings.auditId, auditId),
+        isNull(findings.assignedToId)
+      ),
+    });
+
+    if (unassignedFindings.length > 0) {
+      return createValidationError(
+        `${unassignedFindings.length} bulguya henüz sorumlu atanmamış. Tüm bulgulara sorumlu atanmalıdır.`
+      );
+    }
+
     await db
       .update(audits)
       .set({ 
@@ -86,14 +86,9 @@ export async function completeAudit(auditId: string): Promise<ActionResponse> {
       })
       .where(eq(audits.id, auditId));
 
-    revalidatePath(`/denetim/audits/${auditId}`);
-    revalidatePath("/denetim/audits");
-    
+    revalidateAuditPaths({ audits: true, specificAudit: auditId });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error completing audit:", error);
-    return { success: false, error: "Failed to complete audit" };
-  }
+  });
 }
 
 /**
@@ -101,32 +96,23 @@ export async function completeAudit(auditId: string): Promise<ActionResponse> {
  * Denetçi tüm bulguların tamamlandığını onaylar ve denetimi kapatır
  */
 export async function closeAudit(auditId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Denetimi kontrol et
+  return withAuth(async (user: User) => {
     const audit = await db.query.audits.findFirst({
       where: eq(audits.id, auditId),
     });
 
     if (!audit) {
-      return { success: false, error: "Audit not found" };
+      return createNotFoundError("Audit");
     }
 
-    // Sadece PendingClosure denetimler kapatılabilir
     if (audit.status !== "PendingClosure") {
-      return { success: false, error: "Only audits pending closure can be closed" };
+      return createValidationError("Only audits pending closure can be closed");
     }
 
-    // Denetçi veya admin olmalı
-    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only audit creator can close the audit" };
+    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
+      return createPermissionError("Only audit creator can close the audit");
     }
 
-    // Tüm bulguların Completed olduğunu kontrol et
     const openFindings = await db.query.findings.findMany({
       where: and(
         eq(findings.auditId, auditId),
@@ -135,13 +121,11 @@ export async function closeAudit(auditId: string): Promise<ActionResponse> {
     });
 
     if (openFindings.length > 0) {
-      return { 
-        success: false, 
-        error: `${openFindings.length} bulgu hala açık. Tüm bulgular tamamlanmalı.` 
-      };
+      return createValidationError(
+        `${openFindings.length} bulgu hala açık. Tüm bulgular tamamlanmalı.`
+      );
     }
 
-    // Status'u Closed'a al
     await db
       .update(audits)
       .set({ 
@@ -150,14 +134,9 @@ export async function closeAudit(auditId: string): Promise<ActionResponse> {
       })
       .where(eq(audits.id, auditId));
 
-    revalidatePath(`/denetim/audits/${auditId}`);
-    revalidatePath("/denetim/audits");
-    
+    revalidateAuditPaths({ audits: true, specificAudit: auditId });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error closing audit:", error);
-    return { success: false, error: "Failed to close audit" };
-  }
+  });
 }
 
 /**
@@ -165,45 +144,46 @@ export async function closeAudit(auditId: string): Promise<ActionResponse> {
  * Bu fonksiyon her bulgu kapandığında çağrılabilir
  */
 export async function checkAuditCompletionStatus(auditId: string): Promise<ActionResponse> {
-  try {
-    // Denetimi kontrol et
-    const audit = await db.query.audits.findFirst({
-      where: eq(audits.id, auditId),
-    });
+  const audit = await db.query.audits.findFirst({
+    where: eq(audits.id, auditId),
+  });
 
-    if (!audit || audit.status !== "InReview") {
-      return { success: true, data: undefined }; // İşlem yapmaya gerek yok
-    }
-
-    // Açık bulgu var mı kontrol et
-    const openFindings = await db.query.findings.findMany({
-      where: and(
-        eq(findings.auditId, auditId),
-        not(eq(findings.status, "Completed"))
-      ),
-    });
-
-    // Tüm bulgular tamamlandıysa PendingClosure'a al
-    if (openFindings.length === 0) {
-      await db
-        .update(audits)
-        .set({ 
-          status: "PendingClosure",
-          updatedAt: new Date(),
-        })
-        .where(eq(audits.id, auditId));
-
-      revalidatePath(`/denetim/audits/${auditId}`);
-      revalidatePath("/denetim/audits");
-      
-      // TODO: Denetçiye bildirim gönder
-    }
-
+  if (!audit || audit.status !== "InReview") {
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error checking audit completion:", error);
-    return { success: false, error: "Failed to check completion status" };
   }
+
+  const openFindings = await db.query.findings.findMany({
+    where: and(
+      eq(findings.auditId, auditId),
+      not(eq(findings.status, "Completed"))
+    ),
+  });
+
+  if (openFindings.length === 0) {
+    await db
+      .update(audits)
+      .set({ 
+        status: "PendingClosure",
+        updatedAt: new Date(),
+      })
+      .where(eq(audits.id, auditId));
+
+    revalidateAuditPaths({ audits: true, specificAudit: auditId });
+    
+    if (audit.auditorId) {
+      await db.insert(notifications).values({
+        userId: audit.auditorId,
+        category: "audit_completed",
+        title: "Denetim Tamamlandı",
+        message: `Tüm bulgular kapatıldı. Denetim kapatılmayı bekliyor.`,
+        relatedEntityType: "audit",
+        relatedEntityId: auditId,
+        isRead: false,
+      });
+    }
+  }
+
+  return { success: true, data: undefined };
 }
 
 /**
@@ -217,29 +197,21 @@ export async function updateAudit(
     auditDate?: Date;
   }
 ): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Denetimi kontrol et
+  return withAuth(async (user: User) => {
     const audit = await db.query.audits.findFirst({
       where: eq(audits.id, auditId),
     });
 
     if (!audit) {
-      return { success: false, error: "Audit not found" };
+      return createNotFoundError("Audit");
     }
 
-    // Sadece creator veya admin düzenleyebilir
-    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only audit creator or admin can update" };
+    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
+      return createPermissionError("Only audit creator or admin can update");
     }
 
-    // Closed denetimler düzenlenemez
     if (audit.status === "Closed") {
-      return { success: false, error: "Closed audits cannot be edited" };
+      return createValidationError("Closed audits cannot be edited");
     }
 
     await db
@@ -250,44 +222,30 @@ export async function updateAudit(
       })
       .where(eq(audits.id, auditId));
 
-    revalidatePath(`/denetim/audits/${auditId}`);
-    revalidatePath("/denetim/audits");
-    revalidatePath("/denetim/all");
-
+    revalidateAuditPaths({ audits: true, all: true, specificAudit: auditId });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error updating audit:", error);
-    return { success: false, error: "Failed to update audit" };
-  }
+  });
 }
 
 /**
  * Denetimi arşivle (pasife al)
  */
 export async function archiveAudit(auditId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Denetimi kontrol et
+  return withAuth(async (user: User) => {
     const audit = await db.query.audits.findFirst({
       where: eq(audits.id, auditId),
     });
 
     if (!audit) {
-      return { success: false, error: "Audit not found" };
+      return createNotFoundError("Audit");
     }
 
-    // Sadece creator veya admin arşivleyebilir
-    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only audit creator or admin can archive" };
+    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
+      return createPermissionError("Only audit creator or admin can archive");
     }
 
-    // Sadece Active veya InReview durumundaki denetimler arşivlenebilir
     if (audit.status !== "Active" && audit.status !== "InReview") {
-      return { success: false, error: "Only active or in-review audits can be archived" };
+      return createValidationError("Only active or in-review audits can be archived");
     }
 
     await db
@@ -298,44 +256,30 @@ export async function archiveAudit(auditId: string): Promise<ActionResponse> {
       })
       .where(eq(audits.id, auditId));
 
-    revalidatePath(`/denetim/audits/${auditId}`);
-    revalidatePath("/denetim/audits");
-    revalidatePath("/denetim/all");
-
+    revalidateAuditPaths({ audits: true, all: true, specificAudit: auditId });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error archiving audit:", error);
-    return { success: false, error: "Failed to archive audit" };
-  }
+  });
 }
 
 /**
  * Denetimi aktife al (arşivden çıkar)
  */
 export async function reactivateAudit(auditId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Denetimi kontrol et
+  return withAuth(async (user: User) => {
     const audit = await db.query.audits.findFirst({
       where: eq(audits.id, auditId),
     });
 
     if (!audit) {
-      return { success: false, error: "Audit not found" };
+      return createNotFoundError("Audit");
     }
 
-    // Sadece creator veya admin aktive edebilir
-    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only audit creator or admin can reactivate" };
+    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
+      return createPermissionError("Only audit creator or admin can reactivate");
     }
 
-    // Sadece Archived durumundaki denetimler aktive edilebilir
     if (audit.status !== "Archived") {
-      return { success: false, error: "Only archived audits can be reactivated" };
+      return createValidationError("Only archived audits can be reactivated");
     }
 
     await db
@@ -346,47 +290,32 @@ export async function reactivateAudit(auditId: string): Promise<ActionResponse> 
       })
       .where(eq(audits.id, auditId));
 
-    revalidatePath(`/denetim/audits/${auditId}`);
-    revalidatePath("/denetim/audits");
-    revalidatePath("/denetim/all");
-
+    revalidateAuditPaths({ audits: true, all: true, specificAudit: auditId });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error reactivating audit:", error);
-    return { success: false, error: "Failed to reactivate audit" };
-  }
+  });
 }
 
 /**
  * Denetimi sil (soft delete)
  */
 export async function deleteAudit(auditId: string): Promise<ActionResponse> {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Denetimi kontrol et
+  return withAuth(async (user: User) => {
     const audit = await db.query.audits.findFirst({
       where: eq(audits.id, auditId),
     });
 
     if (!audit) {
-      return { success: false, error: "Audit not found" };
+      return createNotFoundError("Audit");
     }
 
-    // Sadece creator veya admin silebilir
-    if (audit.createdById !== user.id && user.role !== "admin" && user.role !== "superAdmin") {
-      return { success: false, error: "Only audit creator or admin can delete" };
+    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
+      return createPermissionError("Only audit creator or admin can delete");
     }
 
-    // Closed denetimler silinemez (güvenlik)
     if (audit.status === "Closed") {
-      return { success: false, error: "Closed audits cannot be deleted" };
+      return createValidationError("Closed audits cannot be deleted");
     }
 
-    // Soft delete
     await db
       .update(audits)
       .set({
@@ -394,12 +323,7 @@ export async function deleteAudit(auditId: string): Promise<ActionResponse> {
       })
       .where(eq(audits.id, auditId));
 
-    revalidatePath("/denetim/audits");
-    revalidatePath("/denetim/all");
-
+    revalidateAuditPaths({ audits: true, all: true });
     return { success: true, data: undefined };
-  } catch (error) {
-    console.error("Error deleting audit:", error);
-    return { success: false, error: "Failed to delete audit" };
-  }
+  });
 }

@@ -3,26 +3,30 @@ import { getFindings } from "@/action/finding-actions";
 import { ExportButton } from "@/components/export/export-button";
 import { exportFindingsToExcel } from "@/action/export-actions";
 import { FindingsTableClient } from "./findings-table-client";
+import { getTranslations } from 'next-intl/server';
 
-export default function FindingsPage() {
+export default async function FindingsPage() {
+  const t = await getTranslations('finding');
+  const tCommon = await getTranslations('common');
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Bulgular</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Tüm denetim bulgularını görüntüleyin
+            {t('description')}
           </p>
         </div>
         <div className="flex gap-2">
           <ExportButton
             onExport={exportFindingsToExcel}
-            filename={`bulgular_${new Date().toISOString().split('T')[0]}.xlsx`}
+            filename={`${t('title').toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`}
           />
         </div>
       </div>
 
-      <Suspense fallback={<div>Yükleniyor...</div>}>
+      <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
         <FindingsTableServer />
       </Suspense>
     </div>

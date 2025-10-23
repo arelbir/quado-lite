@@ -109,16 +109,19 @@ export function CreatePlanForm({
 }: CreatePlanFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [planType, setPlanType] = useState<"scheduled" | "adhoc">(defaultType);
+  // Edit mode'da defaultType'ı initialData'ya göre belirle
+  const [planType, setPlanType] = useState<"scheduled" | "adhoc">(
+    mode === "edit" && initialData?.scheduledDate ? "scheduled" : defaultType
+  );
   const [auditorOpen, setAuditorOpen] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: defaultType,
+      type: mode === "edit" && initialData?.scheduledDate ? "scheduled" : defaultType,
       title: initialData?.title || "",
       description: initialData?.description || "",
-      templateId: "",
+      templateId: mode === "edit" ? "dummy" : "", // Edit mode'da gerek yok
       scheduledDate: initialData?.scheduledDate 
         ? new Date(initialData.scheduledDate).toISOString().split('T')[0]
         : "",
@@ -202,8 +205,25 @@ export function CreatePlanForm({
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <div className="space-y-4">
+      {mode === "edit" && (
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/denetim/plans">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Planı Düzenle</h1>
+            <p className="text-sm text-muted-foreground">
+              Plan bilgilerini güncelleyin
+            </p>
+          </div>
+        </div>
+      )}
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
         <FormField
           control={form.control}
@@ -223,26 +243,28 @@ export function CreatePlanForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="templateId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Denetim Şablonu *</FormLabel>
-              <FormControl>
-                <TemplateSelector
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={isPending}
-                />
-              </FormControl>
-              <FormDescription>
-                Şablon seçtiğinizde, şablondaki sorular otomatik eklenecek
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {mode === "create" && (
+          <FormField
+            control={form.control}
+            name="templateId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Denetim Şablonu *</FormLabel>
+                <FormControl>
+                  <TemplateSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={isPending}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Şablon seçtiğinizde, şablondaki sorular otomatik eklenecek
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {planType === "scheduled" && (
           <>
@@ -488,7 +510,12 @@ export function CreatePlanForm({
         <div className="flex items-center gap-4">
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {planType === "scheduled" ? "Planı Oluştur" : "Denetimi Başlat"}
+            {mode === "edit" 
+              ? "Kaydet" 
+              : planType === "scheduled" 
+                ? "Planı Oluştur" 
+                : "Denetimi Başlat"
+            }
           </Button>
           <Button 
             type="button" 
@@ -501,5 +528,6 @@ export function CreatePlanForm({
         </div>
       </form>
     </Form>
+    </div>
   );
 }

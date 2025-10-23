@@ -1,0 +1,55 @@
+{
+  "audit": {
+    "Active": "Devam Ediyor",
+    "InReview": "İnceleme Aşamasında",
+    "PendingClosure": "Kapanış Bekliyor",
+    "Closed": "Tamamlandı",
+    "Archived": "Arşivlendi"
+  },
+  "plan": {
+    "Pending": "Plan Bekliyor",
+    "Created": "Oluşturuldu",
+    "Cancelled": "İptal Edildi"
+  },
+  "finding": {
+    "New": "Yeni",
+    "Assigned": "Atandı",
+    "InProgress": "İşlemde",
+    "PendingAuditorClosure": "Denetçi Kapatması Bekliyor",
+    "Completed": "Tamamlandı",
+    "Rejected": "Reddedildi"
+  },
+  "action": {
+    "Assigned": "Atandı",
+    "PendingManagerApproval": "Yönetici Onayı Bekliyor",
+    "Completed": "Tamamlandı",
+    "Rejected": "Reddedildi",
+    "Cancelled": "İptal Edildi"
+  },
+  "actionType": {
+    "Simple": "Basit",
+    "Corrective": "Düzeltici",
+    "Preventive": "Önleyici"
+  },
+  "dof": {
+    "Step1_Problem": "1. Problem Tanımı",
+    "Step2_TempMeasures": "2. Geçici Önlemler",
+    "Step3_RootCause": "3. Kök Neden",
+    "Step4_Activities": "4. Faaliyetler",
+    "Step5_Implementation": "5. Uygulama",
+    "Step6_EffectivenessCheck": "6. Etkinlik",
+    "PendingManagerApproval": "Yönetici Onayı Bekliyor",
+    "Completed": "Tamamlandı",
+    "Rejected": "Reddedildi"
+  },
+  "risk": {
+    "Kritik": "Kritik",
+    "Yüksek": "Yüksek",
+    "Orta": "Orta",
+    "Düşük": "Düşük"
+  },
+  "activity": {
+    "Düzeltici": "Düzeltici",
+    "Önleyici": "Önleyici"
+  }
+}

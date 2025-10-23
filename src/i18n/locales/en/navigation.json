@@ -1,0 +1,36 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "audits": "Audits",
+    "myAudits": "My Audits",
+    "allAudits": "All Audits",
+    "auditPlans": "Audit Plans",
+    "findings": "Findings",
+    "actions": "Actions",
+    "dofs": "CAPA",
+    "reports": "Reports",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "audits": "Audits",
+    "findings": "Findings",
+    "actions": "Actions",
+    "dofs": "CAPA",
+    "details": "Details",
+    "edit": "Edit",
+    "create": "Create",
+    "reports": "Reports"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "details": "Details",
+    "findings": "Findings",
+    "actions": "Actions",
+    "timeline": "Timeline",
+    "documents": "Documents",
+    "history": "History"
+  }
+}
