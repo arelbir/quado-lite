@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -30,6 +30,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, HelpCircle } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(3, "En az 3 karakter gerekli"),
@@ -51,62 +52,53 @@ interface QuestionBank {
 
 interface EditTemplateFormProps {
   template: any;
+  availableQuestionBanks: any;
 }
 
 /**
  * Edit Template Form
  * Pattern: DRY - Create form ile aynı yapı ama default values + update action
  */
-export function EditTemplateForm({ template }: EditTemplateFormProps) {
+export function EditTemplateForm({ template: initialTemplate, availableQuestionBanks }: EditTemplateFormProps) {
+  const t = useTranslations('templates');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [questionBanks, setQuestionBanks] = useState<QuestionBank[]>([]);
-  const [loading, setLoading] = useState(true);
+  const questionBanks = availableQuestionBanks as QuestionBank[];
+  const loading = false;
 
   // Parse existing question bank IDs
-  const existingBankIds = template.questionBankIds 
-    ? (JSON.parse(template.questionBankIds) as string[])
+  const existingBankIds = initialTemplate.questionBankIds 
+    ? (JSON.parse(initialTemplate.questionBankIds) as string[])
     : [];
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: template.name,
-      description: template.description || "",
-      category: template.category,
+      name: initialTemplate.name,
+      description: initialTemplate.description || "",
+      category: initialTemplate.category,
       questionBankIds: existingBankIds,
-      estimatedDurationMinutes: template.estimatedDurationMinutes || "",
+      estimatedDurationMinutes: initialTemplate.estimatedDurationMinutes || "",
     },
   });
 
-  // Load question banks
-  useEffect(() => {
-    fetch("/api/question-banks")
-      .then((res) => res.json())
-      .then((data) => {
-        setQuestionBanks(data as QuestionBank[]);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error loading question banks:", error);
-        setLoading(false);
-      });
-  }, []);
+  // Question banks already passed from server
 
   function onSubmit(values: FormValues) {
     startTransition(async () => {
       try {
-        const result = await updateAuditTemplate(template.id, values);
+        const result = await updateAuditTemplate(initialTemplate.id, values);
         
         if (result.success) {
-          toast.success("Şablon başarıyla güncellendi!");
-          router.push(`/denetim/templates/${template.id}`);
+          toast.success(t('messages.templateUpdated'));
+          router.push(`/denetim/templates/${initialTemplate.id}`);
           router.refresh();
         } else {
           toast.error(result.error);
         }
       } catch (error) {
-        toast.error("Bir hata oluştu");
+        toast.error(tCommon('status.error'));
       }
     });
   }
@@ -119,7 +111,7 @@ export function EditTemplateForm({ template }: EditTemplateFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Şablon Adı *</FormLabel>
+              <FormLabel>{t('fields.templateName')} *</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="Örn: ISO 9001 Standart Denetim Şablonu" 
@@ -137,7 +129,7 @@ export function EditTemplateForm({ template }: EditTemplateFormProps) {
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Kategori *</FormLabel>
+              <FormLabel>{t('fields.category')} *</FormLabel>
               <Select 
                 onValueChange={field.onChange} 
                 defaultValue={field.value}
@@ -145,7 +137,7 @@ export function EditTemplateForm({ template }: EditTemplateFormProps) {
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Kategori seçin" />
+                    <SelectValue placeholder={t('placeholders.selectCategory')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -214,17 +206,17 @@ export function EditTemplateForm({ template }: EditTemplateFormProps) {
           render={() => (
             <FormItem>
               <div className="mb-4">
-                <FormLabel className="text-base">Soru Havuzları</FormLabel>
+                <FormLabel className="text-base">{t('fields.selectQuestionBanks')}</FormLabel>
                 <FormDescription>
-                  Şablonda kullanılacak soru havuzlarını seçin
+                  {t('messages.selectBanksOptional')}
                 </FormDescription>
               </div>
               {loading ? (
-                <div className="text-sm text-muted-foreground">Yükleniyor...</div>
+                <div className="text-sm text-muted-foreground">{tCommon('status.loading')}</div>
               ) : questionBanks.length === 0 ? (
                 <div className="rounded-md border border-muted bg-muted/20 p-3 text-sm text-muted-foreground flex items-center gap-2">
                   <HelpCircle className="h-4 w-4" />
-                  <span>Henüz soru havuzu yok. Önce soru havuzu oluşturun.</span>
+                  <span>{t('noQuestionBanks')}</span>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -276,7 +268,7 @@ export function EditTemplateForm({ template }: EditTemplateFormProps) {
           <div className="flex items-center gap-4">
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Güncelle
+              {isPending ? tCommon('status.saving') : tCommon('actions.update')}
             </Button>
             <Button 
               type="button" 
@@ -284,12 +276,12 @@ export function EditTemplateForm({ template }: EditTemplateFormProps) {
               onClick={() => router.back()}
               disabled={isPending}
             >
-              İptal
+              {tCommon('actions.cancel')}
             </Button>
           </div>
           <DeleteTemplateButton 
-            templateId={template.id}
-            templateName={template.name}
+            templateId={initialTemplate.id}
+            templateName={initialTemplate.name}
           />
         </div>
       </form>

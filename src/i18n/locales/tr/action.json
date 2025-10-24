@@ -51,6 +51,28 @@
     "critical": "Kritik"
   },
   
+  "timeline": {
+    "created": "Aksiyon Oluşturuldu",
+    "createdBy": "tarafından",
+    "assigned": "Sorumluya Atandı",
+    "assignedDescription": "sorumlu olarak atandı",
+    "progressNote": "İlerleme Notu",
+    "completed": "Sorumlu Tamamladı",
+    "completedDescription": "aksiyonu tamamladı",
+    "approved": "Yönetici Onayladı",
+    "approvedDescription": "aksiyonu onayladı",
+    "rejected": "Reddedildi & Geri Atandı",
+    "rejectedDescription": "reddetti ve tekrar atadı",
+    "rejectedNote": "Red Nedeni",
+    "rejectedReassigned": "Aksiyon tekrar \"Atandı\" durumuna döndü",
+    "pendingApprovalTitle": "Yönetici Onayı Bekleniyor",
+    "pendingApprovalDescription": "onaylamalı",
+    "cancelled": "İptal Edildi",
+    "cancelledDescription": "Aksiyon iptal edildi (döngü kırıldı)",
+    "cancelledNote": "İptal Nedeni",
+    "unknown": "Bilinmeyen"
+  },
+  
   "messages": {
     "created": "Aksiyon başarıyla oluşturuldu",
     "updated": "Aksiyon güncellendi",
@@ -77,10 +99,16 @@
   
   "sections": {
     "details": "Aksiyon Detayları",
+    "overview": "Genel",
+    "description": "Aksiyon Açıklaması",
     "progress": "İlerleme Notları",
     "timeline": "Zaman Çizelgesi",
     "history": "Geçmiş",
-    "attachments": "Ekler"
+    "attachments": "Ekler",
+    "relatedFinding": "Bağlı Bulgu",
+    "dates": "Tarihler",
+    "assignments": "Atamalar",
+    "assignment": "Atama"
   },
   
   "placeholders": {

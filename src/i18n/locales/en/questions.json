@@ -25,5 +25,10 @@
     "removeOption": "Remove",
     "createQuestion": "Create Question",
     "updateQuestion": "Update Question"
+  },
+  "messages": {
+    "requiredQuestion": "Auditor must answer this question",
+    "updateQuestionInfo": "Update question information",
+    "addToBankDescription": "add question to bank"
   }
 }

@@ -249,12 +249,12 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
           <AlertDialogTrigger asChild>
             <Button variant="outline" disabled={isPending}>
               <Ban className="h-4 w-4 mr-2" />
-              İptal Et
+              {t('cancel')}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Aksiyonu İptal Et</AlertDialogTitle>
+              <AlertDialogTitle>{t('cancel')}</AlertDialogTitle>
               <AlertDialogDescription>
                 {t('messages.confirmCancelManager')}
               </AlertDialogDescription>

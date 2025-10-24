@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Plus, Check, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { useTranslations } from 'next-intl';
 
 interface Question {
   id: string;
@@ -43,11 +45,13 @@ export function AddQuestionDialog({
   availableQuestions,
   disabled = false 
 }: AddQuestionDialogProps) {
+  const t = useTranslations('audit');
+  const tCommon = useTranslations('common');
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set());
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
 
   // Arama filtresi
   const filteredQuestions = availableQuestions.filter((q) => {
@@ -71,34 +75,33 @@ export function AddQuestionDialog({
     setSelectedQuestions(newSelected);
   };
 
-  const handleAddQuestions = async () => {
+  const handleAddQuestions = () => {
     if (selectedQuestions.size === 0) {
       toast.error("Lütfen en az bir soru seçin");
       return;
     }
 
-    setIsPending(true);
-    try {
-      const response = await fetch(`/api/audits/${auditId}/questions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          questionIds: Array.from(selectedQuestions),
-        }),
-      });
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/audits/${auditId}/questions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questionIds: Array.from(selectedQuestions),
+          }),
+        });
 
-      if (!response.ok) throw new Error("Failed to add questions");
+        if (!response.ok) throw new Error("Failed to add questions");
 
-      toast.success(`${selectedQuestions.size} soru eklendi`);
-      setOpen(false);
-      setSelectedQuestions(new Set());
-      setSearchQuery(""); // Search'ü temizle
-      router.refresh();
-    } catch (error) {
-      toast.error("Sorular eklenirken hata oluştu");
-    } finally {
-      setIsPending(false);
-    }
+        toast.success(`${selectedQuestions.size} soru eklendi`);
+        setOpen(false);
+        setSelectedQuestions(new Set());
+        setSearchQuery("");
+        router.refresh();
+      } catch (error) {
+        toast.error("Sorular eklenirken hata oluştu");
+      }
+    });
   };
 
   // Dialog kapandığında search'ü temizle

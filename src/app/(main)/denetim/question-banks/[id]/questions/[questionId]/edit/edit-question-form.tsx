@@ -163,7 +163,7 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
           name="questionType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Soru Tipi *</FormLabel>
+              <FormLabel>{t('fields.questionType')} *</FormLabel>
               <Select 
                 onValueChange={(value) => {
                   field.onChange(value);
@@ -177,7 +177,7 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Soru tipi seçin" />
+                    <SelectValue placeholder={t('placeholders.selectType')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -223,10 +223,10 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
           name="questionText"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Soru Metni *</FormLabel>
+              <FormLabel>{t('fields.questionText')} *</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Soru metnini girin"
+                  placeholder={t('placeholders.enterQuestion')}
                   className="min-h-[100px]"
                   {...field}
                   disabled={isPending}
@@ -274,7 +274,7 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
               {options.map((option, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
-                    placeholder={`Seçenek ${index + 1}`}
+                    placeholder={`${t('fields.options')} ${index + 1}`}
                     value={option}
                     onChange={(e) => updateOption(index, e.target.value)}
                     disabled={isPending}
@@ -309,9 +309,9 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>Zorunlu Soru</FormLabel>
+                <FormLabel>{t('fields.isRequired')}</FormLabel>
                 <FormDescription>
-                  Denetçi bu soruyu cevaplamak zorunda
+                  {t('messages.requiredQuestion')}
                 </FormDescription>
               </div>
             </FormItem>

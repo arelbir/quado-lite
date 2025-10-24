@@ -5,6 +5,9 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/drizzle/db";
 import { user } from "@/drizzle/schema";
+import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 /**
  * Audit Plan Create Page
@@ -18,11 +21,18 @@ interface PageProps {
 }
 
 export default async function NewPlanPage({ searchParams }: PageProps) {
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'plans' });
   const planType = searchParams.type || "scheduled";
   
   const title = planType === "adhoc" 
-    ? "Plansız Denetim Başlat" 
-    : "Planlı Denetim Oluştur";
+    ? t('startAdhocAudit')
+    : t('createScheduledAudit');
     
   const description = planType === "adhoc"
     ? "Hemen denetim başlatın (şablondan)"
@@ -44,7 +54,7 @@ export default async function NewPlanPage({ searchParams }: PageProps) {
       />
 
       <FormCard 
-        title="Plan Bilgileri"
+        title={t('planInfo')}
         description={planType === "adhoc" ? "Denetim hemen başlatılacak" : "Denetim belirlenen tarihte otomatik oluşturulacak"}
       >
         <Suspense fallback={<Skeleton className="h-[400px]" />}>

@@ -7,5 +7,38 @@
   "createFirst": "İlk denetim şablonunu oluşturun",
   "questionBanks": "Soru Havuzu",
   "noQuestionBanks": "Soru Havuzu Yok",
-  "manage": "Şablonu Yönet"
+  "totalQuestions": "Toplam Sorular",
+  "manage": "Şablonu Yönet",
+  "selectTemplate": "Şablon seçin",
+  "fields": {
+    "templateName": "Şablon Adı",
+    "category": "Kategori",
+    "description": "Açıklama",
+    "estimatedDuration": "Tahmini Süre (Dakika)",
+    "selectQuestionBanks": "Soru Havuzları"
+  },
+  "placeholders": {
+    "templateExample": "Örn: ISO 9001 Standart Denetim Şablonu",
+    "selectCategory": "Kategori seçin",
+    "descriptionExample": "Şablon hakkında kısa bir açıklama...",
+    "durationExample": "Örn: 60"
+  },
+  "categories": {
+    "quality": "Kalite",
+    "environment": "Çevre",
+    "ohs": "İSG",
+    "infoSecurity": "Bilgi Güvenliği",
+    "foodSafety": "Gıda Güvenliği",
+    "other": "Diğer"
+  },
+  "messages": {
+    "selectBanksOptional": "Şablonda kullanılacak soru havuzlarını seçin (opsiyonel)",
+    "enterTemplateInfo": "Şablon adı ve kategorisini belirleyin",
+    "templateCreated": "Şablon başarıyla oluşturuldu!",
+    "templateUpdated": "Şablon başarıyla güncellendi!",
+    "selectedBanksCount": "Seçili havuz sayısı",
+    "allQuestionsInBanks": "Tüm havuzlardaki sorular",
+    "banksInTemplate": "Bu şablonda kullanılan soru havuzları",
+    "noBanksAddedYet": "Bu şablona henüz soru havuzu eklenmemiş"
+  }
 }

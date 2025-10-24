@@ -8,6 +8,7 @@ import { ArrowRight, Plus, ListChecks, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { updateDofStep } from "@/action/dof-actions";
 import { DofActivityForm } from "../dof-activity-form";
+import { useTranslations } from 'next-intl';
 
 interface User {
   id: string;

@@ -1,4 +1,9 @@
 {
   "title": "My Pending Tasks",
-  "description": "All tasks assigned to me and pending approvals"
+  "description": "All tasks assigned to me and items pending approval",
+  "myActions": "My Actions",
+  "myDofs": "My DOFs",
+  "myApprovals": "My Approvals",
+  "myFindings": "My Findings",
+  "pendingApprovals": "Pending approvals"
 }

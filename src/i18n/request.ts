@@ -27,6 +27,7 @@ export default getRequestConfig(async ({ locale }) => {
       templates: (await import(`./locales/${validLocale}/templates.json`)).default,
       questionBanks: (await import(`./locales/${validLocale}/questionBanks.json`)).default,
       questions: (await import(`./locales/${validLocale}/questions.json`)).default,
+      plans: (await import(`./locales/${validLocale}/plans.json`)).default,
     },
   };
 });

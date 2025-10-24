@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslations } from 'next-intl';
 
 interface Template {
   id: string;
@@ -28,6 +29,7 @@ interface TemplateSelectorProps {
  * SOLID: Single Responsibility - sadece template seçimi
  */
 export function TemplateSelector({ value, onChange, disabled }: TemplateSelectorProps) {
+  const t = useTranslations('templates');
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +61,7 @@ export function TemplateSelector({ value, onChange, disabled }: TemplateSelector
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger>
-        <SelectValue placeholder="Şablon seçin" />
+        <SelectValue placeholder={t('selectTemplate')} />
       </SelectTrigger>
       <SelectContent>
         {templates.map((template) => (

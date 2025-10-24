@@ -24,6 +24,7 @@ import {
 import { ListChecks } from "lucide-react";
 import { toast } from "sonner";
 import { createAction } from "@/action/action-actions";
+import { useTranslations } from 'next-intl';
 
 interface QuickActionDialogProps {
   findingId: string;
@@ -31,6 +32,8 @@ interface QuickActionDialogProps {
 }
 
 export function QuickActionDialog({ findingId, users }: QuickActionDialogProps) {
+  const t = useTranslations('action');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [details, setDetails] = useState("");
@@ -40,6 +43,7 @@ export function QuickActionDialog({ findingId, users }: QuickActionDialogProps) 
 
   const handleSubmit = () => {
     if (!details.trim()) {
+      toast.error(tCommon("pleaseEnterActionDetails"));
       toast.error("Lütfen aksiyon detayını girin");
       return;
     }

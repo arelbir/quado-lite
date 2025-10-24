@@ -22,7 +22,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { updateFinding } from "@/action/finding-actions";
+import { assignFinding } from "@/action/finding-actions";
+import { useTranslations } from 'next-intl';
 
 interface QuickAssignDialogProps {
   findingId: string;
@@ -44,10 +45,7 @@ export function QuickAssignDialog({ findingId, users, currentAssigneeId }: Quick
     }
 
     startTransition(async () => {
-      const result = await updateFinding(findingId, {
-        assignedToId: selectedUserId,
-        riskType: selectedRisk as any,
-      });
+      const result = await assignFinding(findingId, selectedUserId);
 
       if (result.success) {
         toast.success("Bulgu atandı");

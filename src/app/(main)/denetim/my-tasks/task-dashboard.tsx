@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useTaskCategories } from "@/hooks/use-task-categories";
 import { VirtualTaskList } from "@/components/tasks/virtual-task-list";
 import { TaskSummary } from "@/types/my-tasks";
+import { useTranslations } from 'next-intl';
 
 /**
  * SOLID - Orchestration Component:
@@ -26,6 +27,7 @@ interface TaskDashboardProps {
 }
 
 export function TaskDashboard({ data }: TaskDashboardProps) {
+  const t = useTranslations('myTasks');
   const categories = useTaskCategories(data);
   
   // Extract icons for proper JSX rendering
@@ -40,7 +42,7 @@ export function TaskDashboard({ data }: TaskDashboardProps) {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aksiyonlarım</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('myActions')}</CardTitle>
             {ActionsIcon && <ActionsIcon className="h-4 w-4 text-muted-foreground" />}
           </CardHeader>
           <CardContent>
@@ -66,13 +68,13 @@ export function TaskDashboard({ data }: TaskDashboardProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Onaylarım</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('myApprovals')}</CardTitle>
             {ApprovalsCategory && <ApprovalsCategory.icon className="h-4 w-4 text-muted-foreground" />}
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.summary.totalApprovals}</div>
             <p className="text-xs text-muted-foreground">
-              Onay bekleyen işler
+              {t('pendingApprovals')}
             </p>
           </CardContent>
         </Card>

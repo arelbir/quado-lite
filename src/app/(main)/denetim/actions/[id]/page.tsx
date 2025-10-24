@@ -13,12 +13,24 @@ import Link from "next/link";
 import { ActionDetailActions } from "@/components/actions/action-detail-actions";
 import { ActionTimeline } from "@/components/actions/action-timeline";
 import { ActionProgressForm } from "@/components/actions/action-progress-form";
+import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
   params: { id: string };
 }
 
 export default async function ActionDetailPage({ params }: PageProps) {
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'action' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+  
   const action = await db.query.actions.findFirst({
     where: eq(actions.id, params.id),
     with: {
@@ -64,27 +76,27 @@ export default async function ActionDetailPage({ params }: PageProps) {
 
   const statusConfig = {
     Assigned: {
-      label: "Atandı",
+      label: t('status.assigned'),
       color: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
       icon: Clock,
     },
     PendingManagerApproval: {
-      label: "Onay Bekliyor",
+      label: t('status.pendingApproval'),
       color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
       icon: Clock,
     },
     Completed: {
-      label: "Tamamlandı",
+      label: t('status.completed'),
       color: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
       icon: CheckCircle2,
     },
     Rejected: {
-      label: "Reddedildi",
+      label: t('status.rejected'),
       color: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
       icon: XCircle,
     },
     Cancelled: {
-      label: "İptal Edildi",
+      label: t('status.cancelled'),
       color: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
       icon: XCircle,
     },
@@ -129,11 +141,11 @@ export default async function ActionDetailPage({ params }: PageProps) {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="overview">
                 <FileText className="h-4 w-4 mr-2" />
-                Genel
+                {t('sections.overview')}
               </TabsTrigger>
               <TabsTrigger value="progress">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                İlerleme
+                {t('sections.progress')}
               </TabsTrigger>
             </TabsList>
 
@@ -142,7 +154,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
               {/* Aksiyon Detayı */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Aksiyon Açıklaması</CardTitle>
+                  <CardTitle className="text-base">{t('sections.description')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed">{action.details}</p>
@@ -174,7 +186,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <XCircle className="h-4 w-4 text-red-600" />
-                      Red Nedeni
+                      {t('fields.rejectionReason')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -191,7 +203,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
               {action.finding && (
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Bağlı Bulgu</CardTitle>
+                    <CardTitle className="text-base">{t('sections.relatedFinding')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Link
@@ -200,7 +212,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
                     >
                       <p className="text-sm font-medium mb-1">{action.finding.details}</p>
                       <p className="text-xs text-muted-foreground">
-                        Detayları görüntüle →
+                        {tCommon('actions.view')} →
                       </p>
                     </Link>
                   </CardContent>
@@ -210,12 +222,12 @@ export default async function ActionDetailPage({ params }: PageProps) {
               {/* Tarihler */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Tarihler</CardTitle>
+                  <CardTitle className="text-base">{t('sections.dates')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Oluşturulma</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">{tCommon('fields.createdAt')}</p>
                       <p className="text-sm">
                         {new Date(action.createdAt).toLocaleString("tr-TR", { 
                           day: '2-digit', 
@@ -280,25 +292,25 @@ export default async function ActionDetailPage({ params }: PageProps) {
           {/* Atama Bilgileri - Kompakt */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Atama</CardTitle>
+              <CardTitle className="text-sm">{t('sections.assignment')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Sorumlu</p>
+                <p className="text-xs font-medium text-muted-foreground">{t('fields.responsiblePerson')}</p>
                 <p className="text-sm">
                   {action.assignedTo?.name || action.assignedTo?.email || "-"}
                 </p>
               </div>
               <Separator />
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Yönetici</p>
+                <p className="text-xs font-medium text-muted-foreground">{tCommon('roles.manager')}</p>
                 <p className="text-sm">
                   {action.manager?.name || action.manager?.email || "-"}
                 </p>
               </div>
               <Separator />
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Oluşturan</p>
+                <p className="text-xs font-medium text-muted-foreground">{tCommon('fields.createdBy')}</p>
                 <p className="text-sm">
                   {action.createdBy?.name || action.createdBy?.email || "-"}
                 </p>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { approveDof, rejectDof } from "@/action/dof-actions";
+import { useTranslations } from 'next-intl';
 import {
   AlertDialog,
   AlertDialogAction,

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from 'next-intl';
 import { ArrowRight, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { updateDofStep } from "@/action/dof-actions";

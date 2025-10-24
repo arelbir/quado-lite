@@ -25,5 +25,10 @@
     "removeOption": "Kaldır",
     "createQuestion": "Soru Oluştur",
     "updateQuestion": "Soruyu Güncelle"
+  },
+  "messages": {
+    "requiredQuestion": "Denetçi bu soruyu cevaplamak zorunda",
+    "updateQuestionInfo": "Soru bilgilerini güncelleyin",
+    "addToBankDescription": "havuzuna soru ekleyin"
   }
 }

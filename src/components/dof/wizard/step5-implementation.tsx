@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { toast } from "sonner";
 import { updateDofStep } from "@/action/dof-actions";
+import { useTranslations } from 'next-intl';
 
 interface Step5ImplementationProps {
   dof: any;

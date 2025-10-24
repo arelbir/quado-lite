@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,6 +47,7 @@ export function DataTable<TData, TValue>({
   searchPlaceholder = "Ara...",
   pageSize = 10,
 }: DataTableProps<TData, TValue>) {
+  const t = useTranslations('common');
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -172,14 +174,14 @@ export function DataTable<TData, TValue>({
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
             <span>
-              {table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length} satır seçildi.
+              {table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length} {t('table.rowsSelected')}
             </span>
           )}
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">
-              Sayfa {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
+              {t('table.page')} {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -190,7 +192,7 @@ export function DataTable<TData, TValue>({
               disabled={!table.getCanPreviousPage()}
             >
               <ChevronLeft className="h-4 w-4" />
-              Önceki
+              {t('table.previous')}
             </Button>
             <Button
               variant="outline"
@@ -198,7 +200,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Sonraki
+              {t('table.next')}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

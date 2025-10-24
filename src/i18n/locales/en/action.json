@@ -51,6 +51,28 @@
     "critical": "Critical"
   },
   
+  "timeline": {
+    "created": "Action Created",
+    "createdBy": "by",
+    "assigned": "Assigned to Responsible",
+    "assignedDescription": "assigned as responsible",
+    "progressNote": "Progress Note",
+    "completed": "Completed by Responsible",
+    "completedDescription": "completed the action",
+    "approved": "Approved by Manager",
+    "approvedDescription": "approved the action",
+    "rejected": "Rejected & Reassigned",
+    "rejectedDescription": "rejected and reassigned",
+    "rejectedNote": "Rejection Reason",
+    "rejectedReassigned": "Action returned to \"Assigned\" status",
+    "pendingApprovalTitle": "Pending Manager Approval",
+    "pendingApprovalDescription": "must approve",
+    "cancelled": "Cancelled",
+    "cancelledDescription": "Action cancelled (loop broken)",
+    "cancelledNote": "Cancellation Reason",
+    "unknown": "Unknown"
+  },
+  
   "messages": {
     "created": "Action created successfully",
     "updated": "Action updated",
@@ -77,10 +99,16 @@
   
   "sections": {
     "details": "Action Details",
+    "overview": "Overview",
+    "description": "Action Description",
     "progress": "Progress Notes",
     "timeline": "Timeline",
     "history": "History",
-    "attachments": "Attachments"
+    "attachments": "Attachments",
+    "relatedFinding": "Related Finding",
+    "dates": "Dates",
+    "assignments": "Assignments",
+    "assignment": "Assignment"
   },
   
   "placeholders": {

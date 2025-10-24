@@ -7,5 +7,38 @@
   "createFirst": "Create your first audit template",
   "questionBanks": "Question Banks",
   "noQuestionBanks": "No Question Banks",
-  "manage": "Manage Template"
+  "totalQuestions": "Total Questions",
+  "manage": "Manage Template",
+  "selectTemplate": "Select template",
+  "fields": {
+    "templateName": "Template Name",
+    "category": "Category",
+    "description": "Description",
+    "estimatedDuration": "Estimated Duration (Minutes)",
+    "selectQuestionBanks": "Question Banks"
+  },
+  "placeholders": {
+    "templateExample": "E.g: ISO 9001 Standard Audit Template",
+    "selectCategory": "Select category",
+    "descriptionExample": "Brief description about template...",
+    "durationExample": "E.g: 60"
+  },
+  "categories": {
+    "quality": "Quality",
+    "environment": "Environment",
+    "ohs": "OHS",
+    "infoSecurity": "Information Security",
+    "foodSafety": "Food Safety",
+    "other": "Other"
+  },
+  "messages": {
+    "selectBanksOptional": "Select question banks to be used in template (optional)",
+    "enterTemplateInfo": "Specify template name and category",
+    "templateCreated": "Template created successfully!",
+    "templateUpdated": "Template updated successfully!",
+    "selectedBanksCount": "Selected banks count",
+    "allQuestionsInBanks": "All questions in banks",
+    "banksInTemplate": "Question banks used in this template",
+    "noBanksAddedYet": "No question banks added to this template yet"
+  }
 }

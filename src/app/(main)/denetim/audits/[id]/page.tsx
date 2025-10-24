@@ -163,11 +163,11 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">
             <CheckCircle2 className="h-4 w-4 mr-2" />
-            Özet
+            {t('sections.overview')}
           </TabsTrigger>
           <TabsTrigger value="questions">
             <HelpCircle className="h-4 w-4 mr-2" />
-            Sorular ({answeredCount}/{questions.length})
+            {t('sections.questions')} ({answeredCount}/{questions.length})
           </TabsTrigger>
           <TabsTrigger value="findings">
             <AlertTriangle className="h-4 w-4 mr-2" />
@@ -175,7 +175,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           </TabsTrigger>
           <TabsTrigger value="details">
             <FileText className="h-4 w-4 mr-2" />
-            Detaylar
+            {t('sections.details')}
           </TabsTrigger>
         </TabsList>
 
@@ -191,7 +191,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 <div className="text-2xl font-bold">{completionPercentage}%</div>
                 <Progress value={completionPercentage} className="mt-2" />
                 <p className="text-xs text-muted-foreground mt-2">
-                  {answeredCount} / {questions.length} soru cevaplandı
+                  {answeredCount} / {questions.length} {t('messages.questionsAnswered')}
                 </p>
               </CardContent>
             </Card>
@@ -227,7 +227,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Son Cevaplanan Sorular</CardTitle>
+                <CardTitle className="text-base">{t('sections.recentAnswers')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {questions.filter(q => q.answer).slice(0, 3).length > 0 ? (
@@ -241,7 +241,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    Henüz cevap yok
+                    {t('messages.noAnswersYet')}
                   </p>
                 )}
               </CardContent>
@@ -267,7 +267,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    Henüz bulgu yok
+                    {t('common.noFindings')}
                   </p>
                 )}
               </CardContent>
@@ -282,9 +282,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
             <CardContent className="pt-6">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">İlerleme</span>
+                  <span className="text-sm font-medium">{t('sections.progress')}</span>
                   <span className="text-sm text-muted-foreground">
-                    {answeredCount} / {questions.length} cevaplandı
+                    {answeredCount} / {questions.length} {t('messages.answered')}
                   </span>
                 </div>
                 <Progress value={completionPercentage} className="h-2" />
@@ -305,9 +305,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Denetim Soruları</CardTitle>
+                  <CardTitle>{t('sections.questions')}</CardTitle>
                   <CardDescription>
-                    {questions.length} soru var
+                    {questions.length} {t('messages.questionsAvailable')}
                   </CardDescription>
                 </div>
                 {audit.status === "Active" && (
@@ -356,19 +356,19 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                   <p className="text-2xl font-bold text-success">
                     {auditFindings.filter(f => f.status === "Completed").length}
                   </p>
-                  <p className="text-xs text-muted-foreground">Tamamlandı</p>
+                  <p className="text-xs text-muted-foreground">{t('status.completed')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-warning">
                     {auditFindings.filter(f => f.status === "InProgress").length}
                   </p>
-                  <p className="text-xs text-muted-foreground">İşlemde</p>
+                  <p className="text-xs text-muted-foreground">{t('status.inProgress')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-destructive">
-                    {auditFindings.filter(f => f.riskType === "Kritik" || f.riskType === "Yüksek").length}
+                    {auditFindings.filter(f => f.status === "New" || f.status === "Assigned").length}
                   </p>
-                  <p className="text-xs text-muted-foreground">Yüksek Risk</p>
+                  <p className="text-xs text-muted-foreground">{t('messages.newFindings')}</p>
                 </div>
               </div>
             </CardContent>
@@ -391,7 +391,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 <div className="text-center py-12">
                   <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-sm text-muted-foreground mb-4">
-                    Henüz bulgu eklenmemiş
+                    {t('messages.noFindingsYet')}
                   </p>
                 </div>
               ) : (

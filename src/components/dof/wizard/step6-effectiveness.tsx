@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Target } from "lucide-react";
 import { toast } from "sonner";
 import { updateDofStep } from "@/action/dof-actions";
+import { useTranslations } from 'next-intl';
 
 interface Step6EffectivenessProps {
   dof: any;

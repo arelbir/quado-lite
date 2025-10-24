@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, Search, FileImage, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 import { updateDofStep } from "@/action/dof-actions";
+import { useTranslations } from 'next-intl';
 
 interface Step3RootCauseProps {
   dof: any;

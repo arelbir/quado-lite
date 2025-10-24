@@ -12,12 +12,16 @@ import {
 import { Download, FileSpreadsheet, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { downloadAuditReport } from "@/action/report-actions";
+import { useTranslations } from 'next-intl';
 
 interface AuditReportButtonProps {
   auditId: string;
+  auditTitle: string;
 }
 
-export function AuditReportButton({ auditId }: AuditReportButtonProps) {
+export function AuditReportButton({ auditId, auditTitle }: AuditReportButtonProps) {
+  const t = useTranslations('audit');
+  const tCommon = useTranslations('common');
   const [format, setFormat] = useState<"excel" | "pdf">("excel");
   const [isPending, startTransition] = useTransition();
 
@@ -51,10 +55,10 @@ export function AuditReportButton({ auditId }: AuditReportButtonProps) {
         // Cleanup
         URL.revokeObjectURL(url);
 
-        toast.success("Rapor indirildi!");
+        toast.success(t('messages.reportDownloaded'));
       } catch (error) {
         console.error("Report download error:", error);
-        toast.error("Rapor oluşturulurken hata oluştu.");
+        toast.error(t('messages.reportError'));
       }
     });
   };
@@ -83,7 +87,7 @@ export function AuditReportButton({ auditId }: AuditReportButtonProps) {
 
       <Button onClick={handleDownload} disabled={isPending}>
         <Download className="mr-2 h-4 w-4" />
-        {isPending ? "Oluşturuluyor..." : "Rapor İndir"}
+        {isPending ? tCommon('status.generating') : t('actions.downloadReport')}
       </Button>
     </div>
   );

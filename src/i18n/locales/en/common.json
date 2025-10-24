@@ -35,13 +35,21 @@
   "status": {
     "loading": "Loading...",
     "saving": "Saving...",
+    "generating": "Generating...",
     "success": "Success!",
     "error": "Error!",
     "noData": "No data found",
     "processing": "Processing...",
     "completed": "Completed",
     "pending": "Pending",
-    "failed": "Failed"
+    "failed": "Failed",
+    "audit": {
+      "Active": "Active",
+      "InProgress": "In Progress",
+      "Completed": "Completed",
+      "Cancelled": "Cancelled",
+      "PendingClosure": "Pending Closure"
+    }
   },
   "common": {
     "yes": "Yes",
@@ -56,5 +64,11 @@
     "noResults": "No results found",
     "allRightsReserved": "All rights reserved"
   },
-  "total": "Total"
+  "total": "Total",
+  "table": {
+    "rowsSelected": "rows selected",
+    "page": "Page",
+    "previous": "Previous",
+    "next": "Next"
+  }
 }

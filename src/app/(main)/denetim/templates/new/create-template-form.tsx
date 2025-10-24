@@ -29,6 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, HelpCircle } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 /**
  * Validation Schema
@@ -56,6 +57,8 @@ interface QuestionBank {
 }
 
 export function CreateTemplateForm() {
+  const t = useTranslations('templates');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [questionBanks, setQuestionBanks] = useState<QuestionBank[]>([]);
@@ -90,14 +93,14 @@ export function CreateTemplateForm() {
         const result = await createAuditTemplate(values);
         
         if (result.success) {
-          toast.success("Şablon başarıyla oluşturuldu!");
+          toast.success(t('messages.templateCreated'));
           // Şablon oluşturulduktan sonra soru ekleme sayfasına yönlendir
           router.push(`/denetim/templates/${result.data.id}`);
         } else {
           toast.error(result.error);
         }
       } catch (error) {
-        toast.error("Bir hata oluştu");
+        toast.error(tCommon('status.error'));
       }
     });
   }
@@ -110,10 +113,10 @@ export function CreateTemplateForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Şablon Adı *</FormLabel>
+              <FormLabel>{t('fields.templateName')} *</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Örn: ISO 9001 Standart Denetim Şablonu" 
+                  placeholder={t('placeholders.templateExample')} 
                   {...field} 
                   disabled={isPending}
                 />
@@ -128,7 +131,7 @@ export function CreateTemplateForm() {
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Kategori *</FormLabel>
+              <FormLabel>{t('fields.category')} *</FormLabel>
               <Select 
                 onValueChange={field.onChange} 
                 defaultValue={field.value}
@@ -136,7 +139,7 @@ export function CreateTemplateForm() {
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Kategori seçin" />
+                    <SelectValue placeholder={t('placeholders.selectCategory')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -161,10 +164,10 @@ export function CreateTemplateForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Açıklama</FormLabel>
+              <FormLabel>{t('fields.description')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Şablon hakkında kısa bir açıklama..."
+                  placeholder={t('placeholders.descriptionExample')}
                   className="min-h-[120px]"
                   {...field}
                   disabled={isPending}
@@ -180,11 +183,11 @@ export function CreateTemplateForm() {
           name="estimatedDurationMinutes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tahmini Süre (Dakika)</FormLabel>
+              <FormLabel>{t('fields.estimatedDuration')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
-                  placeholder="Örn: 60"
+                  placeholder={t('placeholders.durationExample')}
                   {...field}
                   disabled={isPending}
                   min="0"
@@ -205,17 +208,17 @@ export function CreateTemplateForm() {
           render={() => (
             <FormItem>
               <div className="mb-4">
-                <FormLabel className="text-base">Soru Havuzları</FormLabel>
+                <FormLabel className="text-base">{t('fields.selectQuestionBanks')}</FormLabel>
                 <FormDescription>
-                  Şablonda kullanılacak soru havuzlarını seçin (opsiyonel)
+                  {t('messages.selectBanksOptional')}
                 </FormDescription>
               </div>
               {loading ? (
-                <div className="text-sm text-muted-foreground">Yükleniyor...</div>
+                <div className="text-sm text-muted-foreground">{tCommon('status.loading')}</div>
               ) : questionBanks.length === 0 ? (
                 <div className="rounded-md border border-muted bg-muted/20 p-3 text-sm text-muted-foreground flex items-center gap-2">
                   <HelpCircle className="h-4 w-4" />
-                  <span>Henüz soru havuzu yok. Önce soru havuzu oluşturun.</span>
+                  <span>{t('noQuestionBanks')}</span>
                 </div>
               ) : (
                 <div className="space-y-3">
