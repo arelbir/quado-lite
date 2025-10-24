@@ -22,13 +22,13 @@ export function UnifiedTableClient({ data, type }: UnifiedTableClientProps) {
   // Status options based on type
   const statusOptions = type === "plan" 
     ? [
-        { label: getPlanStatusLabel('Active'), value: 'Active' },
-        { label: getPlanStatusLabel('Completed'), value: 'Completed' },
+        { label: getPlanStatusLabel('Pending'), value: 'Pending' },
+        { label: getPlanStatusLabel('Created'), value: 'Created' },
         { label: getPlanStatusLabel('Cancelled'), value: 'Cancelled' },
       ]
     : [
-        { label: getAuditStatusLabel('InProgress'), value: 'InProgress' },
-        { label: getAuditStatusLabel('Completed'), value: 'Completed' },
+        { label: getAuditStatusLabel('Active'), value: 'Active' },
+        { label: getAuditStatusLabel('Closed'), value: 'Closed' },
         { label: getAuditStatusLabel('Archived'), value: 'Archived' },
       ];
   

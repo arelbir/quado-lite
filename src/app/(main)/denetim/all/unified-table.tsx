@@ -23,6 +23,7 @@ export async function UnifiedAuditsTable({ type }: UnifiedAuditsTableProps) {
       date: plan.scheduledDate || plan.createdAt,
       status: plan.status,
       scheduleType: plan.scheduleType,
+      auditorId: plan.auditorId, // 🔥 FIX: Denetçi kontrolü için
       createdBy: plan.createdBy,
       template: plan.template,
       createdAudit: plan.createdAudit,

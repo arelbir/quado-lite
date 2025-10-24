@@ -32,6 +32,7 @@ export type UnifiedRecord = {
   date: Date;
   status: string;
   scheduleType?: string;
+  auditorId?: string | null; // 🔥 FIX: Denetçi kontrolü için
   createdBy: {
     id: string;
     name: string | null;
@@ -228,9 +229,12 @@ export const columns: ColumnDef<UnifiedRecord>[] = [
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleStartPlan}>
+                <DropdownMenuItem 
+                  onClick={handleStartPlan}
+                  disabled={!record.auditorId}
+                >
                   <Play className="h-4 w-4 mr-2" />
-                  Hemen Başlat
+                  {!record.auditorId ? "Denetçi Atamalısınız" : "Hemen Başlat"}
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={`/denetim/plans/${record.id}/edit`}>

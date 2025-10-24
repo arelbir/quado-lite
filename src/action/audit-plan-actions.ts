@@ -105,6 +105,7 @@ async function createAuditFromPlan(plan: {
   auditDate: Date;
   createdById: string;
   templateId?: string | null;
+  auditorId?: string | null;
 }): Promise<{ auditId: string }> {
   // 1. Audit oluştur
   const [audit] = await db
@@ -114,6 +115,7 @@ async function createAuditFromPlan(plan: {
       description: plan.description,
       auditDate: plan.auditDate,
       createdById: plan.createdById,
+      auditorId: plan.auditorId, // 🔥 FIX: Plan'dan denetçi aktar
     })
     .returning({ id: audits.id });
 
@@ -237,6 +239,7 @@ export async function startAdhocAudit(data: {
       auditDate: data.auditDate || new Date(),
       createdById: user.id,
       templateId: data.templateId,
+      auditorId: undefined, // Adhoc'ta denetçi yok (sonra atanır)
     });
 
     const [plan] = await db
@@ -268,7 +271,7 @@ export async function startAdhocAudit(data: {
  * Planlanmış denetimleri otomatik oluştur (CRON JOB için)
  * Bugünkü tarihteki tüm pending planları işler
  */
-export async function createScheduledAudits(): Promise<ActionResponse<{ created: number }>> {
+export async function createScheduledAudits(): Promise<ActionResponse<{ created: number; skipped: number }>> {
   try {
     // Bugünün başlangıcı ve bitişi
     const today = new Date();
@@ -291,8 +294,16 @@ export async function createScheduledAudits(): Promise<ActionResponse<{ created:
     });
 
     let createdCount = 0;
+    let skippedCount = 0;
 
     for (const plan of pendingPlans) {
+      // 🔥 VALIDATION: Denetçisi olmayan planları atla
+      if (!plan.auditorId) {
+        console.warn(`Plan ${plan.id} skipped: No auditor assigned`);
+        skippedCount++;
+        continue;
+      }
+
       // DRY: Audit oluştur ve soruları yükle
       const { auditId } = await createAuditFromPlan({
         title: plan.title,
@@ -300,6 +311,7 @@ export async function createScheduledAudits(): Promise<ActionResponse<{ created:
         auditDate: plan.scheduledDate || new Date(),
         createdById: plan.createdById!,
         templateId: plan.templateId,
+        auditorId: plan.auditorId, // 🔥 FIX: Plan'dan denetçi aktar
       });
 
       // DRY: Plan durumunu güncelle
@@ -311,7 +323,13 @@ export async function createScheduledAudits(): Promise<ActionResponse<{ created:
     // DRY: Revalidate paths
     revalidateAuditPaths({ audits: true, plans: true });
     
-    return { success: true, data: { created: createdCount } };
+    return { 
+      success: true, 
+      data: { 
+        created: createdCount,
+        skipped: skippedCount // Denetçisi olmayan planlar
+      } 
+    };
   } catch (error) {
     console.error("Error creating scheduled audits:", error);
     return { success: false, error: "Failed to create scheduled audits" };
@@ -386,12 +404,18 @@ export async function startPlanManually(planId: string): Promise<ActionResponse<
       return { success: false, error: "Only plan creator or admin can start manually" };
     }
 
+    // 🔥 VALIDATION: Denetçi atanmış olmalı
+    if (!plan.auditorId) {
+      return { success: false, error: "Denetim başlatılamıyor: Denetçi atanmalıdır" };
+    }
+
     const { auditId } = await createAuditFromPlan({
       title: plan.title,
       description: plan.description,
       auditDate: new Date(),
       createdById: user.id,
       templateId: plan.templateId,
+      auditorId: plan.auditorId, // 🔥 FIX: Plan'dan denetçi aktar
     });
 
     await updatePlanStatus(planId, "Created", auditId);

@@ -1,0 +1,224 @@
+{
+  "title": "Organization Management",
+  "description": "Manage companies, branches, departments and positions",
+  
+  "companies": {
+    "title": "Companies",
+    "description": "Manage your companies",
+    "createNew": "Create New Company",
+    "editCompany": "Edit Company",
+    "deleteCompany": "Delete Company",
+    "deleteConfirm": "Are you sure you want to delete this company?",
+    "fields": {
+      "name": "Company Name",
+      "code": "Company Code",
+      "legalName": "Legal Name",
+      "taxNumber": "Tax Number",
+      "country": "Country",
+      "city": "City",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "placeholders": {
+      "name": "Enter company name",
+      "code": "Enter company code",
+      "legalName": "Enter legal name",
+      "taxNumber": "Enter tax number",
+      "country": "Select country",
+      "city": "Enter city",
+      "address": "Enter address",
+      "phone": "Enter phone number",
+      "email": "Enter email address",
+      "website": "Enter website URL",
+      "description": "Enter description"
+    },
+    "messages": {
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully",
+      "createError": "Failed to create company",
+      "updateError": "Failed to update company",
+      "deleteError": "Failed to delete company"
+    }
+  },
+
+  "branches": {
+    "title": "Branches",
+    "description": "Manage branch offices and locations across your organization",
+    "createNew": "Create New Branch",
+    "editBranch": "Edit Branch",
+    "deleteBranch": "Delete Branch",
+    "deleteConfirm": "Are you sure you want to delete this branch?",
+    "fields": {
+      "name": "Branch Name",
+      "code": "Branch Code",
+      "company": "Company",
+      "type": "Branch Type",
+      "country": "Country",
+      "city": "City",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "description": "Description",
+      "manager": "Branch Manager",
+      "departments": "Departments",
+      "isActive": "Active"
+    },
+    "types": {
+      "Headquarters": "Headquarters",
+      "Regional Office": "Regional Office",
+      "Branch Office": "Branch Office",
+      "Sales Office": "Sales Office",
+      "Service Center": "Service Center"
+    },
+    "placeholders": {
+      "name": "Enter branch name",
+      "code": "Enter branch code",
+      "company": "Select company",
+      "type": "Select branch type",
+      "country": "Select country",
+      "city": "Enter city",
+      "address": "Enter address",
+      "phone": "Enter phone number",
+      "email": "Enter email address",
+      "description": "Enter description",
+      "manager": "Select branch manager"
+    },
+    "messages": {
+      "created": "Branch created successfully",
+      "updated": "Branch updated successfully",
+      "deleted": "Branch deleted successfully",
+      "createError": "Failed to create branch",
+      "updateError": "Failed to update branch",
+      "deleteError": "Failed to delete branch"
+    }
+  },
+
+  "departments": {
+    "title": "Departments",
+    "description": "Manage your organization's department hierarchy",
+    "createNew": "Create New Department",
+    "editDepartment": "Edit Department",
+    "deleteDepartment": "Delete Department",
+    "deleteConfirm": "Are you sure you want to delete this department?",
+    "fields": {
+      "name": "Department Name",
+      "code": "Department Code",
+      "branch": "Branch",
+      "parent": "Parent Department",
+      "manager": "Department Manager",
+      "description": "Description",
+      "costCenter": "Cost Center",
+      "budget": "Budget",
+      "isActive": "Active",
+      "employees": "Employees",
+      "subDepartments": "Sub-Departments"
+    },
+    "placeholders": {
+      "name": "Enter department name",
+      "code": "Enter department code",
+      "branch": "Select branch",
+      "parent": "Select parent department (optional)",
+      "manager": "Select department manager",
+      "description": "Enter description",
+      "costCenter": "Enter cost center code",
+      "budget": "Enter budget"
+    },
+    "messages": {
+      "created": "Department created successfully",
+      "updated": "Department updated successfully",
+      "deleted": "Department deleted successfully",
+      "createError": "Failed to create department",
+      "updateError": "Failed to update department",
+      "deleteError": "Failed to delete department",
+      "hasSubDepartments": "Cannot delete department with sub-departments"
+    }
+  },
+
+  "positions": {
+    "title": "Positions",
+    "description": "Manage job positions and career levels",
+    "createNew": "Create New Position",
+    "editPosition": "Edit Position",
+    "deletePosition": "Delete Position",
+    "deleteConfirm": "Are you sure you want to delete this position?",
+    "fields": {
+      "name": "Position Name",
+      "code": "Position Code",
+      "level": "Career Level",
+      "category": "Category",
+      "description": "Description",
+      "salaryGrade": "Salary Grade",
+      "isActive": "Active"
+    },
+    "levels": {
+      "1": "Level 1 - Intern",
+      "2": "Level 2 - Jr. Specialist",
+      "3": "Level 3 - Specialist",
+      "4": "Level 4 - Sr. Specialist",
+      "5": "Level 5 - Team Lead",
+      "6": "Level 6 - Manager",
+      "7": "Level 7 - Sr. Manager",
+      "8": "Level 8 - VP",
+      "9": "Level 9 - GM",
+      "10": "Level 10 - CEO"
+    },
+    "categories": {
+      "Management": "Management",
+      "Technical": "Technical",
+      "Administrative": "Administrative",
+      "Operational": "Operational",
+      "Sales": "Sales",
+      "Support": "Support"
+    },
+    "placeholders": {
+      "name": "Enter position name",
+      "code": "Enter position code",
+      "level": "Select career level",
+      "category": "Select category",
+      "description": "Enter description",
+      "salaryGrade": "Enter salary grade"
+    },
+    "messages": {
+      "created": "Position created successfully",
+      "updated": "Position updated successfully",
+      "deleted": "Position deleted successfully",
+      "createError": "Failed to create position",
+      "updateError": "Failed to update position",
+      "deleteError": "Failed to delete position"
+    }
+  },
+
+  "common": {
+    "location": "Location",
+    "contact": "Contact",
+    "details": "Details",
+    "management": "Management",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "unassigned": "Unassigned",
+    "selectCompany": "Select Company",
+    "selectBranch": "Select Branch",
+    "selectDepartment": "Select Department",
+    "selectManager": "Select Manager",
+    "noManager": "No Manager"
+  },
+
+  "validation": {
+    "nameRequired": "Name is required",
+    "codeRequired": "Code is required",
+    "companyRequired": "Company is required",
+    "typeRequired": "Type is required",
+    "levelRequired": "Level is required",
+    "nameMin": "Name must be at least 2 characters",
+    "codeMin": "Code must be at least 2 characters",
+    "invalidEmail": "Invalid email address",
+    "branchIdRequired": "Branch ID is required for update",
+    "positionIdRequired": "Position ID is required for update"
+  }
+}

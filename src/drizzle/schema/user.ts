@@ -9,6 +9,9 @@ import { audits } from "./audit";
 import { findings } from "./finding";
 import { actions } from "./action";
 import { dofs, dofActivities } from "./dof";
+import { companies, branches, departments, positions } from "./organization";
+import { userRoles } from "./role-system";
+import { userTeams, groupMembers } from "./teams-groups";
 
 
 export const user = pgTable("User", {
@@ -20,6 +23,30 @@ export const user = pgTable("User", {
 	image: varchar("image"),
 	theme: theme("theme").default('system'),
 	status: userStatus("status").default('active'),
+	
+	// 🔥 NEW: Organization fields (Week 1 - Enterprise User Management)
+	companyId: uuid("companyId"),
+	branchId: uuid("branchId"),
+	departmentId: uuid("departmentId"),
+	positionId: uuid("positionId"),
+	managerId: uuid("managerId"), // Direct manager
+	employeeNumber: varchar("employeeNumber", { length: 50 }),
+	
+	// Employment details
+	hireDate: timestamp("hireDate"),
+	terminationDate: timestamp("terminationDate"),
+	employmentType: varchar("employmentType", { length: 50 }), // FullTime, PartTime, Contract, Intern
+	workLocation: varchar("workLocation", { length: 50 }), // OnSite, Remote, Hybrid
+	
+	// Contact
+	phoneNumber: varchar("phoneNumber", { length: 50 }),
+	mobileNumber: varchar("mobileNumber", { length: 50 }),
+	emergencyContact: varchar("emergencyContact", { length: 255 }),
+	
+	// Locale
+	timezone: varchar("timezone", { length: 50 }),
+	locale: varchar("locale", { length: 10 }),
+	
 	createdAt: timestamp("createdAt").defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt"),
 	deletedAt: timestamp("deletedAt"),
@@ -29,6 +56,7 @@ export const user = pgTable("User", {
 	(table) => {
 		return {
 			emailKey: uniqueIndex("User_email_key").on(table.email),
+			employeeNumberKey: uniqueIndex("User_employeeNumber_key").on(table.employeeNumber),
 			userCreatedByIdFkey: foreignKey({
 				columns: [table.createdById],
 				foreignColumns: [table.id],
@@ -38,6 +66,12 @@ export const user = pgTable("User", {
 				columns: [table.deletedById],
 				foreignColumns: [table.id],
 				name: "User_deletedById_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			// 🔥 NEW: Organization foreign keys
+			userManagerIdFkey: foreignKey({
+				columns: [table.managerId],
+				foreignColumns: [table.id],
+				name: "User_managerId_fkey"
 			}).onUpdate("cascade").onDelete("set null"),
 		}
 	});
@@ -108,6 +142,35 @@ export const userRelation = relations(user, ({ one, many }) => ({
 	menus: many(userMenuTable, {
 		relationName: 'user_menu_u',
 	}),
+	// 🔥 NEW: Organization Relations
+	company: one(companies, {
+		fields: [user.companyId],
+		references: [companies.id],
+		relationName: 'user_company',
+	}),
+	branch: one(branches, {
+		fields: [user.branchId],
+		references: [branches.id],
+		relationName: 'user_branch',
+	}),
+	department: one(departments, {
+		fields: [user.departmentId],
+		references: [departments.id],
+		relationName: 'user_department',
+	}),
+	position: one(positions, {
+		fields: [user.positionId],
+		references: [positions.id],
+		relationName: 'user_position',
+	}),
+	manager: one(user, {
+		fields: [user.managerId],
+		references: [user.id],
+		relationName: 'user_manager',
+	}),
+	directReports: many(user, {
+		relationName: 'user_manager', // Users reporting to this user
+	}),
 	// Audit System Relations
 	createdAudits: many(audits, {
 		relationName: 'audit_creator',
@@ -138,6 +201,20 @@ export const userRelation = relations(user, ({ one, many }) => ({
 	}),
 	responsibleActivities: many(dofActivities, {
 		relationName: 'dof_activity_responsible',
+	}),
+	// 🔥 NEW: Multi-Role System Relations
+	userRoles: many(userRoles, {
+		relationName: 'user_roles',
+	}),
+	assignedRoles: many(userRoles, {
+		relationName: 'user_assigned_roles',
+	}),
+	// 🔥 NEW: Teams & Groups Relations (Week 4)
+	teams: many(userTeams, {
+		relationName: 'user_teams',
+	}),
+	groups: many(groupMembers, {
+		relationName: 'user_groups',
 	}),
 }))
 

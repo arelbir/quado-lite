@@ -8,6 +8,34 @@
       "when": 1761238411782,
       "tag": "0000_violet_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1761318997777,
+      "tag": "0001_yielding_war_machine",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1761319432539,
+      "tag": "0002_vengeful_fabian_cortez",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1761319973802,
+      "tag": "0003_sturdy_fenris",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1761320254902,
+      "tag": "0004_messy_black_panther",
+      "breakpoints": true
     }
   ]
 }

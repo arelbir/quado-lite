@@ -9,9 +9,10 @@ import { useDofStatusLabel } from "@/lib/i18n/status-helpers";
 
 interface DofsTableClientProps {
   data: DofRecord[];
+  pageCount?: number;
 }
 
-export function DofsTableClient({ data }: DofsTableClientProps) {
+export function DofsTableClient({ data, pageCount }: DofsTableClientProps) {
   const t = useTranslations('dof');
   const tCommon = useTranslations('common');
   const columns = useDofColumns();
@@ -45,7 +46,7 @@ export function DofsTableClient({ data }: DofsTableClientProps) {
   const { table } = useDataTable({
     data,
     columns,
-    pageCount: Math.ceil(data.length / 10),
+    pageCount: pageCount ?? -1, // Server-side if provided, else client-side
     filterFields,
   });
 

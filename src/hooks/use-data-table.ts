@@ -339,6 +339,10 @@ export function useDataTable<TData, TValue>({
     JSON.stringify(dateColumnFilters),
   ])
 
+  // Determine if pagination is server-side or client-side
+  // pageCount === -1 means client-side pagination
+  const isServerSidePagination = pageCount !== -1
+
   const table = useReactTable({
     data,
     columns,
@@ -366,7 +370,7 @@ export function useDataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    manualPagination: true,
+    manualPagination: isServerSidePagination, // Dynamic: true for server-side, false for client-side
     manualSorting: true,
     manualFiltering: false, // Client-side filtering için false
   })

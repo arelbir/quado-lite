@@ -116,12 +116,104 @@ export interface Audit {
 export type AuditStatus = Audit["status"];
 
 // ============================================
+// ORGANIZATION TYPES
+// ============================================
+
+export interface Company {
+  id: string;
+  name: string;
+  code: string;
+  legalName: string | null;
+  taxNumber: string | null;
+  country: string | null;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  createdById: string | null;
+  deletedById: string | null;
+}
+
+export interface Branch {
+  id: string;
+  companyId: string;
+  name: string;
+  code: string;
+  type: string;
+  country: string | null;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  email?: string | null;
+  description?: string | null;
+  managerId: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  createdById: string | null;
+  deletedById: string | null;
+}
+
+export interface Department {
+  id: string;
+  branchId: string | null;
+  name: string;
+  code: string;
+  description: string | null;
+  parentDepartmentId: string | null;
+  managerId: string | null;
+  costCenter: string | null;
+  budget: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  createdById: string | null;
+  deletedById: string | null;
+}
+
+export interface Position {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  level: string | null;
+  category: string | null;
+  salaryGrade: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  createdById: string | null;
+  deletedById: string | null;
+}
+
+// Organization types with relations
+export interface BranchWithRelations extends Branch {
+  manager?: Pick<User, 'id' | 'name' | 'email'> | null;
+  _count?: {
+    departments: number;
+  };
+}
+
+export interface DepartmentWithRelations extends Department {
+  manager?: Pick<User, 'id' | 'name' | 'email'> | null;
+  children?: Department[];
+}
+
+// ============================================
 // RESPONSE TYPES
 // ============================================
 
 export type ActionResponse<T = void> = 
-  | { success: true; data: T }
-  | { success: false; error: string };
+  | { success: true; data: T; message?: string }
+  | { success: false; error: string; message?: string };
 
 // ============================================
 // HELPER TYPE UTILITIES

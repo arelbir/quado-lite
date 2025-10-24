@@ -134,7 +134,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <AuditReportButton auditId={params.id} />
+          <AuditReportButton auditId={params.id} auditTitle={audit.title} />
           {audit.status === "Active" && (
             <Button asChild variant="outline" size="sm">
               <Link href={`/denetim/audits/${params.id}/edit`}>

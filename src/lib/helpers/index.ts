@@ -11,6 +11,23 @@ export {
   withAuth,
 } from "./auth-helpers";
 
+// 🔥 NEW: Permission System (Week 3)
+export {
+  createPermissionChecker,
+  requirePermission,
+  canCreateAudit,
+  canApproveAudit,
+  canCreateFinding,
+  canCloseFinding,
+  canApproveAction,
+  canApproveDOF,
+  canManageUsers,
+  canManageRoles,
+  type PermissionCheck,
+  type PermissionResult,
+  PermissionChecker,
+} from "@/lib/auth/permission-checker";
+
 // Error Helpers
 export {
   createActionError,
@@ -25,5 +42,6 @@ export {
   revalidateActionPaths,
   revalidateFindingPaths,
   revalidateDOFPaths,
+  revalidateOrganizationPaths,
   revalidateCommonPaths,
 } from "./revalidation-helpers";

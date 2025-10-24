@@ -54,6 +54,9 @@ export default auth((req) => {
   return void 0;
 });
 
+// Use Node.js runtime for database and bcrypt support
+export const runtime = 'nodejs';
+
 // Optionally, don't invoke Middleware on some paths
 export const config = {
   matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],

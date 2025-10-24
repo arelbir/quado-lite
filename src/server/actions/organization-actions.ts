@@ -1,0 +1,336 @@
+/**
+ * ORGANIZATION ACTIONS
+ * Server actions for organization management
+ * 
+ * Features:
+ * - Company CRUD
+ * - Branch CRUD
+ * - Department CRUD
+ * - Position CRUD
+ * 
+ * Pattern: withAuth + Type-Safe + DRY + SOLID
+ * Refactored: 2025-01-25 (Week 7-8 Completion)
+ */
+
+"use server";
+
+import { db } from "@/drizzle/db";
+import { companies, branches, departments, positions } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
+import { 
+  withAuth, 
+  revalidateOrganizationPaths,
+  createNotFoundError,
+  createValidationError 
+} from "@/lib/helpers";
+import type { ActionResponse, Company, Branch, Department, Position } from "@/lib/types";
+
+// ============================================
+// COMPANY ACTIONS
+// ============================================
+
+export async function createCompany(data: {
+  name: string;
+  code: string;
+  legalName?: string;
+  taxNumber?: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  description?: string;
+}): Promise<ActionResponse<{ id: string }>> {
+  return withAuth(async (user) => {
+    const [company] = await db.insert(companies).values({
+      ...data,
+      isActive: true,
+      createdById: user.id,
+    }).returning({ id: companies.id });
+
+    revalidateOrganizationPaths({ companies: true });
+    
+    return {
+      success: true,
+      data: { id: company!.id },
+      message: "Company created successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function updateCompany(
+  id: string,
+  data: Partial<{
+    name: string;
+    code: string;
+    legalName: string;
+    taxNumber: string;
+    country: string;
+    city: string;
+    address: string;
+    phone: string;
+    email: string;
+    website: string;
+    description: string;
+    isActive: boolean;
+  }>
+): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    await db.update(companies)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(companies.id, id));
+
+    revalidateOrganizationPaths({ companies: true, specificCompany: id });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Company updated successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function deleteCompany(id: string): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    await db.delete(companies).where(eq(companies.id, id));
+
+    revalidateOrganizationPaths({ companies: true });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Company deleted successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+// ============================================
+// BRANCH ACTIONS
+// ============================================
+
+export async function createBranch(data: {
+  companyId: string;
+  name: string;
+  code: string;
+  type: string;
+  country?: string;
+  city?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  description?: string;
+  managerId?: string;
+}): Promise<ActionResponse<{ id: string }>> {
+  return withAuth(async (user) => {
+    const [branch] = await db.insert(branches).values({
+      ...data,
+      isActive: true,
+      createdById: user.id,
+    }).returning({ id: branches.id });
+
+    revalidateOrganizationPaths({ branches: true });
+    
+    return {
+      success: true,
+      data: { id: branch!.id },
+      message: "Branch created successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function updateBranch(
+  id: string,
+  data: Partial<{
+    name: string;
+    code: string;
+    type: string;
+    country: string;
+    city: string;
+    address: string;
+    phone: string;
+    email: string;
+    description: string;
+    managerId: string;
+    isActive: boolean;
+  }>
+): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    await db.update(branches)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(branches.id, id));
+
+    revalidateOrganizationPaths({ branches: true, specificBranch: id });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Branch updated successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function deleteBranch(id: string): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    await db.delete(branches).where(eq(branches.id, id));
+
+    revalidateOrganizationPaths({ branches: true });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Branch deleted successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+// ============================================
+// DEPARTMENT ACTIONS
+// ============================================
+
+export async function createDepartment(data: {
+  branchId?: string;
+  name: string;
+  code: string;
+  parentDepartmentId?: string;
+  managerId?: string;
+  description?: string;
+  costCenter?: string;
+}): Promise<ActionResponse<{ id: string }>> {
+  return withAuth(async (user) => {
+    const [department] = await db.insert(departments).values({
+      ...data,
+      isActive: true,
+      createdById: user.id,
+    }).returning({ id: departments.id });
+
+    revalidateOrganizationPaths({ departments: true });
+    
+    return {
+      success: true,
+      data: { id: department!.id },
+      message: "Department created successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function updateDepartment(
+  id: string,
+  data: Partial<{
+    name: string;
+    code: string;
+    branchId: string;
+    parentDepartmentId: string;
+    managerId: string;
+    description: string;
+    costCenter: string;
+    isActive: boolean;
+  }>
+): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    await db.update(departments)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(departments.id, id));
+
+    revalidateOrganizationPaths({ departments: true, specificDepartment: id });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Department updated successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function deleteDepartment(id: string): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    // Check if department has children
+    const children = await db.query.departments.findMany({
+      where: eq(departments.parentDepartmentId, id),
+    });
+
+    if (children.length > 0) {
+      return createValidationError("Cannot delete department with sub-departments");
+    }
+
+    await db.delete(departments).where(eq(departments.id, id));
+
+    revalidateOrganizationPaths({ departments: true });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Department deleted successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+// ============================================
+// POSITION ACTIONS
+// ============================================
+
+export async function createPosition(data: {
+  name: string;
+  code: string;
+  level: string;
+  category?: string;
+  description?: string;
+  salaryGrade?: string;
+}): Promise<ActionResponse<{ id: string }>> {
+  return withAuth(async (user) => {
+    const [position] = await db.insert(positions).values({
+      ...data,
+      isActive: true,
+      createdById: user.id,
+    }).returning({ id: positions.id });
+
+    revalidateOrganizationPaths({ positions: true });
+    
+    return {
+      success: true,
+      data: { id: position!.id },
+      message: "Position created successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function updatePosition(
+  id: string,
+  data: Partial<{
+    name: string;
+    code: string;
+    level: string;
+    category: string;
+    description: string;
+    salaryGrade: string;
+    isActive: boolean;
+  }>
+): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    await db.update(positions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(positions.id, id));
+
+    revalidateOrganizationPaths({ positions: true, specificPosition: id });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Position updated successfully",
+    };
+  }, { requireAdmin: true });
+}
+
+export async function deletePosition(id: string): Promise<ActionResponse> {
+  return withAuth(async (user) => {
+    await db.delete(positions).where(eq(positions.id, id));
+
+    revalidateOrganizationPaths({ positions: true });
+    
+    return {
+      success: true,
+      data: undefined,
+      message: "Position deleted successfully",
+    };
+  }, { requireAdmin: true });
+}
