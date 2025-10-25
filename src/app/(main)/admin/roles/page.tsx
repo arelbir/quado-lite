@@ -22,22 +22,27 @@ export const metadata: Metadata = {
 };
 
 export default async function RolesPage() {
-  // Fetch all roles with permission count
-  const roles = await db.query.roles.findMany({
-    with: {
-      permissions: {
-        with: {
-          permission: true,
+  // Fetch all roles with permissions and all available permissions
+  const [roles, allPermissions] = await Promise.all([
+    db.query.roles.findMany({
+      with: {
+        permissions: {
+          with: {
+            permission: true,
+          },
         },
-      },
-    },
-    orderBy: (roles, { asc }) => [asc(roles.name)],
-  });
+      } as any,
+      orderBy: (roles, { asc }) => [asc(roles.name)],
+    }),
+    db.query.permissions.findMany({
+      orderBy: (permissions, { asc }) => [asc(permissions.name)],
+    }),
+  ]);
 
-  // Transform data to include permission count
-  const rolesWithCount = roles.map(role => ({
+  // Transform roles data
+  const rolesWithPermissions = roles.map((role: any) => ({
     ...role,
-    permissionCount: role.permissions.length,
+    permissions: role.permissions?.map((rp: any) => ({ id: rp.permission.id })) || [],
   }));
 
   return (
@@ -51,7 +56,10 @@ export default async function RolesPage() {
         </div>
       </div>
 
-      <RolesTableClient roles={rolesWithCount as any} />
+      <RolesTableClient 
+        roles={rolesWithPermissions as any} 
+        permissions={allPermissions as any}
+      />
     </div>
   );
 }

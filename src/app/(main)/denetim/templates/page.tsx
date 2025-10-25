@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getAuditTemplates } from "@/action/audit-template-actions";
+import { getAuditTemplates } from "@/server/actions/audit-template-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText } from "lucide-react";

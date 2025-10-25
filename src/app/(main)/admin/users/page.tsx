@@ -33,8 +33,18 @@ interface PageProps {
 }
 
 export default async function UsersPage({ searchParams }: PageProps) {
-  // Fetch departments and positions for dropdowns
-  const [departmentsList, positionsList] = await Promise.all([
+  // Fetch all dropdown data
+  const [companiesList, branchesList, departmentsList, positionsList, managersList] = await Promise.all([
+    db.query.companies.findMany({
+      columns: { id: true, name: true },
+      where: (companies, { eq }) => eq(companies.isActive, true),
+      orderBy: (companies, { asc }) => [asc(companies.name)],
+    }),
+    db.query.branches.findMany({
+      columns: { id: true, name: true },
+      where: (branches, { eq }) => eq(branches.isActive, true),
+      orderBy: (branches, { asc }) => [asc(branches.name)],
+    }),
     db.query.departments.findMany({
       columns: { id: true, name: true },
       where: (departments, { eq }) => eq(departments.isActive, true),
@@ -44,6 +54,11 @@ export default async function UsersPage({ searchParams }: PageProps) {
       columns: { id: true, name: true },
       where: (positions, { eq }) => eq(positions.isActive, true),
       orderBy: (positions, { asc }) => [asc(positions.name)],
+    }),
+    db.query.user.findMany({
+      columns: { id: true, name: true, email: true },
+      where: (user, { eq, isNull }) => eq(user.status, 'active'),
+      orderBy: (user, { asc }) => [asc(user.name)],
     }),
   ]);
 
@@ -103,8 +118,11 @@ export default async function UsersPage({ searchParams }: PageProps) {
 
       <UsersTableClient 
         users={result.data as any} 
+        companies={companiesList as any}
+        branches={branchesList as any}
         departments={departmentsList as any}
         positions={positionsList as any}
+        managers={managersList as any}
         pageCount={result.pageCount} 
       />
     </div>

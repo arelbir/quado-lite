@@ -30,7 +30,7 @@ import {
 import { ArrowLeft, Save, Check, ChevronsUpDown } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { updateAuditPlan } from "@/action/audit-plan-actions";
+import { updateAuditPlan } from "@/server/actions/audit-plan-actions";
 import { cn } from "@/lib/utils";
 import { useTranslations } from 'next-intl';
 

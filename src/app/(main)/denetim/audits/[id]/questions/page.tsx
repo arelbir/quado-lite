@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/drizzle/db";
 import { audits } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
-import { getAuditQuestions, checkAuditCompletion } from "@/action/audit-question-actions";
+import { getAuditQuestions, checkAuditCompletion } from "@/server/actions/audit-question-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";

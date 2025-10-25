@@ -11,6 +11,8 @@ import {
   createActionError,
   revalidateAuditPaths,
 } from "@/lib/helpers";
+import { startWorkflow } from "@/server/actions/workflow-actions";
+import { getAuditWorkflowId, buildAuditMetadata } from "@/lib/workflow/workflow-integration";
 
 // ============================================
 // HELPER FUNCTIONS - LOCAL (Plan-specific)
@@ -29,6 +31,7 @@ async function getPlanWithValidation(
 ): Promise<{ plan: Plan } | { error: string }> {
   const plan = await db.query.auditPlans.findFirst({
     where: eq(auditPlans.id, planId),
+    // @ts-ignore - Drizzle with clause type inference limitation
     with: options?.withTemplate ? { template: true } : undefined,
   });
 
@@ -117,11 +120,31 @@ async function createAuditFromPlan(plan: {
       createdById: plan.createdById,
       auditorId: plan.auditorId, // 🔥 FIX: Plan'dan denetçi aktar
     })
-    .returning({ id: audits.id });
+    .returning();
 
   // 2. Template varsa soruları yükle
   if (plan.templateId) {
     await loadQuestionsFromTemplate(audit!.id, plan.templateId);
+  }
+
+  // 3. Workflow başlat
+  try {
+    const workflowId = await getAuditWorkflowId({
+      riskLevel: (audit as any).riskLevel,
+      totalScore: 0,
+    });
+
+    if (workflowId) {
+      await startWorkflow({
+        workflowDefinitionId: workflowId,
+        entityType: "Audit",
+        entityId: audit!.id,
+        entityMetadata: buildAuditMetadata(audit),
+      });
+    }
+  } catch (error) {
+    console.error("Workflow start failed:", error);
+    // Continue - workflow is optional
   }
 
   return { auditId: audit!.id };
@@ -289,6 +312,7 @@ export async function createScheduledAudits(): Promise<ActionResponse<{ created:
         isNull(auditPlans.deletedAt)
       ),
       with: {
+        // @ts-ignore - Drizzle relation type inference limitation
         template: true,
       },
     });
@@ -345,6 +369,7 @@ export async function getAuditPlans() {
     const plans = await db.query.auditPlans.findMany({
       where: isNull(auditPlans.deletedAt),
       with: {
+        // @ts-ignore - Drizzle relation type inference limitation
         template: {
           columns: {
             id: true,

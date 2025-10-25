@@ -5,17 +5,16 @@ import { user } from "./user";
 import { findings } from "./finding";
 import { actions } from "./action";
 
-// DOF Status Enum (7 Adım)
+// DOF Status Enum (UPDATED: Workflow integration - removed approval statuses)
 export const dofStatusEnum = pgEnum("dof_status", [
   "Step1_Problem",           // Adım 1: Problem Tanımı
   "Step2_TempMeasures",      // Adım 2: Geçici Önlemler
   "Step3_RootCause",         // Adım 3: Kök Neden Analizi
   "Step4_Activities",        // Adım 4: Faaliyet Belirleme
   "Step5_Implementation",    // Adım 5: Uygulama
-  "Step6_EffectivenessCheck",// Adım 6: Etkinlik Kontrolü
-  "PendingManagerApproval",  // Yönetici onayı bekliyor
-  "Completed",               // Yönetici onayladı, kapandı
-  "Rejected"                 // Yönetici reddetti
+  "Step6_EffectivenessCheck",// Adım 6: Etkinlik Kontrolü (Submit to workflow here)
+  "Completed",               // Workflow onaylandı, kapandı (Final state)
+  "Cancelled"                // İptal edildi (Exit state - NEW)
 ]);
 
 // Activity Type Enum

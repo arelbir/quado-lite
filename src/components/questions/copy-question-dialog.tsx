@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { copyQuestion } from "@/action/question-actions";
-import { getActiveQuestionBanks } from "@/action/question-bank-actions";
+import { copyQuestion } from "@/server/actions/question-actions";
+import { getActiveQuestionBanks } from "@/server/actions/question-bank-actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {

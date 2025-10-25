@@ -12,18 +12,18 @@
  * Week 7-8: Day 6
  */
 
-import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { db } from "@/drizzle/db";
 import { user } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Mail, Building2, Briefcase, Shield, Calendar } from "lucide-react";
+import { User, Mail, Building2, Briefcase, Shield, Calendar, ArrowLeft, Edit } from "lucide-react";
 import { format } from "date-fns";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "User Details | Admin",
   description: "Manage user details",
 };
@@ -41,6 +41,13 @@ export default async function UserDetailPage({
       position: true,
       company: true,
       branch: true,
+      manager: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       userRoles: {
         with: {
           role: true,
@@ -72,8 +79,22 @@ export default async function UserDetailPage({
           <p className="text-muted-foreground mt-1">{userDetail.email}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">Edit Profile</Button>
-          <Button variant="outline">Assign Role</Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/users">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Users
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href={`/admin/users?edit=${params.id}`}>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit Profile
+            </Link>
+          </Button>
+          <Button variant="outline" disabled>
+            <Shield className="w-4 h-4 mr-2" />
+            Assign Role
+          </Button>
         </div>
       </div>
 
@@ -119,7 +140,7 @@ export default async function UserDetailPage({
         <CardContent>
           {userDetail.userRoles.length > 0 ? (
             <div className="space-y-2">
-              {userDetail.userRoles.map((ur) => (
+              {userDetail.userRoles.map((ur: any) => (
                 <div
                   key={ur.id}
                   className="flex items-center justify-between p-3 rounded border"
@@ -179,12 +200,33 @@ export default async function UserDetailPage({
               </div>
             </div>
             <div>
+              <div className="text-sm font-medium text-muted-foreground">Employee Number</div>
+              <div className="mt-1">{userDetail.employeeNumber || "N/A"}</div>
+            </div>
+            <div>
               <div className="text-sm font-medium text-muted-foreground">Company</div>
               <div className="mt-1">{userDetail.company?.name || "N/A"}</div>
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">Branch</div>
               <div className="mt-1">{userDetail.branch?.name || "N/A"}</div>
+            </div>
+            <div>
+              <div className="text-sm font-medium text-muted-foreground">Manager</div>
+              <div className="mt-1 flex items-center gap-2">
+                <User className="w-4 h-4 text-muted-foreground" />
+                {userDetail.manager?.name || userDetail.manager?.email || "N/A"}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-medium text-muted-foreground">Status</div>
+              <div className="mt-1">
+                {userDetail.status === "active" ? (
+                  <Badge className="bg-green-100 text-green-800">Active</Badge>
+                ) : (
+                  <Badge variant="secondary">Inactive</Badge>
+                )}
+              </div>
             </div>
             <div>
               <div className="text-sm font-medium text-muted-foreground">Created At</div>

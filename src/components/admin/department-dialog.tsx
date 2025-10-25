@@ -39,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,7 @@ interface DepartmentDialogProps {
   department?: Department | null;
   parentId?: string;
   departments: Department[];
+  users: any[];
   onSuccess?: () => void;
 }
 
@@ -82,6 +84,7 @@ export function DepartmentDialog({
   department,
   parentId,
   departments,
+  users,
   onSuccess,
 }: DepartmentDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,7 +96,7 @@ export function DepartmentDialog({
       name: "",
       code: "",
       parentDepartmentId: parentId || undefined,
-      managerId: undefined,
+      managerId: "none",
       description: "",
       costCenter: "",
     },
@@ -106,21 +109,19 @@ export function DepartmentDialog({
         name: department.name,
         code: department.code,
         parentDepartmentId: department.parentDepartmentId || undefined,
-        managerId: department.managerId || undefined,
+        managerId: department.managerId || "none",
         description: department.description || "",
         costCenter: department.costCenter || "",
       });
-    } else if (parentId) {
+    } else {
       form.reset({
         name: "",
         code: "",
         parentDepartmentId: parentId,
-        managerId: undefined,
+        managerId: "none",
         description: "",
         costCenter: "",
       });
-    } else {
-      form.reset();
     }
   }, [department, parentId, form]);
 
@@ -128,9 +129,15 @@ export function DepartmentDialog({
     setIsSubmitting(true);
 
     try {
+      // Handle "none" value for managerId
+      const submitData = {
+        ...data,
+        managerId: data.managerId === "none" ? undefined : data.managerId,
+      };
+
       const result = isEdit
-        ? await updateDepartment(department!.id, data)
-        : await createDepartment(data);
+        ? await updateDepartment(department!.id, submitData)
+        : await createDepartment(submitData);
 
       if (result.success) {
         toast.success(result.message || (isEdit ? "Department updated successfully" : "Department created successfully"));
@@ -200,26 +207,23 @@ export function DepartmentDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Parent Department</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select parent department (optional)" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="none">None (Root)</SelectItem>
-                      {departments
+                  <FormControl>
+                    <SearchableSelect
+                      options={departments
                         .filter(d => d.id !== department?.id) // Can't select self
-                        .map((dept) => (
-                          <SelectItem key={dept.id} value={dept.id}>
-                            {dept.name} ({dept.code})
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                        .map((dept) => ({
+                          value: dept.id,
+                          label: `${dept.name} (${dept.code})`,
+                        }))}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Select parent department (optional)"
+                      searchPlaceholder="Search departments..."
+                      emptyText="No departments found"
+                      allowNone
+                      noneLabel="None (Root)"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -247,9 +251,18 @@ export function DepartmentDialog({
                   <FormItem>
                     <FormLabel>Manager</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Manager ID (from users)"
-                        {...field}
+                      <SearchableSelect
+                        options={users.map((user: any) => ({
+                          value: user.id,
+                          label: user.name || user.email,
+                        }))}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder="Select manager (optional)"
+                        searchPlaceholder="Search users..."
+                        emptyText="No users found"
+                        allowNone
+                        noneLabel="No Manager"
                       />
                     </FormControl>
                     <FormMessage />

@@ -1,37 +1,15 @@
-import { getMyPendingTasks } from "@/action/my-tasks-actions";
-import { TaskDashboard } from "./task-dashboard";
-import { getTranslations } from 'next-intl/server';
+import { redirect } from "next/navigation";
 
 /**
- * SOLID Architecture - Server Component
+ * DEPRECATED: Old task management page
  * 
- * Responsibilities:
- * - Data fetching (Server Side)
- * - Page metadata
- * - Header section
+ * This page has been replaced by the centralized workflow task management.
+ * All tasks (Actions, DOFs, Findings) are now managed through the workflow system.
  * 
- * Delegates:
- * - UI rendering to TaskDashboard (Client Component)
- * - Virtual scrolling to VirtualTaskList
- * - Individual task rendering to TaskCard
+ * Redirecting to: /admin/workflows/my-tasks
  */
 
-export default async function MyTasksPage() {
-  const t = await getTranslations('myTasks');
-  const data = await getMyPendingTasks();
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-        <p className="text-muted-foreground">
-          {t('description')}
-        </p>
-      </div>
-
-      {/* Dashboard with Virtual Scrolling */}
-      <TaskDashboard data={data} />
-    </div>
-  );
+export default function MyTasksPage() {
+  // Redirect to new workflow-based task management
+  redirect("/admin/workflows/my-tasks");
 }

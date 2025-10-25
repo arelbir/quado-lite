@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { createAudit } from "@/action/audit-actions";
+import { createAudit } from "@/server/actions/audit-actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,

@@ -17,8 +17,8 @@ export default async function CompanyDetailPage({ params }: { params: { id: stri
           isActive: true,
         },
       },
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!company) {
     notFound();
@@ -145,7 +145,7 @@ export default async function CompanyDetailPage({ params }: { params: { id: stri
           <CardContent>
             {company.branches && company.branches.length > 0 ? (
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                {company.branches.map((branch) => (
+                {company.branches.map((branch: any) => (
                   <Card key={branch.id}>
                     <CardContent className="pt-6">
                       <div className="flex items-start justify-between">

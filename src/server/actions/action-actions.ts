@@ -13,6 +13,8 @@ import {
   revalidateFindingPaths,
   revalidateDOFPaths,
 } from "@/lib/helpers";
+import { startWorkflow } from "@/server/actions/workflow-actions";
+import { getActionWorkflowId, buildActionMetadata } from "@/lib/workflow/workflow-integration";
 
 /**
  * FR-003: Süreç Sahibi, Aksiyon Oluşturabilir
@@ -47,7 +49,7 @@ export async function createAction(data: {
         status: "Assigned",
         createdById: user.id,
       })
-      .returning({ id: actions.id });
+      .returning();
 
     await db
       .update(findings)
@@ -56,6 +58,26 @@ export async function createAction(data: {
         updatedAt: new Date(),
       })
       .where(eq(findings.id, data.findingId));
+
+    // Workflow başlat
+    try {
+      const workflowId = await getActionWorkflowId({
+        priority: (action as any).priority,
+        type: (action as any).type,
+        findingId: data.findingId,
+      });
+
+      if (workflowId) {
+        await startWorkflow({
+          workflowDefinitionId: workflowId,
+          entityType: "Action",
+          entityId: action!.id,
+          entityMetadata: buildActionMetadata(action),
+        });
+      }
+    } catch (error) {
+      console.error("Workflow start failed:", error);
+    }
 
     revalidateFindingPaths({ list: true });
     revalidateActionPaths({ list: true });
@@ -110,8 +132,9 @@ export async function createDofAction(data: {
 }
 
 /**
- * FR-004: Aksiyon Sorumlusu, Aksiyonu Tamamlayabilir
- * Sorumlu, aksiyonu tamamladığını işaretler (Yönetici onayına gider)
+ * FR-004: Mark Action as Complete (Workflow Integration)
+ * Status: Assigned → InProgress
+ * Sorumlu aksiyonu tamamladığını işaretler, workflow başlatılır
  */
 export async function completeAction(
   actionId: string,
@@ -130,11 +153,45 @@ export async function completeAction(
       return createPermissionError("Only assigned user can complete this action");
     }
 
+    // Update action to InProgress
     await db
       .update(actions)
       .set({
-        status: "PendingManagerApproval",
+        status: "InProgress",
         completionNotes,
+        updatedAt: new Date(),
+      })
+      .where(eq(actions.id, actionId));
+
+    revalidateActionPaths({ list: true });
+    return { success: true, data: undefined };
+  });
+}
+
+/**
+ * DEPRECATED: Use workflow system instead
+ * This function is kept for backward compatibility but should not be used
+ * Use transitionWorkflow() from workflow-actions.ts
+ */
+export async function approveAction(
+  actionId: string
+): Promise<ActionResponse> {
+  console.warn('⚠️ approveAction() is deprecated. Use workflow system instead.');
+  
+  return withAuth(async (user: User) => {
+    const action = await db.query.actions.findFirst({
+      where: eq(actions.id, actionId),
+    });
+
+    if (!action) {
+      return createNotFoundError("Action");
+    }
+
+    // Complete via workflow instead
+    await db
+      .update(actions)
+      .set({
+        status: "Completed",
         completedAt: new Date(),
         updatedAt: new Date(),
       })
@@ -146,91 +203,16 @@ export async function completeAction(
 }
 
 /**
- * FR-004: Aksiyon Yöneticisi, Aksiyonu Onaylayabilir
- */
-export async function approveAction(
-  actionId: string
-): Promise<ActionResponse> {
-  return withAuth(async (user: User) => {
-    const action = await db.query.actions.findFirst({
-      where: eq(actions.id, actionId),
-    });
-
-    if (!action) {
-      return createNotFoundError("Action");
-    }
-
-    if (action.managerId !== user.id && user.role !== "admin") {
-      return createPermissionError("Only assigned manager can approve this action");
-    }
-
-    if (action.status !== "PendingManagerApproval") {
-      return { 
-        success: false, 
-        error: "Action must be completed by responsible first" 
-      };
-    }
-
-    await db
-      .update(actions)
-      .set({
-        status: "Completed",
-        updatedAt: new Date(),
-      })
-      .where(eq(actions.id, actionId));
-
-    // Bulgunun diğer alt görevlerini kontrol et
-    if (action.findingId) {
-      const [remainingActionsCount] = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(actions)
-        .where(
-          and(
-            eq(actions.findingId, action.findingId),
-            not(eq(actions.status, "Completed"))
-          )
-        );
-
-      const [remainingDofsCount] = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(dofs)
-        .where(
-          and(
-            eq(dofs.findingId, action.findingId),
-            not(eq(dofs.status, "Completed"))
-          )
-        );
-
-      const remainingTasks = (remainingActionsCount?.count || 0) + (remainingDofsCount?.count || 0);
-
-      if (remainingTasks === 0) {
-        await db
-          .update(findings)
-          .set({
-            status: "InProgress",
-            updatedAt: new Date(),
-          })
-          .where(eq(findings.id, action.findingId));
-      }
-    }
-
-    revalidateActionPaths({ list: true });
-    return { success: true, data: undefined };
-  });
-}
-
-/**
- * FR-004: Aksiyon Yöneticisi, Aksiyonu Reddedebilir
- * 
- * WORKFLOW: Reject → Assigned (Döngü)
- * - Status "Assigned"a döner
- * - Sorumlu tekrar çalışabilir
- * - Red nedeni kaydedilir (timeline'da görünür)
+ * DEPRECATED: Use workflow system instead
+ * This function is kept for backward compatibility
+ * Use transitionWorkflow() from workflow-actions.ts
  */
 export async function rejectAction(
   actionId: string,
   reason?: string
 ): Promise<ActionResponse> {
+  console.warn('⚠️ rejectAction() is deprecated. Use workflow system instead.');
+  
   return withAuth(async (user: User) => {
     const action = await db.query.actions.findFirst({
       where: eq(actions.id, actionId),
@@ -240,10 +222,7 @@ export async function rejectAction(
       return createNotFoundError("Action");
     }
 
-    if (action.managerId !== user.id) {
-      return createPermissionError("Only assigned manager can reject this action");
-    }
-
+    // Reject: Back to Assigned for rework
     await db
       .update(actions)
       .set({
@@ -346,27 +325,8 @@ export async function getActionsByFinding(findingId: string) {
     const data = await db.query.actions.findMany({
       where: eq(actions.findingId, findingId),
       with: {
-        assignedTo: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        manager: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        createdBy: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        createdBy: true,
+        manager: true,
       },
       orderBy: (actions, { desc }) => [desc(actions.createdAt)],
     });
@@ -388,21 +348,8 @@ export async function getMyActions() {
     if (user.role === "admin" || user.role === "superAdmin") {
       const data = await db.query.actions.findMany({
         with: {
-          finding: true,
-          assignedTo: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          manager: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
+          createdBy: true,
+          manager: true,
         },
         orderBy: (actions, { desc }) => [desc(actions.createdAt)],
       });
@@ -416,21 +363,8 @@ export async function getMyActions() {
           eq(actions.managerId, user.id)
         ),
       with: {
-        finding: true,
-        assignedTo: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        manager: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        createdBy: true,
+        manager: true,
       },
       orderBy: (actions, { desc }) => [desc(actions.createdAt)],
     });

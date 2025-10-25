@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Lock, AlertCircle } from "lucide-react";
-import { completeAudit, closeAudit } from "@/action/audit-actions";
+import { completeAudit, closeAudit } from "@/server/actions/audit-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";

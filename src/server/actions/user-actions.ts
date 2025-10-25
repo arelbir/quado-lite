@@ -28,13 +28,70 @@ import type { ActionResponse } from "@/lib/types";
 // USER ACTIONS
 // ============================================
 
+export async function createUser(
+  data: {
+    name: string;
+    email: string;
+    password: string;
+    companyId?: string;
+    branchId?: string;
+    departmentId?: string;
+    positionId?: string;
+    managerId?: string;
+    employeeNumber?: string;
+    status?: "active" | "inactive";
+  }
+): Promise<ActionResponse<{ id: string }>> {
+  return withAuth(async (currentUser) => {
+    // Check if email already exists
+    const existingUser = await db.query.user.findFirst({
+      where: eq(user.email, data.email),
+    });
+
+    if (existingUser) {
+      return {
+        success: false,
+        data: undefined,
+        error: "User with this email already exists",
+      };
+    }
+
+    // Create user
+    const [newUser] = await db.insert(user).values({
+      name: data.name,
+      email: data.email,
+      password: data.password, // Should be hashed in production
+      companyId: data.companyId,
+      branchId: data.branchId,
+      departmentId: data.departmentId,
+      positionId: data.positionId,
+      managerId: data.managerId,
+      employeeNumber: data.employeeNumber,
+      status: data.status || "active",
+      createdById: currentUser.id,
+    }).returning({ id: user.id });
+
+    revalidatePath("/admin/users");
+    
+    return {
+      success: true,
+      data: { id: newUser!.id },
+      message: "User created successfully",
+    };
+  }, { requireAdmin: true });
+}
+
 export async function updateUser(
   userId: string,
   data: Partial<{
     name: string;
     email: string;
+    companyId: string;
+    branchId: string;
     departmentId: string;
     positionId: string;
+    managerId: string;
+    employeeNumber: string;
     status: "active" | "inactive";
   }>
 ): Promise<ActionResponse> {

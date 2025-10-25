@@ -1,4 +1,4 @@
-import { deleteUsersAction } from "@/action/user"
+import { deleteUsersAction } from "@/server/actions/user"
 import { getErrorMessage } from "@/lib/handle-error"
 import { User } from "@/types/model/user"
 import { type Row } from "@tanstack/react-table"

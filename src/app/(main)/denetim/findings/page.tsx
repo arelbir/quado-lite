@@ -3,7 +3,7 @@ import { db } from "@/drizzle/db";
 import { findings } from "@/drizzle/schema";
 import { count } from "drizzle-orm";
 import { ExportButton } from "@/components/export/export-button";
-import { exportFindingsToExcel } from "@/action/export-actions";
+import { exportFindingsToExcel } from "@/server/actions/export-actions";
 import { FindingsTableClient } from "./findings-table-client";
 import { getTranslations } from 'next-intl/server';
 import { paginate } from "@/lib/pagination-helper";

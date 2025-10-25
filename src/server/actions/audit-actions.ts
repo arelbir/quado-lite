@@ -13,6 +13,8 @@ import {
   createValidationError,
   revalidateAuditPaths,
 } from "@/lib/helpers";
+import { startWorkflow } from "@/server/actions/workflow-actions";
+import { getAuditCompletionWorkflowId, buildAuditMetadata } from "@/lib/workflow/workflow-integration";
 
 /**
  * Yeni denetim oluştur
@@ -44,7 +46,7 @@ export async function createAudit(data: {
 
 /**
  * Denetimi tamamla (Active → InReview)
- * Denetçi sorumluluğunu bırakır, bulgular süreç sahiplerince tamamlanır
+ * WORKFLOW INTEGRATION: Starts audit completion workflow for manager approval
  */
 export async function completeAudit(auditId: string): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
@@ -64,7 +66,7 @@ export async function completeAudit(auditId: string): Promise<ActionResponse> {
       return createPermissionError("Only audit creator can complete the audit");
     }
 
-    // YENİ: Atanmamış bulgu kontrolü
+    // Check all findings are assigned
     const unassignedFindings = await db.query.findings.findMany({
       where: and(
         eq(findings.auditId, auditId),
@@ -78,6 +80,12 @@ export async function completeAudit(auditId: string): Promise<ActionResponse> {
       );
     }
 
+    // Get findings count for workflow decision
+    const allFindings = await db.query.findings.findMany({
+      where: eq(findings.auditId, auditId),
+    });
+
+    // Update audit status to InReview
     await db
       .update(audits)
       .set({ 
@@ -86,6 +94,20 @@ export async function completeAudit(auditId: string): Promise<ActionResponse> {
       })
       .where(eq(audits.id, auditId));
 
+    // Start workflow for audit completion approval
+    const workflowId = await getAuditCompletionWorkflowId();
+    if (workflowId) {
+      await startWorkflow({
+        workflowDefinitionId: workflowId,
+        entityType: "Audit",
+        entityId: auditId,
+        entityMetadata: buildAuditMetadata({
+          ...audit,
+          findingsCount: allFindings.length,
+        }),
+      });
+    }
+
     revalidateAuditPaths({ audits: true, specificAudit: auditId });
     return { success: true, data: undefined };
   });
@@ -93,7 +115,8 @@ export async function completeAudit(auditId: string): Promise<ActionResponse> {
 
 /**
  * Denetimi kapat (PendingClosure → Closed)
- * Denetçi tüm bulguların tamamlandığını onaylar ve denetimi kapatır
+ * WORKFLOW INTEGRATION: Triggered by workflow approval
+ * Can also be called manually for backward compatibility
  */
 export async function closeAudit(auditId: string): Promise<ActionResponse> {
   return withAuth(async (user: User) => {

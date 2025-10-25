@@ -28,12 +28,12 @@ import {
 import { UpdateUsers, UpdateUsersSchema } from "../_lib/validations"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { updateUser } from "@/action/user"
+import { updateUser } from "@/server/actions/user"
 import { Credenza, CredenzaBody, CredenzaClose, CredenzaContent, CredenzaDescription, CredenzaFooter, CredenzaHeader, CredenzaTitle, CredenzaTrigger } from "@/components/ui/credenza"
 import { PermissionTree } from "./permission-tree"
 import { MenuWithValue } from "@/types/model/menu"
 import { useAction } from "next-safe-action/hooks"
-import { assignMenusToUserAction } from "@/action/menu"
+import { assignMenusToUserAction } from "@/server/actions/menu"
 import { isExecuting } from "next-safe-action/status"
 
 

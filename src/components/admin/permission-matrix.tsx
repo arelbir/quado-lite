@@ -23,13 +23,18 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface Permission {
   id: string;
+  name: string;
   resource: string;
   action: string;
   description: string | null;
 }
+
+// CRUD Actions
+const CRUD_ACTIONS = ['Create', 'Read', 'Update', 'Delete'] as const;
 
 interface PermissionMatrixProps {
   roleId: string;
@@ -51,14 +56,17 @@ export function PermissionMatrix({
   const [isSaving, setIsSaving] = useState(false);
 
   // Group permissions by resource
-  const groupedPermissions = permissions.reduce((acc, permission) => {
-    const resource = permission.resource;
+  const groupedByResource = permissions.reduce((acc, permission) => {
+    const resource = permission.resource || "General";
     if (!acc[resource]) {
       acc[resource] = [];
     }
     acc[resource]!.push(permission);
     return acc;
   }, {} as Record<string, Permission[]>);
+
+  // Get sorted resources
+  const resources = Object.keys(groupedByResource).sort();
 
   // Toggle permission
   const togglePermission = (permissionId: string) => {
@@ -76,31 +84,31 @@ export function PermissionMatrix({
     setSelectedPermissions(newSelected);
   };
 
-  // Select all in resource
-  const selectAllInResource = (resource: string) => {
+  // Select all CRUD for a resource
+  const selectAllCRUD = (resource: string) => {
     if (isSystemRole) return;
     
     const newSelected = new Set(selectedPermissions);
-    const resourcePerms = groupedPermissions[resource];
-    if (resourcePerms) {
-      resourcePerms.forEach(p => {
-        newSelected.add(p.id);
-      });
-    }
+    CRUD_ACTIONS.forEach(action => {
+      const perm = permissions.find(
+        p => p.resource === resource && p.action.toLowerCase() === action.toLowerCase()
+      );
+      if (perm) newSelected.add(perm.id);
+    });
     setSelectedPermissions(newSelected);
   };
 
-  // Clear all in resource
-  const clearAllInResource = (resource: string) => {
+  // Clear all CRUD for a resource
+  const clearAllCRUD = (resource: string) => {
     if (isSystemRole) return;
     
     const newSelected = new Set(selectedPermissions);
-    const resourcePerms = groupedPermissions[resource];
-    if (resourcePerms) {
-      resourcePerms.forEach(p => {
-        newSelected.delete(p.id);
-      });
-    }
+    CRUD_ACTIONS.forEach(action => {
+      const perm = permissions.find(
+        p => p.resource === resource && p.action.toLowerCase() === action.toLowerCase()
+      );
+      if (perm) newSelected.delete(perm.id);
+    });
     setSelectedPermissions(newSelected);
   };
 
@@ -134,19 +142,6 @@ export function PermissionMatrix({
       if (!assignedPermissionIds.has(id)) return true;
     }
     return false;
-  };
-
-  // Get action color
-  const getActionColor = (action: string): string => {
-    switch (action.toLowerCase()) {
-      case 'create': return 'bg-green-100 text-green-800';
-      case 'read': return 'bg-blue-100 text-blue-800';
-      case 'update': return 'bg-yellow-100 text-yellow-800';
-      case 'delete': return 'bg-red-100 text-red-800';
-      case 'approve': return 'bg-purple-100 text-purple-800';
-      case 'execute': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
   };
 
   return (
@@ -184,53 +179,127 @@ export function PermissionMatrix({
         </Card>
       )}
 
-      {/* Permission Matrix */}
-      <div className="space-y-4">
-        {Object.entries(groupedPermissions).map(([resource, perms]) => (
-          <Card key={resource}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">{resource}</CardTitle>
-                  <CardDescription>
-                    {perms.length} permissions available
-                  </CardDescription>
-                </div>
-                {!isSystemRole && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => selectAllInResource(resource)}
+      {/* CRUD Permission Matrix */}
+      <Card>
+        <CardHeader>
+          <CardTitle>CRUD Permission Matrix</CardTitle>
+          <CardDescription>
+            Toggle permissions by clicking on the checkboxes
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2">
+                  <th className="text-left p-3 font-medium text-sm bg-muted sticky left-0">
+                    Module
+                  </th>
+                  {CRUD_ACTIONS.map((action) => (
+                    <th key={action} className="text-center p-3 font-medium text-sm bg-muted min-w-[100px]">
+                      {action}
+                    </th>
+                  ))}
+                  {!isSystemRole && (
+                    <th className="text-center p-3 font-medium text-sm bg-muted">
+                      Actions
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {resources.map((resource, idx) => {
+                  const resourcePerms = groupedByResource[resource] || [];
+                  
+                  return (
+                    <tr 
+                      key={resource}
+                      className={cn(
+                        "border-b hover:bg-accent/30 transition-colors",
+                        idx % 2 === 0 && "bg-accent/10"
+                      )}
                     >
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      Select All
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => clearAllInResource(resource)}
-                    >
-                      <XCircle className="w-3 h-3 mr-1" />
-                      Clear All
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {perms.map((permission) => {
+                      <td className="p-3 font-medium sticky left-0 bg-background">
+                        {resource}
+                      </td>
+                      
+                      {CRUD_ACTIONS.map((action) => {
+                        const perm = permissions.find(
+                          p => p.resource === resource && p.action.toLowerCase() === action.toLowerCase()
+                        );
+                        const isSelected = perm ? selectedPermissions.has(perm.id) : false;
+                        
+                        return (
+                          <td key={action} className="text-center p-3">
+                            {perm ? (
+                              <Checkbox
+                                checked={isSelected}
+                                disabled={isSystemRole}
+                                onCheckedChange={() => togglePermission(perm.id)}
+                                className="mx-auto"
+                              />
+                            ) : (
+                              <span className="text-gray-300">-</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                      
+                      {!isSystemRole && (
+                        <td className="text-center p-3">
+                          <div className="flex items-center justify-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => selectAllCRUD(resource)}
+                              className="h-7 px-2 text-xs"
+                            >
+                              All
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => clearAllCRUD(resource)}
+                              className="h-7 px-2 text-xs"
+                            >
+                              None
+                            </Button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Special Permissions (Non-CRUD) */}
+      {permissions.some(p => !CRUD_ACTIONS.some(a => a.toLowerCase() === p.action.toLowerCase())) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Special Permissions</CardTitle>
+            <CardDescription>
+              Non-CRUD operations (Approve, Export, Execute, etc.)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {permissions
+                .filter(p => !CRUD_ACTIONS.some(a => a.toLowerCase() === p.action.toLowerCase()))
+                .map((permission) => {
                   const isSelected = selectedPermissions.has(permission.id);
                   
                   return (
                     <div
                       key={permission.id}
-                      className={`
-                        flex items-start gap-3 p-3 rounded-lg border transition-colors
-                        ${isSelected ? 'bg-accent border-primary' : 'hover:bg-accent/50'}
-                        ${isSystemRole ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}
-                      `}
+                      className={cn(
+                        "flex items-start gap-3 p-3 rounded-lg border transition-colors",
+                        isSelected ? "bg-accent border-primary" : "hover:bg-accent/50",
+                        isSystemRole ? "cursor-not-allowed opacity-70" : "cursor-pointer"
+                      )}
                       onClick={() => !isSystemRole && togglePermission(permission.id)}
                     >
                       <Checkbox
@@ -241,9 +310,10 @@ export function PermissionMatrix({
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <Badge className={getActionColor(permission.action)}>
+                          <Badge variant="outline">
                             {permission.action}
                           </Badge>
+                          <span className="text-sm font-medium">{permission.resource}</span>
                         </div>
                         {permission.description && (
                           <p className="text-xs text-muted-foreground mt-1">
@@ -254,38 +324,10 @@ export function PermissionMatrix({
                     </div>
                   );
                 })}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Permission Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Object.entries(groupedPermissions).map(([resource, perms]) => {
-              const selectedCount = perms.filter(p => 
-                selectedPermissions.has(p.id)
-              ).length;
-              
-              return (
-                <div key={resource} className="text-center p-3 rounded-lg border">
-                  <div className="text-2xl font-bold">
-                    {selectedCount}/{perms.length}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {resource}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

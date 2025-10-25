@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { MessageSquarePlus } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useToastMessages } from "@/lib/i18n/toast-messages";
-import { addActionProgress } from "@/action/action-actions";
+import { addActionProgress } from "@/server/actions/action-actions";
 
 /**
  * Action Progress Form

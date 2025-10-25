@@ -9,6 +9,7 @@ import { format } from "date-fns";
 export interface HRSyncLog {
   id: string;
   status: string;
+  sourceType: string;
   startedAt: Date;
   completedAt: Date | null;
   totalRecords: number | null;
@@ -19,7 +20,7 @@ export interface HRSyncLog {
     id: string;
     name: string;
     sourceType: string;
-  };
+  } | null;
 }
 
 export const columns: ColumnDef<HRSyncLog>[] = [
@@ -29,7 +30,8 @@ export const columns: ColumnDef<HRSyncLog>[] = [
       <DataTableColumnHeader column={column} title="Config" />
     ),
     cell: ({ row }) => {
-      return <span className="font-medium">{row.original.config.name}</span>;
+      const configName = row.original.config?.name || "Manual Sync";
+      return <span className="font-medium">{configName}</span>;
     },
   },
   {
@@ -38,11 +40,13 @@ export const columns: ColumnDef<HRSyncLog>[] = [
       <DataTableColumnHeader column={column} title="Source" />
     ),
     cell: ({ row }) => {
-      const sourceType = row.original.config.sourceType;
+      const sourceType = row.original.config?.sourceType || row.original.sourceType || "MANUAL";
       const icons: Record<string, string> = {
         LDAP: "🔐",
         CSV: "📄",
+        REST_API: "🌐",
         "REST API": "🌐",
+        MANUAL: "👤",
       };
       return (
         <div className="flex items-center gap-2">
@@ -103,7 +107,12 @@ export const columns: ColumnDef<HRSyncLog>[] = [
       <DataTableColumnHeader column={column} title="Started" />
     ),
     cell: ({ row }) => {
-      return format(new Date(row.getValue("startedAt")), "PPp");
+      const date = new Date(row.getValue("startedAt"));
+      return (
+        <span suppressHydrationWarning>
+          {format(date, "MMM dd, yyyy HH:mm")}
+        </span>
+      );
     },
   },
   {

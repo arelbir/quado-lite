@@ -186,6 +186,7 @@ export const getUsers = action(getUsersSchema, async (params) => {
         .limit(per_page)
         .offset(offset)
         .leftJoin(role, eq(user.id, role.userId))
+        // @ts-expect-error - Drizzle alias type inference limitation
         .leftJoin(parent, eq(parent.id, user.createdById))
         .where(
           !operator || operator === "and" ? and(...whereParams()) : or(...whereParams()),

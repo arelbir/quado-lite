@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { deleteAuditTemplate } from "@/action/audit-template-actions";
+import { deleteAuditTemplate } from "@/server/actions/audit-template-actions";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,

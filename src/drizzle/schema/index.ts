@@ -12,6 +12,8 @@ export * from "./role-system";
 export * from "./teams-groups";
 // 🔥 NEW: HR Integration (Week 5-6)
 export * from "./hr-sync";
+// 🔥 NEW: Workflow System (Week 9-10)
+export * from "./workflow";
 // Kurumsal Denetim Sistemi
 export * from "./audit";
 export * from "./finding";

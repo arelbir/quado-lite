@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { createScheduledPlan, startAdhocAudit } from "@/action/audit-plan-actions";
+import { createScheduledPlan, startAdhocAudit } from "@/server/actions/audit-plan-actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,

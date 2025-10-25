@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { deleteQuestion } from "@/action/question-actions";
+import { deleteQuestion } from "@/server/actions/question-actions";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,

@@ -35,14 +35,15 @@ export async function getAuditQuestions(auditId: string) {
       orderBy: (auditQuestions, { asc }) => [asc(auditQuestions.createdAt)],
     });
 
-    const data = auditQuestionsData.map((aq) => ({
+    // Type assertion needed because Drizzle's with clause doesn't fully infer types
+    const data = auditQuestionsData.map((aq: any) => ({
       ...aq,
-      question: {
+      question: aq.question ? {
         ...aq.question,
-        checklistOptions: aq.question?.checklistOptions
+        checklistOptions: aq.question.checklistOptions
           ? JSON.parse(aq.question.checklistOptions)
           : null,
-      },
+      } : null,
     }));
 
     return { success: true, data };
@@ -87,9 +88,10 @@ export async function answerAuditQuestion(data: {
       });
 
       if (auditQuestion) {
+        const aq = auditQuestion as any; // Type assertion for Drizzle with clause
         await db.insert(findings).values({
-          auditId: auditQuestion.auditId,
-          details: `[Otomatik Bulgu] Soru: ${auditQuestion.question?.questionText}\nCevap: ${data.answer}\n${data.notes ? `Not: ${data.notes}` : ""}`,
+          auditId: aq.auditId,
+          details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\nCevap: ${data.answer}\n${data.notes ? `Not: ${data.notes}` : ""}`,
           status: "New",
           riskType: "Orta",
           createdById: user.id,
@@ -140,9 +142,10 @@ export async function answerMultipleQuestions(
         });
 
         if (auditQuestion) {
+          const aq = auditQuestion as any; // Type assertion for Drizzle with clause
           await db.insert(findings).values({
-            auditId: auditQuestion.auditId,
-            details: `[Otomatik Bulgu] Soru: ${auditQuestion.question?.questionText}\nCevap: ${answerData.answer}\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`,
+            auditId: aq.auditId,
+            details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\nCevap: ${answerData.answer}\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`,
             status: "New",
             riskType: "Orta",
             createdById: user.id,
@@ -226,17 +229,18 @@ export async function saveAllAuditAnswers(data: {
         });
 
         if (auditQuestion) {
+          const aq = auditQuestion as any; // Type assertion for Drizzle with clause
           const existingFinding = await db.query.findings.findFirst({
             where: and(
               eq(findings.auditId, data.auditId),
-              eq(findings.details, `[Otomatik Bulgu] Soru: ${auditQuestion.question?.questionText}\nCevap: ${answerData.answer}\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`)
+              eq(findings.details, `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\\nCevap: ${answerData.answer}\\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`)
             ),
           });
 
           if (!existingFinding) {
             await db.insert(findings).values({
               auditId: data.auditId,
-              details: `[Otomatik Bulgu] Soru: ${auditQuestion.question?.questionText}\nCevap: ${answerData.answer}\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`,
+              details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\\nCevap: ${answerData.answer}\\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`,
               status: "New",
               riskType: "Orta",
               createdById: user.id,

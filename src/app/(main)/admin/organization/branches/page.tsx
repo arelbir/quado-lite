@@ -33,7 +33,7 @@ export default async function BranchesPage() {
             id: true,
           },
         },
-      },
+      } as any,
       orderBy: (branches, { asc }) => [asc(branches.name)],
     }),
     db.query.companies.findMany({
@@ -49,13 +49,13 @@ export default async function BranchesPage() {
   const companies: Pick<Company, 'id' | 'name' | 'code'>[] = companiesRaw;
 
   // Transform data for client component
-  const branchesWithCount: BranchWithRelations[] = branches.map((branch) => ({
+  const branchesWithCount = branches.map((branch: any) => ({
     ...branch,
-    type: branch.type || "Branch Office", // Ensure type is not null
+    type: branch.type || "Branch", // Ensure type is not null
     _count: {
       departments: branch.departments?.length || 0,
     },
-  }));
+  })) as BranchWithRelations[];
 
   return (
     <div className="flex flex-col gap-6 p-6">

@@ -19,6 +19,11 @@ export const notificationCategoryEnum = pgEnum("notification_category", [
   "plan_created",
   "audit_completed",
   "audit_reminder",
+  "workflow_assignment",
+  "workflow_deadline_approaching",
+  "workflow_escalated",
+  "workflow_approved",
+  "workflow_rejected",
 ]);
 
 /**

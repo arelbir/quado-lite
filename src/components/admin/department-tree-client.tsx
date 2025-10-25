@@ -285,29 +285,7 @@ export function DepartmentTreeClient({
         </CardContent>
       </Card>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription>Total Departments</CardDescription>
-            <CardTitle className="text-3xl">{departments.length}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription>Root Departments</CardDescription>
-            <CardTitle className="text-3xl">{rootDepartments.length}</CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription>With Manager</CardDescription>
-            <CardTitle className="text-3xl">
-              {departments.filter(d => d.managerId).length}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
+
 
       {/* Department Dialog */}
       <DepartmentDialog
@@ -316,6 +294,7 @@ export function DepartmentTreeClient({
         department={editingDept}
         parentId={parentIdForNew}
         departments={departments}
+        users={users}
         onSuccess={() => window.location.reload()}
       />
     </div>

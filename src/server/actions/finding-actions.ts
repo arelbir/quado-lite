@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { findings, actions, dofs } from "@/drizzle/schema";
+import { findings, actions, dofs, audits } from "@/drizzle/schema";
 import { eq, and, not, sql } from "drizzle-orm";
 import type { ActionResponse, User, Finding } from "@/lib/types";
 import { 
@@ -12,7 +12,10 @@ import {
   createPermissionError,
   createValidationError,
   revalidateFindingPaths,
+  revalidateAuditPaths,
 } from "@/lib/helpers";
+import { startWorkflow } from "@/server/actions/workflow-actions";
+import { getFindingWorkflowId, buildFindingMetadata } from "@/lib/workflow/workflow-integration";
 import { checkAuditCompletionStatus } from "./audit-actions";
 
 /**
@@ -178,6 +181,22 @@ export async function submitFindingForClosure(
       })
       .where(eq(findings.id, findingId));
 
+    // Workflow başlat
+    try {
+      const workflowId = await getFindingWorkflowId();
+
+      if (workflowId) {
+        await startWorkflow({
+          workflowDefinitionId: workflowId,
+          entityType: "Finding",
+          entityId: findingId,
+          entityMetadata: buildFindingMetadata(finding),
+        });
+      }
+    } catch (error) {
+      console.error("Workflow start failed:", error);
+    }
+
     revalidateFindingPaths({ list: true });
     return { success: true, data: undefined };
   });
@@ -257,21 +276,7 @@ export async function getFindings() {
     if (user.role === "admin" || user.role === "superAdmin") {
       const data = await db.query.findings.findMany({
         with: {
-          audit: true,
-          assignedTo: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          createdBy: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
+          createdBy: true,
         },
         orderBy: (findings, { desc }) => [desc(findings.createdAt)],
       });
@@ -281,21 +286,7 @@ export async function getFindings() {
     const data = await db.query.findings.findMany({
       where: eq(findings.assignedToId, user.id),
       with: {
-        audit: true,
-        assignedTo: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        createdBy: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        createdBy: true,
       },
       orderBy: (findings, { desc }) => [desc(findings.createdAt)],
     });
@@ -370,15 +361,14 @@ export async function getFindingById(findingId: string) {
     const finding = await db.query.findings.findFirst({
       where: eq(findings.id, findingId),
       with: {
-        audit: true,
-        assignedTo: {
+        createdBy: {
           columns: {
             id: true,
             name: true,
-            email: true,
           },
         },
-        createdBy: {
+        // @ts-expect-error - Drizzle relation type inference limitation
+        assignedTo: {
           columns: {
             id: true,
             name: true,

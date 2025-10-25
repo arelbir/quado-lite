@@ -1,11 +1,11 @@
 import { Suspense } from "react";
-import { getFindings } from "@/action/finding-actions";
+import { getFindings } from "@/server/actions/finding-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
-import { closeFinding, rejectFinding } from "@/action/finding-actions";
+import { closeFinding, rejectFinding } from "@/server/actions/finding-actions";
 import { getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';

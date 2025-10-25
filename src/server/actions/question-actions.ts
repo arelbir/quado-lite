@@ -118,6 +118,7 @@ export async function getQuestionById(questionId: string) {
     const question = await db.query.questions.findFirst({
       where: eq(questions.id, questionId),
       with: {
+        // @ts-expect-error - Drizzle relation type inference limitation
         bank: {
           columns: {
             id: true,

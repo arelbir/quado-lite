@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { updateQuestion, deleteQuestion } from "@/action/question-actions";
+import { updateQuestion, deleteQuestion } from "@/server/actions/question-actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,

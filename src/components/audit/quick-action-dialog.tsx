@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { ListChecks } from "lucide-react";
 import { toast } from "sonner";
-import { createAction } from "@/action/action-actions";
+import { createAction } from "@/server/actions/action-actions";
 import { useTranslations } from 'next-intl';
 
 interface QuickActionDialogProps {

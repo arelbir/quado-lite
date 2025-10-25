@@ -69,7 +69,7 @@ const menus = [
         type: 'menu',
       },
       {
-        path: "/denetim/my-tasks",
+        path: "/admin/workflows/my-tasks",
         label: "myTasks",
         icon: "ClipboardCheck",
         status: "active",

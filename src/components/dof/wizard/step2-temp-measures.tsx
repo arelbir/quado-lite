@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';
-import { updateDofStep } from "@/action/dof-actions";
+import { updateDofStep } from "@/server/actions/dof-actions";
 
 interface Step2TempMeasuresProps {
   dof: any;

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Download, FileSpreadsheet, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { downloadAuditReport } from "@/action/report-actions";
+import { downloadAuditReport } from "@/server/actions/report-actions";
 import { useTranslations } from 'next-intl';
 
 interface AuditReportButtonProps {

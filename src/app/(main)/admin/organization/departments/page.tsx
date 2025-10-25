@@ -14,28 +14,60 @@
 
 import { Metadata } from "next";
 import { db } from "@/drizzle/db";
-import { departments } from "@/drizzle/schema";
+import { departments, user } from "@/drizzle/schema";
 import { DepartmentTreeClient } from "@/components/admin/department-tree-client";
+import { eq } from "drizzle-orm";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building2, Users, BarChart3, FolderTree } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Department Management | Admin",
-  description: "Manage organization departments",
+  description: "Manage organizational departments",
 };
 
 export default async function DepartmentsPage() {
   // Fetch all departments with relations
-  const allDepartments = await db.query.departments.findMany({
-    with: {
-      manager: {
-        columns: {
-          id: true,
-          name: true,
-          email: true,
+  const [allDepartments, activeUsers] = await Promise.all([
+    db.query.departments.findMany({
+      with: {
+        branch: {
+          columns: {
+            id: true,
+            name: true,
+          },
         },
+        parent: {
+          columns: {
+            id: true,
+            name: true,
+          },
+        },
+        manager: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      } as any,
+      orderBy: (departments, { asc }) => [asc(departments.name)],
+    }),
+    db.query.user.findMany({
+      columns: {
+        id: true,
+        name: true,
+        email: true,
       },
-    },
-    orderBy: (departments, { asc }) => [asc(departments.name)],
-  });
+      where: eq(user.status, 'active'),
+      orderBy: (user, { asc }) => [asc(user.name)],
+    }),
+  ]);
+
+  // Calculate statistics
+  const totalDepartments = allDepartments.length;
+  const activeDepartments = allDepartments.filter(d => d.isActive).length;
+  const rootDepartments = allDepartments.filter(d => !d.parentDepartmentId).length;
+  const departmentsWithManager = allDepartments.filter(d => d.managerId).length;
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -48,7 +80,71 @@ export default async function DepartmentsPage() {
         </div>
       </div>
 
-      <DepartmentTreeClient departments={allDepartments} />
+      {/* Statistics Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Departments
+            </CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalDepartments}</div>
+            <p className="text-xs text-muted-foreground">
+              Across all levels
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Active Departments
+            </CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{activeDepartments}</div>
+            <p className="text-xs text-muted-foreground">
+              Currently active
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Root Departments
+            </CardTitle>
+            <FolderTree className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{rootDepartments}</div>
+            <p className="text-xs text-muted-foreground">
+              Top-level units
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              With Managers
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{departmentsWithManager}</div>
+            <p className="text-xs text-muted-foreground">
+              {((departmentsWithManager / totalDepartments) * 100).toFixed(0)}% coverage
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Department Tree */}
+      <DepartmentTreeClient departments={allDepartments as any} users={activeUsers} />
     </div>
   );
 }

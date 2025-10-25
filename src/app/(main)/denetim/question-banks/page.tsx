@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getQuestionBanks } from "@/action/question-bank-actions";
+import { getQuestionBanks } from "@/server/actions/question-bank-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, HelpCircle } from "lucide-react";

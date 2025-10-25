@@ -13,11 +13,6 @@ interface HRSyncLogsTableClientProps {
 export function HRSyncLogsTableClient({ data }: HRSyncLogsTableClientProps) {
   const filterFields: DataTableFilterField<HRSyncLog>[] = [
     {
-      label: "Search",
-      value: "config.name" as keyof HRSyncLog,
-      placeholder: "Search configs...",
-    },
-    {
       label: "Status",
       value: "status" as keyof HRSyncLog,
       options: [
@@ -29,11 +24,12 @@ export function HRSyncLogsTableClient({ data }: HRSyncLogsTableClientProps) {
     },
     {
       label: "Source",
-      value: "config.sourceType" as keyof HRSyncLog,
+      value: "sourceType" as keyof HRSyncLog,
       options: [
         { label: "LDAP", value: "LDAP" },
         { label: "CSV", value: "CSV" },
-        { label: "REST API", value: "REST API" },
+        { label: "REST API", value: "REST_API" },
+        { label: "Manual", value: "MANUAL" },
       ],
     },
   ];

@@ -55,11 +55,12 @@ export async function getQuestionBanks() {
             email: true,
           },
         },
+        // @ts-expect-error - Drizzle relation type inference limitation
         questions: {
-          where: (questions, { isNull }) => isNull(questions.deletedAt),
+          where: (questions: any, { isNull }: any) => isNull(questions.deletedAt),
         },
       },
-      orderBy: (questionBanks, { desc }) => [desc(questionBanks.createdAt)],
+      orderBy: (questionBanks: any, { desc }: any) => [desc(questionBanks.createdAt)],
     });
 
     return { success: true, data };
@@ -90,9 +91,10 @@ export async function getQuestionBankById(bankId: string) {
             email: true,
           },
         },
+        // @ts-expect-error - Drizzle relation type inference limitation
         questions: {
-          where: (questions, { isNull }) => isNull(questions.deletedAt),
-          orderBy: (questions, { asc }) => [asc(questions.orderIndex)],
+          where: (questions: any, { isNull }: any) => isNull(questions.deletedAt),
+          orderBy: (questions: any, { asc }: any) => [asc(questions.orderIndex)],
           with: {
             createdBy: {
               columns: {

@@ -13,6 +13,8 @@ import {
   revalidateDOFPaths,
   revalidateFindingPaths,
 } from "@/lib/helpers";
+import { startWorkflow } from "@/server/actions/workflow-actions";
+import { getDofWorkflowId, buildDofMetadata } from "@/lib/workflow/workflow-integration";
 
 /**
  * FR-003: Süreç Sahibi, DÖF Oluşturabilir
@@ -49,7 +51,7 @@ export async function createDof(data: {
         status: "Step1_Problem",
         createdById: user.id,
       })
-      .returning({ id: dofs.id });
+      .returning();
 
     await db
       .update(findings)
@@ -58,6 +60,22 @@ export async function createDof(data: {
         updatedAt: new Date(),
       })
       .where(eq(findings.id, data.findingId));
+
+    // Workflow başlat
+    try {
+      const workflowId = await getDofWorkflowId();
+
+      if (workflowId) {
+        await startWorkflow({
+          workflowDefinitionId: workflowId,
+          entityType: "DOF",
+          entityId: dof!.id,
+          entityMetadata: buildDofMetadata(dof),
+        });
+      }
+    } catch (error) {
+      console.error("Workflow start failed:", error);
+    }
 
     revalidateFindingPaths({ list: true });
     revalidateDOFPaths({ list: true });
@@ -205,7 +223,9 @@ export async function completeDofActivity(
 }
 
 /**
- * DÖF Sorumlusu, Tüm Adımları Tamamlayınca Yönetici Onayına Gönderir
+ * WORKFLOW INTEGRATION: Submit DOF for Approval
+ * Status: Step6 (workflow will handle approval)
+ * Tüm adımlar tamamlandıktan sonra workflow başlatılır
  */
 export async function submitDofForApproval(
   dofId: string
@@ -223,6 +243,7 @@ export async function submitDofForApproval(
       return createPermissionError("Only assigned user can submit for approval");
     }
 
+    // Check all activities completed
     const [pendingActivitiesCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(dofActivities)
@@ -239,25 +260,23 @@ export async function submitDofForApproval(
       );
     }
 
-    await db
-      .update(dofs)
-      .set({
-        status: "PendingManagerApproval",
-        updatedAt: new Date(),
-      })
-      .where(eq(dofs.id, dofId));
-
+    // Keep at Step6, workflow will handle approval process
+    // No status change needed - workflow system takes over
     revalidateDOFPaths({ list: true });
-    return { success: true, data: undefined };
+    return { success: true, data: undefined, message: "DOF ready for workflow approval" };
   });
 }
 
 /**
- * FR-013: DÖF Yöneticisi, DÖF'ü Onaylayabilir
+ * DEPRECATED: Use workflow system instead
+ * This function is kept for backward compatibility
+ * Use transitionWorkflow() from workflow-actions.ts
  */
 export async function approveDof(
   dofId: string
 ): Promise<ActionResponse> {
+  console.warn('⚠️ approveDof() is deprecated. Use workflow system instead.');
+  
   return withAuth(async (user: User) => {
     const dof = await db.query.dofs.findFirst({
       where: eq(dofs.id, dofId),
@@ -267,14 +286,7 @@ export async function approveDof(
       return createNotFoundError("DOF");
     }
 
-    if (dof.managerId !== user.id && user.role !== "admin") {
-      return createPermissionError("Only assigned manager can approve DOF");
-    }
-
-    if (dof.status !== "PendingManagerApproval") {
-      return createValidationError("DOF must be submitted for approval first");
-    }
-
+    // Complete via workflow instead
     await db
       .update(dofs)
       .set({
@@ -290,12 +302,16 @@ export async function approveDof(
 }
 
 /**
- * FR-013: DÖF Yöneticisi, DÖF'ü Reddedebilir
+ * DEPRECATED: Use workflow system instead
+ * This function is kept for backward compatibility
+ * Use transitionWorkflow() from workflow-actions.ts
  */
 export async function rejectDof(
   dofId: string,
   reason?: string
 ): Promise<ActionResponse> {
+  console.warn('⚠️ rejectDof() is deprecated. Use workflow system instead.');
+  
   return withAuth(async (user: User) => {
     const dof = await db.query.dofs.findFirst({
       where: eq(dofs.id, dofId),
@@ -305,14 +321,11 @@ export async function rejectDof(
       return createNotFoundError("DOF");
     }
 
-    if (dof.managerId !== user.id && user.role !== "admin") {
-      return createPermissionError("Only assigned manager can reject DOF");
-    }
-
+    // Reject: Back to Step6 for rework (not "Rejected" status)
     await db
       .update(dofs)
       .set({
-        status: "Rejected",
+        status: "Step6_EffectivenessCheck",
         updatedAt: new Date(),
       })
       .where(eq(dofs.id, dofId));
@@ -330,27 +343,8 @@ export async function getDofsByFinding(findingId: string) {
     const data = await db.query.dofs.findMany({
       where: eq(dofs.findingId, findingId),
       with: {
-        assignedTo: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        manager: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        createdBy: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        manager: true,
+        createdBy: true,
       },
       orderBy: (dofs, { desc }) => [desc(dofs.createdAt)],
     });
@@ -400,21 +394,8 @@ export async function getMyDofs() {
     if (user.role === "admin" || user.role === "superAdmin") {
       const data = await db.query.dofs.findMany({
         with: {
-          finding: true,
-          assignedTo: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          manager: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
+          manager: true,
+          createdBy: true,
         },
         orderBy: (dofs, { desc }) => [desc(dofs.createdAt)],
       });
@@ -428,21 +409,8 @@ export async function getMyDofs() {
           eq(dofs.managerId, user.id)
         ),
       with: {
-        finding: true,
-        assignedTo: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        manager: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        manager: true,
+        createdBy: true,
       },
       orderBy: (dofs, { desc }) => [desc(dofs.createdAt)],
     });

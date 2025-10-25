@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 
 export default async function PositionsPage() {
   // Fetch all positions
-  const positions: Position[] = await db.query.positions.findMany({
+  const positions = await db.query.positions.findMany({
     orderBy: (positions, { asc }) => [asc(positions.level), asc(positions.name)],
-  });
+  }) as Position[];
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

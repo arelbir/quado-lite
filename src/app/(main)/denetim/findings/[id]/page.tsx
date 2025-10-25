@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { getFindingById } from "@/action/finding-actions";
-import { getActionsByFinding } from "@/action/action-actions";
-import { getDofsByFinding } from "@/action/dof-actions";
+import { getFindingById } from "@/server/actions/finding-actions";
+import { getActionsByFinding } from "@/server/actions/action-actions";
+import { getDofsByFinding } from "@/server/actions/dof-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";

@@ -1,5 +1,5 @@
 import { getAllAudits } from "@/server/data/audit-list";
-import { getAuditPlans } from "@/action/audit-plan-actions";
+import { getAuditPlans } from "@/server/actions/audit-plan-actions";
 import { UnifiedTableClient } from "./unified-table-client";
 import type { UnifiedRecord } from "./columns";
 

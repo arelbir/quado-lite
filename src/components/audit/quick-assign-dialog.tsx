@@ -22,7 +22,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { assignFinding } from "@/action/finding-actions";
+import { assignFinding } from "@/server/actions/finding-actions";
 import { useTranslations } from 'next-intl';
 
 interface QuickAssignDialogProps {

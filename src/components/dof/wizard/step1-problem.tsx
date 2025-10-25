@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from 'next-intl';
 import { ArrowRight, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
-import { updateDofStep } from "@/action/dof-actions";
+import { updateDofStep } from "@/server/actions/dof-actions";
 import Link from "next/link";
 
 interface Step1ProblemProps {

@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createColumns, type User } from "./columns";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableFilterField } from "@/types/data-table";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { UserDialog } from "@/components/admin/user-dialog";
 import {
   AlertDialog,
@@ -21,6 +22,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteUser } from "@/server/actions/user-actions";
 
+interface Company {
+  id: string;
+  name: string;
+}
+
+interface Branch {
+  id: string;
+  name: string;
+}
+
 interface Department {
   id: string;
   name: string;
@@ -31,19 +42,48 @@ interface Position {
   name: string;
 }
 
+interface Manager {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
 interface UsersTableClientProps {
   users: User[];
+  companies: Company[];
+  branches: Branch[];
   departments: Department[];
   positions: Position[];
+  managers: Manager[];
   pageCount?: number;
 }
 
-export function UsersTableClient({ users, departments, positions, pageCount }: UsersTableClientProps) {
+export function UsersTableClient({ users, companies, branches, departments, positions, managers, pageCount }: UsersTableClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
+
+  // Check URL params for edit mode
+  useEffect(() => {
+    const editUserId = searchParams?.get('edit');
+    if (editUserId) {
+      const userToEdit = users.find(u => u.id === editUserId);
+      if (userToEdit) {
+        setEditingUser(userToEdit);
+        setEditDialogOpen(true);
+        // Clean URL after opening dialog
+        router.replace('/admin/users');
+      }
+    }
+  }, [searchParams, users, router]);
+
+  const handleCreate = () => {
+    setEditingUser(null);
+    setEditDialogOpen(true);
+  };
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
@@ -110,7 +150,12 @@ export function UsersTableClient({ users, departments, positions, pageCount }: U
   return (
     <>
       <div className="space-y-4">
-        <DataTableToolbar table={table} filterFields={filterFields} />
+        <div className="flex items-center justify-between">
+          <DataTableToolbar table={table} filterFields={filterFields} />
+          <Button onClick={handleCreate}>
+            Create New User
+          </Button>
+        </div>
         <DataTable
           table={table}
           title="Users"
@@ -123,8 +168,11 @@ export function UsersTableClient({ users, departments, positions, pageCount }: U
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         user={editingUser}
+        companies={companies}
+        branches={branches}
         departments={departments}
         positions={positions}
+        managers={managers}
         onSuccess={handleEditSuccess}
       />
 

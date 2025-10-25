@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { useTranslations } from 'next-intl';
-import { saveAllAuditAnswers } from "@/action/audit-question-actions";
+import { saveAllAuditAnswers } from "@/server/actions/audit-question-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";

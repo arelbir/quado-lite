@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Plus, ListChecks, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { updateDofStep } from "@/action/dof-actions";
+import { updateDofStep } from "@/server/actions/dof-actions";
 import { DofActivityForm } from "../dof-activity-form";
 import { useTranslations } from 'next-intl';
 

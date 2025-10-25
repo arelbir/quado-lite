@@ -42,7 +42,7 @@ export interface Action {
   id: string;
   title: string;
   description: string | null;
-  status: "Assigned" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
+  status: "Assigned" | "InProgress" | "Completed" | "Cancelled"; // UPDATED: Workflow integration
   type: "Simple" | "Corrective" | "Preventive";
   assignedToId: string | null;
   managerId: string | null;
@@ -87,9 +87,8 @@ export interface DOF {
     | "Step4_Activities"
     | "Step5_Implementation"
     | "Step6_EffectivenessCheck"
-    | "PendingManagerApproval"
-    | "Completed"
-    | "Rejected";
+    | "Completed"  // UPDATED: Workflow integration
+    | "Cancelled"; // UPDATED: Added exit state
   activityType: "Düzeltici" | "Önleyici";
   assignedToId: string | null;
   managerId: string | null;

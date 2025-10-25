@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { getFindings } from "@/action/finding-actions";
-import { getMyActions } from "@/action/action-actions";
-import { getMyDofs } from "@/action/dof-actions";
+import { getFindings } from "@/server/actions/finding-actions";
+import { getMyActions } from "@/server/actions/action-actions";
+import { getMyDofs } from "@/server/actions/dof-actions";
 import { 
   ClipboardCheck, 
   AlertCircle, 

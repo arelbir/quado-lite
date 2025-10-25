@@ -13,8 +13,8 @@ import {
 import { Calendar, Eye, Play, Edit, MoreVertical, Trash2, Ban, Archive, ArchiveRestore } from "lucide-react";
 import Link from "next/link";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
-import { startPlanManually, deletePlan } from "@/action/audit-plan-actions";
-import { archiveAudit, reactivateAudit, deleteAudit } from "@/action/audit-actions";
+import { startPlanManually, deletePlan } from "@/server/actions/audit-plan-actions";
+import { archiveAudit, reactivateAudit, deleteAudit } from "@/server/actions/audit-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { 

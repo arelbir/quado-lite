@@ -33,7 +33,7 @@ export default async function RoleDetailPage({
   params: { id: string };
 }) {
   // Fetch role with permissions and users
-  const role = await db.query.roles.findFirst({
+  const roleData = await db.query.roles.findFirst({
     where: eq(roles.id, params.id),
     with: {
       permissions: {
@@ -52,21 +52,23 @@ export default async function RoleDetailPage({
           },
         },
       },
-    },
+    } as any,
   });
 
-  if (!role) {
+  if (!roleData) {
     notFound();
   }
 
+  const role = roleData as any;
+
   // Fetch all available permissions
   const allPermissions = await db.query.permissions.findMany({
-    orderBy: (permissions, { asc }) => [asc(permissions.resource), asc(permissions.action)],
+    orderBy: (permissions, { asc }) => [asc(permissions.name)],
   });
 
   // Get assigned permission IDs
-  const assignedPermissionIds = new Set(
-    role.permissions.map(rp => rp.permission.id)
+  const assignedPermissionIds = new Set<string>(
+    role.permissions?.map((rp: any) => rp.permission.id) || []
   );
 
   return (
@@ -94,13 +96,13 @@ export default async function RoleDetailPage({
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Assigned Permissions</CardDescription>
-            <CardTitle className="text-3xl">{role.permissions.length}</CardTitle>
+            <CardTitle className="text-3xl">{role.permissions?.length || 0}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Users with this Role</CardDescription>
-            <CardTitle className="text-3xl">{role.userRoles.length}</CardTitle>
+            <CardTitle className="text-3xl">{role.userRoles?.length || 0}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
@@ -138,7 +140,7 @@ export default async function RoleDetailPage({
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {role.userRoles.slice(0, 10).map((ur) => (
+              {role.userRoles.slice(0, 10).map((ur: any) => (
                 <div
                   key={ur.id}
                   className="flex items-center justify-between p-2 rounded border"

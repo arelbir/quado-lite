@@ -1,21 +1,49 @@
 "use server";
 
-import { getFindings } from "./finding-actions";
-import { getMyActions } from "./action-actions";
+import { db } from "@/drizzle/db";
 import { exportToExcel } from "@/lib/export/excel-export-service";
+
+// Helper functions for status labels
+function getStatusLabel(status: string): string {
+  const labels: Record<string, string> = {
+    New: "Yeni",
+    Assigned: "Atandı",
+    InProgress: "İşlemde",
+    PendingAuditorClosure: "Onay Bekliyor",
+    Completed: "Tamamlandı",
+    Rejected: "Reddedildi",
+  };
+  return labels[status] || status;
+}
+
+function getActionStatusLabel(status: string): string {
+  const labels: Record<string, string> = {
+    Assigned: "Atandı",
+    InProgress: "İşlemde",
+    Completed: "Tamamlandı",
+    Cancelled: "İptal Edildi",
+  };
+  return labels[status] || status;
+}
 
 /**
  * Bulguları Excel'e export et
  */
 export async function exportFindingsToExcel(): Promise<Buffer> {
-  const findings = await getFindings();
+  // Fetch findings with relations for export
+  const findingsData = await db.query.findings.findMany({
+    with: {
+      createdBy: { columns: { id: true, name: true } },
+    },
+  });
 
-  const data = findings.map((finding) => ({
+  // Type assertion needed because relations aren't fully inferred
+  const data = findingsData.map((finding: any) => ({
     bulgu: finding.details,
     durum: getStatusLabel(finding.status),
     risk: finding.riskType || "-",
-    denetim: finding.audit?.title || "-",
-    surecSahibi: finding.assignedTo?.name || "-",
+    denetim: "-", // Audit title - TODO: Add audit relation if needed
+    surecSahibi: "-", // Assigned user - TODO: Add assignedTo relation if needed
     tarih: new Date(finding.createdAt).toLocaleDateString("tr-TR"),
   }));
 
@@ -40,14 +68,20 @@ export async function exportFindingsToExcel(): Promise<Buffer> {
  * Aksiyonları Excel'e export et
  */
 export async function exportActionsToExcel(): Promise<Buffer> {
-  const actions = await getMyActions();
+  // Fetch actions with relations for export
+  const actionsData = await db.query.actions.findMany({
+    with: {
+      createdBy: { columns: { id: true, name: true } },
+    },
+  });
 
-  const data = actions.map((action) => ({
+  // Type assertion needed because relations aren't fully inferred
+  const data = actionsData.map((action: any) => ({
     aksiyon: action.details,
     durum: getActionStatusLabel(action.status),
-    sorumlu: action.assignedTo?.name || "-",
-    yonetici: action.manager?.name || "-",
-    bulgu: action.finding?.details.substring(0, 50) + "..." || "-",
+    sorumlu: "-", // Assigned user - TODO: Add assignedTo relation if needed
+    yonetici: "-", // Manager - TODO: Add manager relation if needed
+    bulgu: "-", // Finding - TODO: Add finding relation if needed
     tarih: new Date(action.createdAt).toLocaleDateString("tr-TR"),
   }));
 
@@ -72,31 +106,7 @@ export async function exportActionsToExcel(): Promise<Buffer> {
  * Denetim detaylı raporu (çoklu sheet)
  */
 export async function exportAuditReport(auditId: string): Promise<Buffer> {
-  // Bu fonksiyonu daha sonra implement edeceğiz
-  // Şimdilik placeholder
+  // TODO: Implement audit report export
+  // This will include multiple sheets: audit info, findings, actions, etc.
   return Buffer.from("");
-}
-
-// Helper functions
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    New: "Yeni",
-    Assigned: "Atandı",
-    InProgress: "İşlemde",
-    PendingAuditorClosure: "Onay Bekliyor",
-    Completed: "Tamamlandı",
-    Rejected: "Reddedildi",
-  };
-  return labels[status] || status;
-}
-
-function getActionStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    Assigned: "Atandı",
-    InProgress: "İşlemde",
-    PendingManagerApproval: "Onay Bekliyor",
-    Completed: "Tamamlandı",
-    Rejected: "Reddedildi",
-  };
-  return labels[status] || status;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { getUserNotifications, markNotificationAsRead, markAllAsRead } from "@/action/notification-actions";
+import { getUserNotifications, markNotificationAsRead, markAllAsRead } from "@/server/actions/notification-actions";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";

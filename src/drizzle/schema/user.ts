@@ -1,5 +1,5 @@
 
-import { pgTable, timestamp, varchar, integer, uniqueIndex, foreignKey, uuid } from "drizzle-orm/pg-core"
+import { pgTable, timestamp, varchar, integer, uniqueIndex, foreignKey, uuid, type PgTableWithColumns } from "drizzle-orm/pg-core"
 import { theme, userStatus } from "./enum";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from 'drizzle-zod'
@@ -14,7 +14,7 @@ import { userRoles } from "./role-system";
 import { userTeams, groupMembers } from "./teams-groups";
 
 
-export const user = pgTable("User", {
+export const user: PgTableWithColumns<any> = pgTable("User", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
 	name: varchar("name"),
 	email: varchar("email"),
@@ -53,7 +53,7 @@ export const user = pgTable("User", {
 	deletedById: uuid("deletedById"),
 	createdById: uuid("createdById"),
 },
-	(table) => {
+	(table): Record<string, any> => {
 		return {
 			emailKey: uniqueIndex("User_email_key").on(table.email),
 			employeeNumberKey: uniqueIndex("User_employeeNumber_key").on(table.employeeNumber),
@@ -67,7 +67,27 @@ export const user = pgTable("User", {
 				foreignColumns: [table.id],
 				name: "User_deletedById_fkey"
 			}).onUpdate("cascade").onDelete("set null"),
-			// 🔥 NEW: Organization foreign keys
+			// 🔥 Organization foreign keys
+			userCompanyIdFkey: foreignKey({
+				columns: [table.companyId],
+				foreignColumns: [companies.id],
+				name: "User_companyId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			userBranchIdFkey: foreignKey({
+				columns: [table.branchId],
+				foreignColumns: [branches.id],
+				name: "User_branchId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			userDepartmentIdFkey: foreignKey({
+				columns: [table.departmentId],
+				foreignColumns: [departments.id],
+				name: "User_departmentId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			userPositionIdFkey: foreignKey({
+				columns: [table.positionId],
+				foreignColumns: [positions.id],
+				name: "User_positionId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
 			userManagerIdFkey: foreignKey({
 				columns: [table.managerId],
 				foreignColumns: [table.id],
