@@ -16,10 +16,11 @@ import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function FindingDetailPage({ params }: PageProps) {
+  const { id } = await params;
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -30,14 +31,14 @@ export default async function FindingDetailPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   try {
-    const finding = await getFindingById(params.id) as any;
+    const finding = await getFindingById(id) as any;
 
     if (!finding) {
       notFound();
     }
 
     // Load custom fields
-    const customFieldsResult = await getCustomFieldValuesWithDefinitions('FINDING', params.id);
+    const customFieldsResult = await getCustomFieldValuesWithDefinitions('FINDING', id);
     const customFields = customFieldsResult.success && customFieldsResult.data 
       ? customFieldsResult.data 
       : [];
@@ -62,7 +63,7 @@ export default async function FindingDetailPage({ params }: PageProps) {
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" asChild>
-              <Link href={`/denetim/findings/${params.id}/edit`}>
+              <Link href={`/denetim/findings/${id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 {tCommon('actions.edit')}
               </Link>
@@ -123,11 +124,11 @@ export default async function FindingDetailPage({ params }: PageProps) {
         {/* Actions & DOFs */}
         <div className="grid gap-6 md:grid-cols-2">
           <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
-            <ActionsCard findingId={params.id} />
+            <ActionsCard findingId={id} />
           </Suspense>
 
           <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
-            <DofsCard findingId={params.id} />
+            <DofsCard findingId={id} />
           </Suspense>
         </div>
       </div>

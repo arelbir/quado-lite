@@ -1,6 +1,14 @@
 /**
  * USERS SEED - 150 Person Company
  * Smart user generator with realistic distribution
+ * 
+ * Features:
+ * - Turkish names (realistic)
+ * - ASCII emails (ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u)
+ * - Email verified (no verification needed)
+ * - Department-based distribution
+ * - Position hierarchy
+ * - Role auto-assignment
  */
 
 import { db } from "@/drizzle/db";
@@ -41,13 +49,31 @@ const POSITION_LEVELS = {
   operational: 0.43,  // %43 - Operators/Staff
 };
 
+// Helper: Convert Turkish characters to ASCII for email
+function toAscii(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/ç/g, 'c')
+    .replace(/ğ/g, 'g')
+    .replace(/ı/g, 'i')
+    .replace(/ö/g, 'o')
+    .replace(/ş/g, 's')
+    .replace(/ü/g, 'u')
+    .replace(/İ/g, 'i');
+}
+
 function generateUser(index: number, deptCode: string, companyId: string) {
   const isFemale = Math.random() > 0.6; // %40 female ratio
   const firstNameArray = isFemale ? FIRST_NAMES.female : FIRST_NAMES.male;
   const firstName = firstNameArray[Math.floor(Math.random() * firstNameArray.length)]!;
   const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]!;
   const name = `${firstName} ${lastName}`;
-  const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@abcteknoloji.com`;
+  
+  // ✅ Convert Turkish characters to ASCII for email
+  const emailFirstName = toAscii(firstName);
+  const emailLastName = toAscii(lastName);
+  const email = `${emailFirstName}.${emailLastName}@abcteknoloji.com`;
+  
   const employeeNumber = `EMP${String(index + 1).padStart(4, "0")}`;
   
   // Random hire date (last 5 years)
@@ -140,6 +166,7 @@ export async function seedUsers(companyId: string) {
         const [newUser] = await db.insert(user).values({
           name: userData.name,
           email: userData.email,
+          emailVerified: new Date(), // ✅ Email verified for seed users
           password: hashedPassword,
           status: "active",
           companyId,
@@ -169,6 +196,7 @@ export async function seedUsers(companyId: string) {
   }
 
   console.log(`  ✅ Created ${createdUsers.length} users`);
+  console.log(`  📧 Email format: firstname.lastname@abcteknoloji.com (Turkish chars converted to ASCII)`);
   console.log(`  📊 Distribution:`);
   console.log(`     - Admins: ${createdUsers.filter((u: any) => u.employeeNumber === "EMP0001").length}`);
   console.log(`     - Managers: ~${Math.floor(createdUsers.length * 0.15)}`);

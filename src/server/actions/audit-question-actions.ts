@@ -1,56 +1,23 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { auditQuestions, findings } from "@/drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { auditQuestions, findings, questions, questionBanks } from "@/drizzle/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import type { ActionResponse, User } from "@/lib/types";
 import { withAuth, revalidateAuditPaths } from "@/lib/helpers";
+import { getAuditQuestionsWithDetails } from "@/lib/db/query-helpers";
 
 /**
  * Denetim sorularını getir
  */
 export async function getAuditQuestions(auditId: string) {
   const result = await withAuth(async () => {
-    const auditQuestionsData = await db.query.auditQuestions.findMany({
-      where: eq(auditQuestions.auditId, auditId),
-      with: {
-        question: {
-          with: {
-            bank: {
-              columns: {
-                id: true,
-                name: true,
-                category: true,
-              },
-            },
-          },
-        },
-        answeredBy: {
-          columns: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-      orderBy: (auditQuestions, { asc }) => [asc(auditQuestions.createdAt)],
-    });
-
-    // Type assertion needed because Drizzle's with clause doesn't fully infer types
-    const data = auditQuestionsData.map((aq: any) => ({
-      ...aq,
-      question: aq.question ? {
-        ...aq.question,
-        checklistOptions: aq.question.checklistOptions
-          ? JSON.parse(aq.question.checklistOptions)
-          : null,
-      } : null,
-    }));
-
+    const data = await getAuditQuestionsWithDetails(auditId);
     return { success: true, data };
   });
 
   if (!result.success) {
-    throw new Error(result.error);
+    throw new Error(result.message || 'Failed to fetch audit questions');
   }
 
   return result.data;

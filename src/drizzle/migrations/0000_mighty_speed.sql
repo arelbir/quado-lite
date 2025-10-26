@@ -191,6 +191,18 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "public"."workflow_module" AS ENUM('DOF', 'ACTION', 'FINDING', 'AUDIT');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."workflow_status" AS ENUM('DRAFT', 'ACTIVE', 'ARCHIVED');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "public"."audit_status" AS ENUM('Active', 'InReview', 'PendingClosure', 'Closed', 'Archived');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -321,16 +333,6 @@ CREATE TABLE IF NOT EXISTS "user_menu" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"menu_id" uuid NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "Role" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar DEFAULT 'user',
-	"userRole" "UserRole" DEFAULT 'user',
-	"superAdmin" boolean DEFAULT false,
-	"userId" uuid NOT NULL,
-	"createdAt" timestamp DEFAULT now(),
-	"updatedAt" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "Task" (
@@ -483,6 +485,15 @@ CREATE TABLE IF NOT EXISTS "Permissions" (
 	"isSystem" boolean DEFAULT false NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "Permissions_code_unique" UNIQUE("code")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "RoleMenus" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"roleId" uuid NOT NULL,
+	"menuId" uuid NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"createdById" uuid,
+	CONSTRAINT "RoleMenus_roleId_menuId_unique" UNIQUE("roleId","menuId")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "RolePermissions" (
@@ -720,6 +731,62 @@ CREATE TABLE IF NOT EXISTS "WorkflowTimeline" (
 	"createdAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "VisualWorkflow" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"module" "workflow_module" NOT NULL,
+	"status" "workflow_status" DEFAULT 'DRAFT' NOT NULL,
+	"nodes" jsonb NOT NULL,
+	"edges" jsonb NOT NULL,
+	"version" varchar(50) DEFAULT '1.0' NOT NULL,
+	"createdById" uuid NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"publishedAt" timestamp with time zone,
+	"publishedById" uuid
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "VisualWorkflowVersion" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"workflowId" uuid NOT NULL,
+	"version" varchar(50) NOT NULL,
+	"changeNotes" text,
+	"nodes" jsonb NOT NULL,
+	"edges" jsonb NOT NULL,
+	"createdById" uuid NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "CustomFieldDefinition" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"entityType" varchar(50) NOT NULL,
+	"fieldKey" varchar(100) NOT NULL,
+	"fieldType" varchar(50) NOT NULL,
+	"label" varchar(255) NOT NULL,
+	"placeholder" varchar(255),
+	"helpText" varchar(500),
+	"required" boolean DEFAULT false NOT NULL,
+	"validation" jsonb,
+	"options" jsonb,
+	"order" integer DEFAULT 0 NOT NULL,
+	"section" varchar(100),
+	"status" varchar(50) DEFAULT 'ACTIVE' NOT NULL,
+	"createdBy" uuid,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "CustomFieldValue" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"definitionId" uuid NOT NULL,
+	"entityType" varchar(50) NOT NULL,
+	"entityId" uuid NOT NULL,
+	"value" jsonb NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "audits" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
@@ -927,12 +994,6 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "Role" ADD CONSTRAINT "Role_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE cascade;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
  ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE cascade;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -1060,6 +1121,24 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "Position" ADD CONSTRAINT "Position_deletedById_fkey" FOREIGN KEY ("deletedById") REFERENCES "public"."User"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "RoleMenus" ADD CONSTRAINT "RoleMenus_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "public"."Roles"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "RoleMenus" ADD CONSTRAINT "RoleMenus_menuId_fkey" FOREIGN KEY ("menuId") REFERENCES "public"."Menu"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "RoleMenus" ADD CONSTRAINT "RoleMenus_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -1275,6 +1354,42 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "VisualWorkflow" ADD CONSTRAINT "VisualWorkflow_createdById_User_id_fk" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE restrict ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "VisualWorkflow" ADD CONSTRAINT "VisualWorkflow_publishedById_User_id_fk" FOREIGN KEY ("publishedById") REFERENCES "public"."User"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "VisualWorkflowVersion" ADD CONSTRAINT "VisualWorkflowVersion_workflowId_VisualWorkflow_id_fk" FOREIGN KEY ("workflowId") REFERENCES "public"."VisualWorkflow"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "VisualWorkflowVersion" ADD CONSTRAINT "VisualWorkflowVersion_createdById_User_id_fk" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE restrict ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "CustomFieldDefinition" ADD CONSTRAINT "CustomFieldDefinition_createdBy_User_id_fk" FOREIGN KEY ("createdBy") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "CustomFieldValue" ADD CONSTRAINT "CustomFieldValue_definitionId_CustomFieldDefinition_id_fk" FOREIGN KEY ("definitionId") REFERENCES "public"."CustomFieldDefinition"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "audits" ADD CONSTRAINT "audits_auditor_id_User_id_fk" FOREIGN KEY ("auditor_id") REFERENCES "public"."User"("id") ON DELETE set null ON UPDATE cascade;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -1468,7 +1583,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS "RegisterVerificationToken_token_key" ON "Regi
 CREATE UNIQUE INDEX IF NOT EXISTS "RegisterVerificationToken_email_token_key" ON "RegisterVerificationToken" ("email","token");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "VerificationToken_token_key" ON "VerificationToken" ("token");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "VerificationToken_email_token_key" ON "VerificationToken" ("email","token");--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "Role_userId_key" ON "Role" ("userId");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "Task_code_key" ON "Task" ("code");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "Account_provider_providerAccountId_key" ON "Account" ("provider","providerAccountId");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "Session_sessionToken_key" ON "Session" ("sessionToken");--> statement-breakpoint

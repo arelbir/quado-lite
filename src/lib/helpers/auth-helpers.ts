@@ -30,9 +30,19 @@ export async function requireUser(): Promise<{ user: User } | { error: string }>
  * Uses new multi-role system
  */
 export function requireAdmin(user: User): boolean {
-  return user.userRoles?.some((ur: any) => 
-    ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-  ) || false;
+  // Check session roles (string array from JWT)
+  if (user.roles && Array.isArray(user.roles)) {
+    return user.roles.includes('ADMIN') || user.roles.includes('SUPER_ADMIN');
+  }
+  
+  // Fallback: Check userRoles relation (if loaded)
+  if (user.userRoles) {
+    return user.userRoles.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+  }
+  
+  return false;
 }
 
 /**

@@ -44,7 +44,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { createDepartment, updateDepartment } from "@/server/actions/organization-actions";
+import { createDepartment, updateDepartment } from "@/server/actions/department-actions";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
@@ -52,8 +52,10 @@ const formSchema = z.object({
   code: z.string().min(2, "Code must be at least 2 characters"),
   parentDepartmentId: z.string().optional(),
   managerId: z.string().optional(),
+  branchId: z.string().optional(),
   description: z.string().optional(),
   costCenter: z.string().optional(),
+  isActive: z.boolean().default(true),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -62,10 +64,12 @@ interface Department {
   id: string;
   name: string;
   code: string;
+  branchId?: string | null;
   parentDepartmentId: string | null;
   managerId: string | null;
-  description: string | null;
-  costCenter: string | null;
+  description?: string | null;
+  costCenter?: string | null;
+  isActive?: boolean;
 }
 
 interface DepartmentDialogProps {
@@ -74,6 +78,7 @@ interface DepartmentDialogProps {
   department?: Department | null;
   parentId?: string;
   departments: Department[];
+  branches: any[];
   users: any[];
   onSuccess?: () => void;
 }
@@ -84,6 +89,7 @@ export function DepartmentDialog({
   department,
   parentId,
   departments,
+  branches,
   users,
   onSuccess,
 }: DepartmentDialogProps) {
@@ -95,10 +101,12 @@ export function DepartmentDialog({
     defaultValues: {
       name: "",
       code: "",
+      branchId: undefined,
       parentDepartmentId: parentId || undefined,
       managerId: "none",
       description: "",
       costCenter: "",
+      isActive: true,
     },
   });
 
@@ -108,19 +116,23 @@ export function DepartmentDialog({
       form.reset({
         name: department.name,
         code: department.code,
+        branchId: department.branchId || undefined,
         parentDepartmentId: department.parentDepartmentId || undefined,
         managerId: department.managerId || "none",
         description: department.description || "",
         costCenter: department.costCenter || "",
+        isActive: department.isActive ?? true,
       });
     } else {
       form.reset({
         name: "",
         code: "",
+        branchId: undefined,
         parentDepartmentId: parentId,
         managerId: "none",
         description: "",
         costCenter: "",
+        isActive: true,
       });
     }
   }, [department, parentId, form]);
@@ -129,10 +141,14 @@ export function DepartmentDialog({
     setIsSubmitting(true);
 
     try {
-      // Handle "none" value for managerId
+      // Handle "none" values for optional fields
       const submitData = {
-        ...data,
-        managerId: data.managerId === "none" ? undefined : data.managerId,
+        name: data.name,
+        code: data.code,
+        branchId: data.branchId || null,
+        parentDepartmentId: data.parentDepartmentId || null,
+        managerId: data.managerId === "none" ? null : data.managerId || null,
+        isActive: data.isActive ?? true,
       };
 
       const result = isEdit
@@ -140,7 +156,7 @@ export function DepartmentDialog({
         : await createDepartment(submitData);
 
       if (result.success) {
-        toast.success(result.message || (isEdit ? "Department updated successfully" : "Department created successfully"));
+        toast.success(isEdit ? "Department updated successfully" : "Department created successfully");
         onOpenChange(false);
         form.reset();
         onSuccess?.();
@@ -222,6 +238,32 @@ export function DepartmentDialog({
                       emptyText="No departments found"
                       allowNone
                       noneLabel="None (Root)"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="branchId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Branch</FormLabel>
+                  <FormControl>
+                    <SearchableSelect
+                      options={branches.map((branch: any) => ({
+                        value: branch.id,
+                        label: `${branch.name} (${branch.code})`,
+                      }))}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Select branch (optional)"
+                      searchPlaceholder="Search branches..."
+                      emptyText="No branches found"
+                      allowNone
+                      noneLabel="No Branch"
                     />
                   </FormControl>
                   <FormMessage />

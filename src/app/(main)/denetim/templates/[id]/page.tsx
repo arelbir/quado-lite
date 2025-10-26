@@ -13,9 +13,9 @@ import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -24,6 +24,7 @@ interface PageProps {
  * Features: Soru havuzlarını görüntüleme ve yönetme
  */
 export default async function TemplateDetailPage({ params }: PageProps) {
+  const { id } = await params;
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -34,7 +35,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   const template = await db.query.auditTemplates.findFirst({
     where: and(
-      eq(auditTemplates.id, params.id),
+      eq(auditTemplates.id, id),
       isNull(auditTemplates.deletedAt)
     ),
     with: {
@@ -92,12 +93,12 @@ export default async function TemplateDetailPage({ params }: PageProps) {
         </div>
         <div className="flex items-center gap-2">
           <Button asChild>
-            <Link href={`/denetim/templates/${params.id}/edit`}>
+            <Link href={`/denetim/templates/${id}/edit`}>
               {tCommon('actions.edit')}
             </Link>
           </Button>
           <DeleteTemplateButton 
-            templateId={params.id}
+            templateId={id}
             templateName={template.name}
           />
         </div>
@@ -153,7 +154,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
                 {t('messages.noBanksAddedYet')}
               </p>
               <Button asChild>
-                <Link href={`/denetim/templates/${params.id}/edit`}>
+                <Link href={`/denetim/templates/${id}/edit`}>
                   <Plus className="h-4 w-4 mr-2" />
                   {tCommon('actions.add')}
                 </Link>

@@ -27,14 +27,12 @@ export const metadata: Metadata = {
   description: "Manage role permissions",
 };
 
-export default async function RoleDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function RoleDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   // Fetch role with permissions and users
   const roleData = await db.query.roles.findFirst({
-    where: eq(roles.id, params.id),
+    where: eq(roles.id, id),
     with: {
       permissions: {
         with: {

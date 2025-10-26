@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1761427237177,
-      "tag": "0000_thick_wolf_cub",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1761429254441,
-      "tag": "0001_dashing_loki",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1761429833112,
-      "tag": "0002_useful_greymalkin",
+      "when": 1761478340471,
+      "tag": "0000_mighty_speed",
       "breakpoints": true
     }
   ]

@@ -10,9 +10,9 @@ import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -20,6 +20,7 @@ interface PageProps {
  * Pattern: Server Component + Client Form (DRY)
  */
 export default async function EditTemplatePage({ params }: PageProps) {
+  const { id } = await params;
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -30,7 +31,7 @@ export default async function EditTemplatePage({ params }: PageProps) {
   
   const template = await db.query.auditTemplates.findFirst({
     where: and(
-      eq(auditTemplates.id, params.id),
+      eq(auditTemplates.id, id),
       isNull(auditTemplates.deletedAt)
     ),
   });
@@ -49,7 +50,7 @@ export default async function EditTemplatePage({ params }: PageProps) {
       <PageHeader 
         title={t('manage')}
         description={t('description')}
-        backHref={`/denetim/templates/${params.id}`}
+        backHref={`/denetim/templates/${id}`}
       />
 
       <FormCard title={t('fields.templateName')}>

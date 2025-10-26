@@ -4,6 +4,7 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from 'drizzle-zod'
 import { userMenuTable } from "./menu";
 import { companies, branches, departments, positions } from "./organization";
+import { userRoles } from "./role-system";
 
 
 export const user: PgTableWithColumns<any> = pgTable("User", {
@@ -129,6 +130,9 @@ export const session = pgTable("Session", {
 
 export const userRelation = relations(user, ({ one, many }) => ({
 	// role: one(role, {...}), // ❌ LEGACY - Removed. Use userRoles instead.
+	userRoles: many(userRoles, {
+		relationName: 'user_roles',
+	}),
 	createdBy: one(user, {
 		fields: [user.createdById],
 		references: [user.id],

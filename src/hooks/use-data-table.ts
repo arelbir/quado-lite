@@ -103,6 +103,15 @@ interface UseDataTableProps<TData, TValue> {
    * @type boolean
    */
   enableAdvancedFilter?: boolean
+
+  /**
+   * Function to get a unique ID for each row.
+   * CRITICAL for row selection with filtering/pagination.
+   * @default undefined (uses index, which causes bugs)
+   * @type (row: TData) => string
+   * @example (row) => row.id
+   */
+  getRowId?: (row: TData) => string
 }
 
 const schema = z.object({
@@ -119,6 +128,7 @@ export function useDataTable<TData, TValue>({
   defaultSort,
   filterFields = [],
   enableAdvancedFilter = false,
+  getRowId,
 }: UseDataTableProps<TData, TValue>) {
   const router = useRouter()
   const pathname = usePathname()
@@ -365,14 +375,15 @@ export function useDataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    getFilteredRowModel: isServerSidePagination ? undefined : getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     manualPagination: isServerSidePagination, // Dynamic: true for server-side, false for client-side
     manualSorting: true,
-    manualFiltering: false, // Client-side filtering için false
+    manualFiltering: isServerSidePagination, // ✅ Server-side filtering when pagination is server-side
+    getRowId, // ✅ CRITICAL: Use custom row ID (database ID) instead of index
   })
 
   return { table }

@@ -100,11 +100,13 @@ async function masterSeed() {
     console.log("  ✅ Role-Menu Mappings");
     console.log("\n🔑 LOGIN:");
     console.log("  📧 Any user: [firstname].[lastname]@abcteknoloji.com");
+    console.log("  ℹ️  Turkish chars → ASCII (ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u)");
     console.log("  🔑 Password: 123456");
     console.log("\n💡 EXAMPLES:");
-    console.log("  admin@abcteknoloji.com (if first user)");
-    console.log("  mehmet.yilmaz@abcteknoloji.com");
-    console.log("  ayse.demir@abcteknoloji.com");
+    console.log("  admin@example.com / 123456");
+    console.log("  mehmet.yilmaz@abcteknoloji.com / 123456 (Mehmet Yılmaz)");
+    console.log("  ayse.demir@abcteknoloji.com / 123456 (Ayşe Demir)");
+    console.log("  selin.yildirim@abcteknoloji.com / 123456 (Selin Yıldırım)");
     console.log("\n");
 
     process.exit(0);

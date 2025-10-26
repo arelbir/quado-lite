@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Building2, MapPin, User, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
+import Link from "next/link";
 import type { BranchWithRelations } from "@/lib/types";
 
 export type Branch = BranchWithRelations;
@@ -126,9 +127,11 @@ export const createColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => window.location.href = `/admin/organization/branches/${branch.id}`}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/organization/branches/branch-detail?id=${branch.id}`}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(branch)}>
               <Edit className="mr-2 h-4 w-4" />

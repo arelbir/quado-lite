@@ -60,6 +60,12 @@ export {
     Circle,
     MoreHorizontal,
     FileQuestion,
+    FileText,
+    ChevronsUpDown,
+    Check,
+    Copy,
+    Info,
+
 } from 'lucide-react'
 
 export { GitHubLogoIcon as Github } from "@radix-ui/react-icons"

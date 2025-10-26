@@ -173,13 +173,16 @@ export async function reorderCustomFields(
 
     // Update order for each field
     for (let i = 0; i < fieldIds.length; i++) {
+      const fieldId = fieldIds[i];
+      if (!fieldId) continue;
+      
       await db
         .update(customFieldDefinitions)
         .set({
           order: i,
           updatedAt: new Date(),
         })
-        .where(eq(customFieldDefinitions.id, fieldIds[i]));
+        .where(eq(customFieldDefinitions.id, fieldId));
     }
 
     revalidatePath(`/admin/custom-fields/${entityType}`);

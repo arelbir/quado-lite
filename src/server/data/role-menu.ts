@@ -14,6 +14,8 @@ import { eq, and } from "drizzle-orm";
  */
 export async function getMenusByUserRoles(userId: string) {
   try {
+    console.log("🔍 [getMenusByUserRoles] Called for userId:", userId);
+    
     // Manual join query to avoid circular dependency
     const results = await db
       .select({
@@ -31,6 +33,8 @@ export async function getMenusByUserRoles(userId: string) {
       .innerJoin(menuTable, eq(roleMenus.menuId, menuTable.id))
       .where(and(eq(userRoles.userId, userId), eq(userRoles.isActive, true)));
 
+    console.log("🔍 [getMenusByUserRoles] Raw results count:", results.length);
+
     // Remove duplicates
     const menuMap = new Map();
     results.forEach((row) => {
@@ -45,9 +49,12 @@ export async function getMenusByUserRoles(userId: string) {
       });
     });
 
-    return Array.from(menuMap.values());
+    const menus = Array.from(menuMap.values());
+    console.log("🔍 [getMenusByUserRoles] Unique menus count:", menus.length);
+    
+    return menus;
   } catch (error) {
-    console.error('Error fetching menus by user roles:', error);
+    console.error('❌ [getMenusByUserRoles] Error fetching menus by user roles:', error);
     return [];
   }
 }

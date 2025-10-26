@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { User as UserIcon, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
+import Link from "next/link";
 
 export interface User {
   id: string;
@@ -31,12 +33,36 @@ export const createColumns = (
   onDelete: (user: User) => void
 ): ColumnDef<User>[] => [
   {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+        className="translate-y-[2px]"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="translate-y-[2px]"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const name = row.getValue("name") as string | null;
+      const name = row.original.name;
       const email = row.original.email;
       return (
         <div className="flex items-center gap-2">
@@ -99,9 +125,11 @@ export const createColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => window.location.href = `/admin/users/${user.id}`}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/users/user-detail?id=${user.id}`}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(user)}>
               <Edit className="mr-2 h-4 w-4" />

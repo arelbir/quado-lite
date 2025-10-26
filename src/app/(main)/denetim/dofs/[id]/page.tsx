@@ -14,7 +14,7 @@ import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // Step mapping
@@ -31,6 +31,7 @@ const stepMap: Record<string, number> = {
 };
 
 export default async function DofDetailPage({ params }: PageProps) {
+  const { id } = await params;
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -39,7 +40,7 @@ export default async function DofDetailPage({ params }: PageProps) {
   
   const t = await getTranslations({ locale, namespace: 'dof' });
   const dof = await db.query.dofs.findFirst({
-    where: eq(dofs.id, params.id),
+    where: eq(dofs.id, id),
     with: {
       finding: true,
       assignedTo: {

@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Users, Building2, User, Hash, Briefcase } from "lucide-react";
 
-export default async function DepartmentDetailPage({ params }: { params: { id: string } }) {
+export default async function DepartmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const department = await db.query.departments.findFirst({
-    where: (departments, { eq }) => eq(departments.id, params.id),
+    where: (departments, { eq }) => eq(departments.id, id),
   }) as any;
 
   if (!department) {
@@ -15,7 +16,7 @@ export default async function DepartmentDetailPage({ params }: { params: { id: s
 
   // Get sub-departments
   const subDepartments = await db.query.departments.findMany({
-    where: (departments, { eq }) => eq(departments.parentDepartmentId, params.id),
+    where: (departments, { eq }) => eq(departments.parentDepartmentId, id),
     columns: {
       id: true,
       name: true,
@@ -25,7 +26,7 @@ export default async function DepartmentDetailPage({ params }: { params: { id: s
 
   // Count employees
   const employees = await db.query.user.findMany({
-    where: (users, { eq }) => eq(users.departmentId, params.id),
+    where: (users, { eq }) => eq(users.departmentId, id),
     columns: {
       id: true,
       name: true,

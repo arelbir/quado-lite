@@ -4,9 +4,10 @@ import { audits, auditQuestions, questions, user } from "@/drizzle/schema";
 import { eq, asc } from "drizzle-orm";
 import { EditAuditForm } from "./edit-audit-form";
 
-export default async function EditAuditPage({ params }: { params: { id: string } }) {
+export default async function EditAuditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const audit = await db.query.audits.findFirst({
-    where: eq(audits.id, params.id),
+    where: eq(audits.id, id),
     with: {
       auditor: { select: { id: true, name: true, email: true } },
     } as any,
@@ -18,12 +19,12 @@ export default async function EditAuditPage({ params }: { params: { id: string }
 
   // Active durumda değilse düzenlenemez
   if (audit.status !== "Active") {
-    redirect(`/denetim/audits/${params.id}`);
+    redirect(`/denetim/audits/${id}`);
   }
 
   // Denetimdeki mevcut sorular
   const currentQuestions = await db.query.auditQuestions.findMany({
-    where: eq(auditQuestions.auditId, params.id),
+    where: eq(auditQuestions.auditId, id),
     with: {
       question: {
         with: {

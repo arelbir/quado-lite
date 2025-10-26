@@ -19,7 +19,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
-import { teams, groups } from "./teams-groups";
+// import { teams, groups } from "./teams-groups"; // ❌ REMOVED: Causes circular dependency
 
 /**
  * COMPANIES TABLE
@@ -281,12 +281,9 @@ export const departmentRelations = relations(departments, ({ one, many }) => ({
   users: many(user, {
     relationName: 'user_department',
   }),
-  teams: many(teams, {
-    relationName: 'department_teams',
-  }),
-  groups: many(groups, {
-    relationName: 'department_groups',
-  }),
+  // teams: Auto-generated inverse relation from teams-groups.ts (teamRelations)
+  // groups: Auto-generated inverse relation from teams-groups.ts (groupRelations)
+  // This prevents circular dependency: organization.ts ↔ teams-groups.ts
 }));
 
 export const positionRelations = relations(positions, ({ many }) => ({

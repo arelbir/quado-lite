@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createColumns, type User } from "./columns";
 import { DataTable } from "@/components/ui/data-table/data-table";
@@ -21,6 +21,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteUser } from "@/server/actions/user-actions";
+import { BulkRoleAssignment } from "@/components/admin/bulk-role-assignment";
+import { Users } from "lucide-react";
 
 interface Company {
   id: string;
@@ -63,8 +65,10 @@ export function UsersTableClient({ users, companies, branches, departments, posi
   const searchParams = useSearchParams();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [bulkRoleDialogOpen, setBulkRoleDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [availableRoles, setAvailableRoles] = useState<any[]>([]);
 
   // Check URL params for edit mode
   useEffect(() => {
@@ -126,7 +130,7 @@ export function UsersTableClient({ users, companies, branches, departments, posi
     {
       label: "Search",
       value: "name" as keyof User,
-      placeholder: "Search users...",
+      placeholder: "Search by name or email...",
     },
     {
       label: "Status",
@@ -139,25 +143,106 @@ export function UsersTableClient({ users, companies, branches, departments, posi
     },
   ];
 
-  const { table } = useDataTable({
+  const { table } = useDataTable<User, any>({
     data: users,
     columns,
-    pageCount: pageCount ?? -1, // Server-side if provided, else client-side
+    pageCount: pageCount ?? -1, // Server-side pagination
     filterFields,
     defaultPerPage: 10,
+    // ✅ Disable client-side filtering (server handles it)
+    enableAdvancedFilter: false,
+    // ✅ CRITICAL: Use database ID as row ID (not index)
+    getRowId: (row: User) => row.id,
   });
+
+  // Fetch available roles when bulk dialog opens
+  useEffect(() => {
+    if (bulkRoleDialogOpen && availableRoles.length === 0) {
+      fetch('/api/roles')
+        .then(res => res.json())
+        .then(data => setAvailableRoles(data as any))
+        .catch(err => {
+          console.error('Failed to fetch roles:', err);
+          toast.error('Failed to fetch roles');
+        });
+    }
+  }, [bulkRoleDialogOpen, availableRoles.length]);
+
+  // ✅ SMART FIX: Only clear selection on page change (not on filter/search)
+  // Database ID'ler sayesinde filter değişse bile selection güvenli
+  const prevPageRef = React.useRef<string | null>(null);
+  
+  useEffect(() => {
+    const currentPage = searchParams?.get('page');
+    
+    // Only reset when page changes (not on filter/search)
+    if (prevPageRef.current !== null && prevPageRef.current !== currentPage) {
+      table.resetRowSelection();
+    }
+    
+    prevPageRef.current = currentPage;
+  }, [searchParams, table]);
+
+  // Get selected users from rowSelection state
+  const rowSelection = table.getState().rowSelection;
+  
+  // Get ALL selected user IDs (even if not in current page/filter)
+  const selectedUserIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+  const selectedCount = selectedUserIds.length;
+  
+  // Get user data for display (only for visible users)
+  // For bulk operation, we'll use ALL selected IDs
+  const selectedUsersForDisplay = selectedUserIds
+    .map(id => {
+      const user = users.find(u => u.id === id);
+      return user ? {
+        id: user.id,
+        name: user.name || 'No Name',
+        email: user.email,
+      } : {
+        id: id,
+        name: 'Unknown User',
+        email: '(not in current view)',
+      };
+    });
+
+  const handleBulkRoleAssignment = () => {
+    if (selectedCount === 0) {
+      toast.error('Please select at least one user');
+      return;
+    }
+    
+    setBulkRoleDialogOpen(true);
+  };
+
+  const handleBulkComplete = () => {
+    table.resetRowSelection();
+    router.refresh();
+  };
 
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <DataTableToolbar table={table} filterFields={filterFields} />
-          <Button onClick={handleCreate}>
-            Create New User
-          </Button>
+        <div className="flex items-center justify-between gap-2">
+          <DataTableToolbar table={table as any} filterFields={filterFields} />
+          <div className="flex gap-2">
+            {selectedCount > 0 && (
+              <Button
+                onClick={handleBulkRoleAssignment}
+                variant="outline"
+                size="sm"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Assign Role to {selectedCount} User(s)
+              </Button>
+            )}
+            <Button onClick={handleCreate}>
+              Create New User
+            </Button>
+          </div>
         </div>
         <DataTable
-          table={table}
+          table={table as any}
           title="Users"
           description="Manage system users and their access"
         />
@@ -197,6 +282,15 @@ export function UsersTableClient({ users, companies, branches, departments, posi
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Bulk Role Assignment Dialog */}
+      <BulkRoleAssignment
+        selectedUsers={selectedUsersForDisplay}
+        availableRoles={availableRoles}
+        open={bulkRoleDialogOpen}
+        onOpenChange={setBulkRoleDialogOpen}
+        onComplete={handleBulkComplete}
+      />
     </>
   );
 }

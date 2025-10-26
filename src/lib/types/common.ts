@@ -12,6 +12,7 @@ export interface User {
   id: string;
   name: string | null;
   email: string | null;
+  roles?: string[]; // From JWT session - e.g., ['SUPER_ADMIN', 'ADMIN']
   userRoles?: Array<{
     role?: {
       code?: string;

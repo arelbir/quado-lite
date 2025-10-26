@@ -81,7 +81,7 @@ export const createColumns = (
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={`/admin/roles/${role.id}`} className="cursor-pointer">
+              <Link href={`/admin/roles/role-detail?id=${role.id}`} className="cursor-pointer">
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </Link>

@@ -33,6 +33,7 @@ import {
 import {
   publishVisualWorkflow,
   archiveVisualWorkflow,
+  restoreVisualWorkflow,
   deleteVisualWorkflow,
 } from '@/server/actions/visual-workflow-actions';
 import { toast } from 'sonner';
@@ -102,6 +103,16 @@ export function WorkflowsTable({ workflows }: Props) {
       router.refresh();
     } else {
       toast.error(result.error || 'Failed to archive');
+    }
+  };
+
+  const handleRestore = async (id: string) => {
+    const result = await restoreVisualWorkflow(id);
+    if (result.success) {
+      toast.success('Workflow restored to draft');
+      router.refresh();
+    } else {
+      toast.error(result.error || 'Failed to restore');
     }
   };
 
@@ -202,6 +213,12 @@ export function WorkflowsTable({ workflows }: Props) {
                         <DropdownMenuItem onClick={() => handleArchive(workflow.id)}>
                           <Icons.Ban className="size-4 mr-2" />
                           Archive
+                        </DropdownMenuItem>
+                      )}
+                      {workflow.status === 'ARCHIVED' && (
+                        <DropdownMenuItem onClick={() => handleRestore(workflow.id)}>
+                          <Icons.Edit className="size-4 mr-2" />
+                          Restore to Draft
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />

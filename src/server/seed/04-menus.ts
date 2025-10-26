@@ -244,6 +244,14 @@ const getMenus = (adminId: string) => [
         type: 'menu',
       },
       {
+        path: "/admin/custom-fields/AUDIT",
+        label: "customFields",
+        icon: "Settings",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
         path: "/system/menus",
         label: "menuManagement",
         icon: "Menu",

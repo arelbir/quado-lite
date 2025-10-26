@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Building2, Mail, Phone, MapPin, User, Users } from "lucide-react";
 
-export default async function BranchDetailPage({ params }: { params: { id: string } }) {
+export default async function BranchDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const branch = await db.query.branches.findFirst({
-    where: (branches, { eq }) => eq(branches.id, params.id),
+    where: (branches, { eq }) => eq(branches.id, id),
     with: {
       company: {
         columns: {

@@ -77,25 +77,39 @@ npx tsx src/server/seed/01-organization.ts
 [firstname].[lastname]@abcteknoloji.com
 ```
 
+**Türkçe Karakter Dönüşümü:**
+```
+ç → c, ğ → g, ı → i, ö → o, ş → s, ü → u, İ → i
+```
+
 **Password (herkes):**
 ```
 123456
 ```
 
+**Email Verification:**
+```
+✅ Tüm seed kullanıcıları emailVerified = true
+📧 Email doğrulaması gerekmez, direkt giriş yapılabilir
+```
+
 **Örnekler:**
-- `mehmet.yilmaz@abcteknoloji.com`
-- `ayse.demir@abcteknoloji.com`
-- `can.ozturk@abcteknoloji.com`
+- `mehmet.yilmaz@abcteknoloji.com` ← Name: Mehmet Yılmaz
+- `ayse.demir@abcteknoloji.com` ← Name: Ayşe Demir
+- `selin.yildirim@abcteknoloji.com` ← Name: Selin Yıldırım (ı→i)
+- `gizem.cetin@abcteknoloji.com` ← Name: Gizem Çetin (ç→c)
 
 ## ✨ ÖZELLİKLER
 
 ### **Smart User Generator**
 - ✅ Gerçekçi Türkçe isimler
+- ✅ Türkçe karaktersiz email (ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u)
 - ✅ Departmana göre otomatik dağıtım
 - ✅ Pozisyon hiyerarşisi
 - ✅ Random hire dates (son 5 yıl)
 - ✅ Role auto-assignment
 - ✅ %40 female ratio
+- ✅ Email verified (direkt giriş)
 
 ### **Modüler Yapı**
 - ✅ Kısa dosyalar (150-200 satır)

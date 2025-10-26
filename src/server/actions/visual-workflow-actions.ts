@@ -4,7 +4,7 @@ import { db } from '@/drizzle/db';
 import { visualWorkflow, visualWorkflowVersion } from '@/drizzle/schema';
 import { eq, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { auth } from '@/config/auth';
+import { currentUser } from '@/lib/auth';
 
 /**
  * Create new visual workflow
@@ -17,8 +17,8 @@ export async function createVisualWorkflow(data: {
   edges: any[];
 }) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await currentUser();
+    if (!user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
 
@@ -32,7 +32,7 @@ export async function createVisualWorkflow(data: {
         edges: data.edges,
         status: 'DRAFT',
         version: '1.0',
-        createdById: session.user.id,
+        createdById: user.id,
       })
       .returning();
 
@@ -58,8 +58,8 @@ export async function updateVisualWorkflow(
   }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await currentUser();
+    if (!user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
 
@@ -98,8 +98,8 @@ export async function saveWorkflowVersion(
   }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await currentUser();
+    if (!user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
 
@@ -111,7 +111,7 @@ export async function saveWorkflowVersion(
         changeNotes: data.changeNotes,
         nodes: data.nodes,
         edges: data.edges,
-        createdById: session.user.id,
+        createdById: user.id,
       })
       .returning();
 
@@ -128,13 +128,13 @@ export async function saveWorkflowVersion(
  */
 export async function publishVisualWorkflow(id: string) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await currentUser();
+    if (!user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
 
     // TODO: Add admin permission check
-    // const userRole = session.user.role;
+    // const userRole = user.role;
     // if (userRole !== 'SUPER_ADMIN' && userRole !== 'QUALITY_MANAGER') {
     //   return { success: false, error: 'Permission denied' };
     // }
@@ -144,7 +144,7 @@ export async function publishVisualWorkflow(id: string) {
       .set({
         status: 'ACTIVE',
         publishedAt: new Date(),
-        publishedById: session.user.id,
+        publishedById: user.id,
         updatedAt: new Date(),
       })
       .where(eq(visualWorkflow.id, id))
@@ -168,8 +168,8 @@ export async function publishVisualWorkflow(id: string) {
  */
 export async function archiveVisualWorkflow(id: string) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await currentUser();
+    if (!user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
 
@@ -209,13 +209,6 @@ export async function getVisualWorkflows() {
             email: true,
           },
         },
-        publishedBy: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
       },
       orderBy: [desc(visualWorkflow.updatedAt)],
     });
@@ -236,13 +229,6 @@ export async function getVisualWorkflowById(id: string) {
       where: eq(visualWorkflow.id, id),
       with: {
         createdBy: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        publishedBy: {
           columns: {
             id: true,
             name: true,
@@ -290,12 +276,44 @@ export async function getWorkflowVersions(workflowId: string) {
 }
 
 /**
+ * Restore archived workflow (make it DRAFT)
+ */
+export async function restoreVisualWorkflow(id: string) {
+  try {
+    const user = await currentUser();
+    if (!user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const [workflow] = await db
+      .update(visualWorkflow)
+      .set({
+        status: 'DRAFT',
+        updatedAt: new Date(),
+      })
+      .where(eq(visualWorkflow.id, id))
+      .returning();
+
+    if (!workflow) {
+      return { success: false, error: 'Workflow not found' };
+    }
+
+    revalidatePath('/admin/workflows');
+    revalidatePath(`/admin/workflows/${id}`);
+    return { success: true, data: workflow };
+  } catch (error) {
+    console.error('[restoreVisualWorkflow] Error:', error);
+    return { success: false, error: 'Failed to restore workflow' };
+  }
+}
+
+/**
  * Delete workflow
  */
 export async function deleteVisualWorkflow(id: string) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await currentUser();
+    if (!user?.id) {
       return { success: false, error: 'Unauthorized' };
     }
 

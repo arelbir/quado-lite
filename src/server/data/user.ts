@@ -66,6 +66,11 @@ export const getUserById = async (id: string) => {
         position: true,
         company: true,
         branch: true,
+        userRoles: {
+          with: {
+            role: true,
+          },
+        },
       },
       where: eq(user.id, id)
     })

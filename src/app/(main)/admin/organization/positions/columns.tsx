@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Briefcase, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
+import Link from "next/link";
 import type { Position as PositionType } from "@/lib/types";
 
 export type Position = PositionType;
@@ -80,9 +81,11 @@ export const createColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => window.location.href = `/admin/organization/positions/${position.id}`}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/organization/positions/position-detail?id=${position.id}`}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(position)}>
               <Edit className="mr-2 h-4 w-4" />

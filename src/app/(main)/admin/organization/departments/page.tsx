@@ -14,11 +14,11 @@
 
 import { Metadata } from "next";
 import { db } from "@/drizzle/db";
-import { departments, user } from "@/drizzle/schema";
-import { DepartmentTreeClient } from "@/components/admin/department-tree-client";
+import { departments, branches, user } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Users, BarChart3, FolderTree } from "lucide-react";
+import { DepartmentsTableClient } from "./departments-table-client";
 
 export const metadata: Metadata = {
   title: "Department Management | Admin",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 export default async function DepartmentsPage() {
   // Fetch all departments with relations
-  const [allDepartments, activeUsers] = await Promise.all([
+  const [allDepartments, allBranches, activeUsers] = await Promise.all([
     db.query.departments.findMany({
       with: {
         branch: {
@@ -51,6 +51,15 @@ export default async function DepartmentsPage() {
         },
       } as any,
       orderBy: (departments, { asc }) => [asc(departments.name)],
+    }),
+    db.query.branches.findMany({
+      columns: {
+        id: true,
+        name: true,
+        code: true,
+      },
+      where: eq(branches.isActive, true),
+      orderBy: (branches, { asc }) => [asc(branches.name)],
     }),
     db.query.user.findMany({
       columns: {
@@ -143,8 +152,12 @@ export default async function DepartmentsPage() {
         </Card>
       </div>
 
-      {/* Department Tree */}
-      <DepartmentTreeClient departments={allDepartments as any} users={activeUsers} />
+      {/* Departments Data Table */}
+      <DepartmentsTableClient 
+        data={allDepartments as any} 
+        branches={allBranches as any}
+        users={activeUsers as any} 
+      />
     </div>
   );
 }

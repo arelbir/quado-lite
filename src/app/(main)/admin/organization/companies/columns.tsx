@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Building, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
+import Link from "next/link";
 import type { Company } from "@/lib/types";
 
 // Re-export for local usage
@@ -100,9 +101,11 @@ export const createColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => window.location.href = `/admin/organization/companies/${company.id}`}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/organization/companies/company-detail?id=${company.id}`}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(company)}>
               <Edit className="mr-2 h-4 w-4" />

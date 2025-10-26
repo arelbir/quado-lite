@@ -20,10 +20,11 @@ import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function ActionDetailPage({ params }: PageProps) {
+  const { id } = await params;
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -34,7 +35,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   const action = await db.query.actions.findFirst({
-    where: eq(actions.id, params.id),
+    where: eq(actions.id, id),
     with: {
       finding: {
         columns: {
@@ -83,7 +84,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
   }
 
   // Load custom fields
-  const customFieldsResult = await getCustomFieldValuesWithDefinitions('ACTION', params.id);
+  const customFieldsResult = await getCustomFieldValuesWithDefinitions('ACTION', id);
   const customFields = customFieldsResult.success && customFieldsResult.data 
     ? customFieldsResult.data 
     : [];

@@ -1,7 +1,13 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { roles, rolePermissions } from "@/drizzle/schema";
+import { 
+  roles, 
+  rolePermissions, 
+  roleMenus, 
+  userRoles 
+} from "@/drizzle/schema";
+import { getRoleWithRelations } from "@/lib/db/query-helpers";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { withAuth } from "@/lib/helpers/auth-helpers";
@@ -219,28 +225,43 @@ export async function deleteRole(roleId: string): Promise<ActionResponse> {
 
 /**
  * GET ROLE BY ID
- * Fetch role with permissions
+ * Fetch role with permissions, menus, and users
  */
 export async function getRoleById(roleId: string): Promise<ActionResponse> {
   return withAuth(async () => {
-    const role = await db.query.roles.findFirst({
-      where: eq(roles.id, roleId),
-      with: {
-        permissions: {
-          with: {
-            permission: true,
-          },
-        },
-      } as any,
-    });
+    const roleData = await getRoleWithRelations(roleId);
 
-    if (!role) {
+    if (!roleData || !roleData.id) {
       return createNotFoundError("Role");
     }
 
     return {
       success: true,
-      data: role,
+      data: roleData,
+    };
+  });
+}
+
+/**
+ * GET ALL ROLES
+ * Fetch all active roles (for dropdowns, assignments, etc.)
+ */
+export async function getAllRoles(): Promise<ActionResponse> {
+  return withAuth(async () => {
+    const rolesList = await db.query.roles.findMany({
+      where: eq(roles.isActive, true),
+      orderBy: (roles, { asc }) => [asc(roles.name)],
+      columns: {
+        id: true,
+        name: true,
+        code: true,
+        description: true,
+      },
+    });
+
+    return {
+      success: true,
+      data: rolesList,
     };
   });
 }

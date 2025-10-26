@@ -8,6 +8,7 @@ import {
   workflowTimeline,
   workflowDelegations,
   user,
+  userRoles,
   type WorkflowStep,
   type WorkflowTransition,
   type WorkflowCondition,
@@ -80,22 +81,27 @@ function parseDeadline(deadlineStr: string | undefined): Date {
  * Get user roles (DRY - used in 2 places)
  */
 async function getUserRoles(userId: string): Promise<string[]> {
+  // Check if user exists
   const userRecord = await db.query.user.findFirst({
     where: eq(user.id, userId),
-    with: {
-      userRoles: {
-        with: {
-          role: true,
-        },
-      },
-    },
   });
 
   if (!userRecord) return [];
 
-  return userRecord.userRoles?.map((ur: any) => 
+  // Fetch user roles separately for better type safety
+  const userRolesList = await db.query.userRoles.findMany({
+    where: and(
+      eq(userRoles.userId, userId),
+      eq(userRoles.isActive, true)
+    ),
+    with: {
+      role: true,
+    } as Record<string, any>,
+  });
+
+  return userRolesList.map((ur: any) => 
     ur.role.name.toLowerCase()
-  ) || [];
+  );
 }
 
 /**

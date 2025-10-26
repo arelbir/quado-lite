@@ -11,6 +11,8 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { Separator } from '@/components/ui/separator';
+import { RoleSelector } from '../FormFields/RoleSelector';
+import { ConditionEditor } from '../FormFields/ConditionEditor';
 
 // Debounce delay for text inputs (ms)
 const DEBOUNCE_DELAY = 300;
@@ -155,19 +157,13 @@ export function PropertiesPanel() {
             <div className="space-y-4">
               <h4 className="text-sm font-semibold">Decision Logic</h4>
               
-              <div>
-                <Label htmlFor="condition">Condition *</Label>
-                <Textarea
-                  id="condition"
-                  value={localData.condition || ''}
-                  onChange={(e) => handleTextChange('condition', e.target.value)}
-                  placeholder="e.g., status === 'approved' OR score > 80"
-                  rows={2}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Define the condition for branching
-                </p>
-              </div>
+              <ConditionEditor
+                value={localData.condition || ''}
+                onChange={(value) => handleTextChange('condition', value)}
+                label="Condition"
+                placeholder="e.g., status === 'approved' OR score > 80"
+                customFieldKeys={[]}
+              />
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2 bg-green-50 border border-green-200 rounded">
@@ -287,23 +283,15 @@ export function PropertiesPanel() {
             <div className="space-y-4">
               <h4 className="text-sm font-semibold">Assignment</h4>
               
-              <div>
-                <Label htmlFor="role">Assigned Role *</Label>
-                <Select
-                  value={localData.assignedRole || ''}
-                  onValueChange={(value) => handleImmediateChange('assignedRole', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-                    <SelectItem value="QUALITY_MANAGER">Quality Manager</SelectItem>
-                    <SelectItem value="PROCESS_OWNER">Process Owner</SelectItem>
-                    <SelectItem value="ACTION_OWNER">Action Owner</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <RoleSelector
+                value={localData.assignedRole || ''}
+                onChange={(value) => handleImmediateChange('assignedRole', value)}
+                label="Assigned To"
+                placeholder="Select role, user, or department..."
+                showDynamic={true}
+                showUsers={true}
+                showDepartments={true}
+              />
 
               <div>
                 <Label htmlFor="deadline">Deadline (hours) *</Label>

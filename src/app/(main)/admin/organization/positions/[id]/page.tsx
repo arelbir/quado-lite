@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Briefcase, Users, FileText, Hash } from "lucide-react";
 
-export default async function PositionDetailPage({ params }: { params: { id: string } }) {
+export default async function PositionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const position = await db.query.positions.findFirst({
-    where: (positions, { eq }) => eq(positions.id, params.id),
+    where: (positions, { eq }) => eq(positions.id, id),
   });
 
   if (!position) {
@@ -15,7 +16,7 @@ export default async function PositionDetailPage({ params }: { params: { id: str
 
   // Count users with this position
   const usersWithPosition = await db.query.user.findMany({
-    where: (users, { eq }) => eq(users.positionId, params.id),
+    where: (users, { eq }) => eq(users.positionId, id),
     columns: {
       id: true,
       name: true,

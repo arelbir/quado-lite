@@ -13,12 +13,13 @@ import { Progress } from "@/components/ui/progress";
 import { AuditQuestionsForm } from "@/components/audit/audit-questions-form";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function AuditQuestionsPage({ params }: PageProps) {
+  const { id } = await params;
   const audit = await db.query.audits.findFirst({
-    where: eq(audits.id, params.id),
+    where: eq(audits.id, id),
     with: {
       createdBy: {
         columns: {
@@ -33,8 +34,8 @@ export default async function AuditQuestionsPage({ params }: PageProps) {
     notFound();
   }
 
-  const questions = await getAuditQuestions(params.id);
-  const completion = await checkAuditCompletion(params.id);
+  const questions = await getAuditQuestions(id);
+  const completion = await checkAuditCompletion(id);
 
   return (
     <div className="space-y-6">
@@ -42,7 +43,7 @@ export default async function AuditQuestionsPage({ params }: PageProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href={`/denetim/audits/${params.id}`}>
+            <Link href={`/denetim/audits/${id}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Denetim Detayına Dön
             </Link>
@@ -94,7 +95,7 @@ export default async function AuditQuestionsPage({ params }: PageProps) {
           </CardContent>
         </Card>
       ) : (
-        <AuditQuestionsForm auditId={params.id} questions={questions} />
+        <AuditQuestionsForm auditId={id} questions={questions} />
       )}
     </div>
   );

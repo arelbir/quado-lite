@@ -16,7 +16,7 @@
 import { Metadata } from "next";
 import { db } from "@/drizzle/db";
 import { user, departments, positions } from "@/drizzle/schema";
-import { count } from "drizzle-orm";
+import { count, or, ilike, sql } from "drizzle-orm";
 import { UsersTableClient } from "./users-table-client";
 import { paginate, getPaginationInfo } from "@/lib/pagination-helper";
 
@@ -29,10 +29,14 @@ interface PageProps {
   searchParams: {
     page?: string
     per_page?: string
+    name?: string
+    status?: string
   }
 }
 
 export default async function UsersPage({ searchParams }: PageProps) {
+  const nameFilter = searchParams.name;
+  const statusFilter = searchParams.status;
   // Fetch all dropdown data
   const [companiesList, branchesList, departmentsList, positionsList, managersList] = await Promise.all([
     db.query.companies.findMany({
@@ -62,48 +66,97 @@ export default async function UsersPage({ searchParams }: PageProps) {
     }),
   ]);
 
-  // ✅ SERVER-SIDE PAGINATION
+  // ✅ SERVER-SIDE PAGINATION WITH FILTERS
   const result = await paginate(
     // Query: Only fetch one page
-    async (limit, offset) => db.query.user.findMany({
-      limit,
-      offset,
-    with: {
-      department: {
-        columns: {
-          id: true,
-          name: true,
-          code: true,
-        },
-      },
-      position: {
-        columns: {
-          id: true,
-          name: true,
-          code: true,
-        },
-      },
-      userRoles: {
+    async (limit, offset) => {
+      // Build where conditions
+      const conditions = [];
+      
+      if (nameFilter) {
+        // Search in both name and email (case-insensitive)
+        conditions.push(
+          or(
+            ilike(user.name, `%${nameFilter}%`),
+            ilike(user.email, `%${nameFilter}%`)
+          )
+        );
+      }
+      
+      if (statusFilter) {
+        conditions.push(sql`${user.status} = ${statusFilter}`);
+      }
+      
+      return db.query.user.findMany({
+        limit,
+        offset,
+        where: conditions.length > 0 ? sql`${sql.join(conditions, sql` AND `)}` : undefined,
         with: {
-          role: {
+          department: {
             columns: {
               id: true,
               name: true,
-              isSystem: true,
+              code: true,
+            },
+          },
+          position: {
+            columns: {
+              id: true,
+              name: true,
+              code: true,
+            },
+          },
+          userRoles: {
+            with: {
+              role: {
+                columns: {
+                  id: true,
+                  name: true,
+                  isSystem: true,
+                },
+              },
             },
           },
         },
-      },
+        orderBy: (user, { desc }) => [desc(user.createdAt)],
+      });
     },
-    orderBy: (user, { desc }) => [desc(user.createdAt)],
-  }),
-    // Count: Total users
+    // Count: Total users (with filters)
     async () => {
-      const result = await db.select({ value: count() }).from(user)
-      return result[0]?.value ?? 0
+      const conditions = [];
+      
+      if (nameFilter) {
+        conditions.push(
+          or(
+            ilike(user.name, `%${nameFilter}%`),
+            ilike(user.email, `%${nameFilter}%`)
+          )
+        );
+      }
+      
+      if (statusFilter) {
+        conditions.push(sql`${user.status} = ${statusFilter}`);
+      }
+      
+      const result = await db
+        .select({ value: count() })
+        .from(user)
+        .where(conditions.length > 0 ? sql`${sql.join(conditions, sql` AND `)}` : undefined);
+      
+      return result[0]?.value ?? 0;
     },
     searchParams
   )
+
+  // 🔍 DEBUG: Log fetched users and their IDs
+  console.log("🔍 [page.tsx] Users fetched from database:");
+  console.log("  Total users:", result.data.length);
+  if (result.data.length > 0) {
+    console.log("  First 3 users:");
+    result.data.slice(0, 3).forEach((u: any) => {
+      console.log(`    - ID: ${u.id} | Name: ${u.name} | Email: ${u.email}`);
+    });
+  }
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

@@ -150,6 +150,12 @@ const PERMISSIONS = [
   { code: "report.audit", resource: "Report", action: "Export", category: "Reporting", name: "Export Audit Reports" },
   { code: "report.finding", resource: "Report", action: "Export", category: "Reporting", name: "Export Finding Reports" },
   { code: "report.dof", resource: "Report", action: "Export", category: "Reporting", name: "Export DOF Reports" },
+  
+  // Custom Fields Permissions
+  { code: "customfield.create", resource: "CustomField", action: "Create", category: "System Management", name: "Create Custom Field" },
+  { code: "customfield.read", resource: "CustomField", action: "Read", category: "System Management", name: "View Custom Field" },
+  { code: "customfield.update", resource: "CustomField", action: "Update", category: "System Management", name: "Update Custom Field" },
+  { code: "customfield.delete", resource: "CustomField", action: "Delete", category: "System Management", name: "Delete Custom Field" },
 ];
 
 /**
@@ -174,6 +180,8 @@ const ROLE_PERMISSION_MAPPINGS: Record<string, string[] | "all"> = {
     "user.create", "user.read", "user.update", "user.delete", "user.assign_role",
     // Department
     "department.create", "department.read", "department.update", "department.delete",
+    // Custom Fields
+    "customfield.create", "customfield.read", "customfield.update", "customfield.delete",
     // Reports
     "report.audit", "report.finding", "report.dof",
   ],
@@ -197,6 +205,7 @@ const ROLE_PERMISSION_MAPPINGS: Record<string, string[] | "all"> = {
     "dof.read", "dof.approve", "dof.reject",
     "user.read",
     "department.read",
+    "customfield.create", "customfield.read", "customfield.update", "customfield.delete",
     "report.audit", "report.finding", "report.dof",
   ],
   

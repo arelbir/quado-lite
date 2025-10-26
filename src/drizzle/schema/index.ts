@@ -2,11 +2,12 @@ export * from "./auth";
 export * from "./enum";
 export * from "./menu";
 export * from "./task";
-export * from "./user";
-// 🔥 NEW: Enterprise Organization
+// 🔥 NEW: Enterprise Organization  
 export * from "./organization";
-// 🔥 NEW: Multi-Role & Permission System
+// 🔥 NEW: Multi-Role & Permission System (MUST be before user to allow import)
 export * from "./role-system";
+// User (after role-system so it can import userRoles table)
+export * from "./user";
 // 🔥 NEW: Teams & Groups (Week 4)
 export * from "./teams-groups";
 // 🔥 NEW: HR Integration (Week 5-6)

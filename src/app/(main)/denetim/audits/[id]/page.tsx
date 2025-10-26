@@ -25,11 +25,13 @@ import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: { id: string };
-  searchParams: { tab?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
 
 export default async function AuditDetailPage({ params, searchParams }: PageProps) {
+  const { id } = await params;
+  const { tab } = await searchParams;
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -40,7 +42,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
   const loggedInUser = await currentUser();
   
   const audit = await db.query.audits.findFirst({
-    where: eq(audits.id, params.id),
+    where: eq(audits.id, id),
     with: {
       createdBy: {
         columns: {
@@ -57,7 +59,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
   }
 
   const auditFindings = await db.query.findings.findMany({
-    where: eq(findings.auditId, params.id),
+    where: eq(findings.auditId, id),
     columns: {
       id: true,
       details: true,
@@ -79,7 +81,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
 
   // Denetim sorularını getir
   const questions = await db.query.auditQuestions.findMany({
-    where: eq(auditQuestions.auditId, params.id),
+    where: eq(auditQuestions.auditId, id),
     with: {
       question: true,
     } as any,
@@ -116,7 +118,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
   );
 
   // Custom fields
-  const customFieldsResult = await getCustomFieldValuesWithDefinitions('AUDIT', params.id);
+  const customFieldsResult = await getCustomFieldValuesWithDefinitions('AUDIT', id);
   const customFields = customFieldsResult.success && customFieldsResult.data 
     ? customFieldsResult.data 
     : [];
@@ -142,10 +144,10 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <AuditReportButton auditId={params.id} auditTitle={audit.title} />
+          <AuditReportButton auditId={id} auditTitle={audit.title} />
           {audit.status === "Active" && (
             <Button asChild variant="outline" size="sm">
-              <Link href={`/denetim/audits/${params.id}/edit`}>
+              <Link href={`/denetim/audits/${id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 Düzenle
               </Link>
@@ -167,7 +169,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
       </div>
 
       {/* Tab-Based Content */}
-      <Tabs defaultValue={searchParams.tab || "overview"} className="space-y-6" id="audit-tabs">
+      <Tabs defaultValue={tab || "overview"} className="space-y-6" id="audit-tabs">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">
             <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -320,7 +322,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 </div>
                 {audit.status === "Active" && (
                   <AddQuestionDialog
-                    auditId={params.id}
+                    auditId={id}
                     availableQuestions={availableQuestions as any}
                   />
                 )}
@@ -339,14 +341,14 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 </p>
                 {audit.status === "Active" && availableQuestions.length > 0 && (
                   <AddQuestionDialog
-                    auditId={params.id}
+                    auditId={id}
                     availableQuestions={availableQuestions as any}
                   />
                 )}
               </CardContent>
             </Card>
           ) : (
-            <AuditQuestionsForm auditId={params.id} questions={questions} />
+            <AuditQuestionsForm auditId={id} questions={questions} />
           )}
         </TabsContent>
 
@@ -408,7 +410,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                     <FindingCard 
                       key={finding.id} 
                       finding={finding} 
-                      auditId={params.id}
+                      auditId={id}
                       users={users}
                     />
                   ))}
