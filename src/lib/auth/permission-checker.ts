@@ -122,8 +122,8 @@ export class PermissionChecker {
               },
             },
           },
-        },
-      });
+        } as any,
+      }) as any[];
 
       if (userRolesList.length === 0) {
         return {
@@ -309,8 +309,8 @@ export class PermissionChecker {
             },
           },
         },
-      },
-    });
+      } as any,
+    }) as any[];
 
     const permissionCodes = new Set<string>();
     for (const userRole of userRolesList) {
@@ -333,10 +333,10 @@ export class PermissionChecker {
       ),
       with: {
         role: true,
-      },
-    });
+      } as any,
+    }) as any[];
 
-    return userRolesList.map(ur => ({
+    return userRolesList.map((ur: any) => ({
       code: ur.role.code,
       name: ur.role.name,
       context: ur.contextType !== 'Global' ? `${ur.contextType}:${ur.contextId}` : undefined,

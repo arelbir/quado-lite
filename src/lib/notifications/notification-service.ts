@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/drizzle/db";
 import { notifications, notificationPreferences } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";

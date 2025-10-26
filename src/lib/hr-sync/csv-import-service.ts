@@ -356,8 +356,8 @@ export class CSVImportService {
       ),
       with: {
         user: true
-      }
-    });
+      } as any
+    }) as any;
 
     if (mapping) return mapping.user;
 

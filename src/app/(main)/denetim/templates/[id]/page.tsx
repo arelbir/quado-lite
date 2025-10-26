@@ -44,8 +44,8 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           email: true,
         },
       },
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!template) {
     notFound();
@@ -63,10 +63,10 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           inArray(questionBanks.id, bankIds),
         with: {
           questions: {
-            where: (questions, { isNull }) => isNull(questions.deletedAt),
+            where: (questions: any, { isNull }: any) => isNull(questions.deletedAt),
           },
-        },
-      })
+        } as any,
+      }) as any[]
     : [];
 
   // Tüm soru sayısını hesapla

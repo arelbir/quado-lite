@@ -12,22 +12,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Building, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
+import type { Company } from "@/lib/types";
 
-export interface Company {
-  id: string;
-  name: string;
-  code: string;
-  legalName: string | null;
-  taxNumber: string | null;
-  description: string | null;
-  country: string | null;
-  city: string | null;
-  address: string | null;
-  phone: string | null;
-  email: string | null;
-  website: string | null;
-  isActive: boolean;
-}
+// Re-export for local usage
+export type { Company };
 
 export const createColumns = (
   onEdit: (company: Company) => void,

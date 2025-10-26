@@ -37,7 +37,7 @@ export default async function QuestionBanksPage() {
 
 async function QuestionBanksGrid() {
   const t = await getTranslations('questionBanks');
-  const questionBanks = await getQuestionBanks();
+  const questionBanks = await getQuestionBanks() as any[];
 
   if (questionBanks.length === 0) {
     return (

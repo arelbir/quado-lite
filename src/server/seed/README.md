@@ -5,6 +5,7 @@
 ```
 seed/
 ├── 00-master.ts              # ✅ Master orchestrator (RUN THIS!)
+├── 00-admin.ts               # ✅ Admin user (first user)
 ├── 01-organization.ts        # ✅ Companies, Branches, Depts, Positions
 ├── 02-users.ts               # ✅ 150 users - Smart generator
 ├── 03-roles.ts               # ✅ Roles & permissions system
@@ -12,6 +13,8 @@ seed/
 ├── 05-question-banks.ts      # ✅ Question banks & templates
 ├── 06-teams-groups.ts        # ✅ Teams & groups
 ├── 07-sample-data.ts         # ✅ Sample audits/findings/actions/dofs
+├── 08-assignments.ts         # ✅ Manager & leader assignments
+├── 09-workflows.ts           # ✅ Workflow definitions ✨ NEW
 ├── cleanup.ts                # ✅ Utility - database cleanup
 ├── README.md                 # ✅ Documentation
 └── SEED-STATUS.md            # ✅ Status report

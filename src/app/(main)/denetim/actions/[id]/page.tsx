@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { db } from "@/drizzle/db";
 import { actions } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
+import { getCustomFieldValuesWithDefinitions } from "@/server/actions/custom-field-value-actions";
+import { CustomFieldsDisplay } from "@/components/forms/CustomFieldsDisplay";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +36,13 @@ export default async function ActionDetailPage({ params }: PageProps) {
   const action = await db.query.actions.findFirst({
     where: eq(actions.id, params.id),
     with: {
-      finding: true,
+      finding: {
+        columns: {
+          id: true,
+          description: true,
+          status: true,
+        },
+      },
       assignedTo: {
         columns: {
           id: true,
@@ -67,18 +75,29 @@ export default async function ActionDetailPage({ params }: PageProps) {
           },
         },
       },
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!action) {
     notFound();
   }
 
-  const statusConfig = {
+  // Load custom fields
+  const customFieldsResult = await getCustomFieldValuesWithDefinitions('ACTION', params.id);
+  const customFields = customFieldsResult.success && customFieldsResult.data 
+    ? customFieldsResult.data 
+    : [];
+
+  const statusConfig: Record<string, any> = {
     Assigned: {
       label: t('status.assigned'),
       color: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
       icon: Clock,
+    },
+    InProgress: {
+      label: t('status.inProgress'),
+      color: "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400",
+      icon: TrendingUp,
     },
     PendingManagerApproval: {
       label: t('status.pendingApproval'),
@@ -282,6 +301,11 @@ export default async function ActionDetailPage({ params }: PageProps) {
             </TabsContent>
 
           </Tabs>
+
+          {/* Custom Fields */}
+          {customFields.length > 0 && (
+            <CustomFieldsDisplay fields={customFields} />
+          )}
         </div>
 
         {/* Sidebar: Timeline + Atama */}

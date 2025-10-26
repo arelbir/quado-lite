@@ -141,7 +141,9 @@ export async function submitFindingForClosure(
       return createNotFoundError("Finding");
     }
 
-    if (finding.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: Process owner or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (finding.assignedToId !== user.id && !isAdmin) {
       return createPermissionError("Only process owner can submit for closure");
     }
 
@@ -273,7 +275,12 @@ export async function rejectFinding(
  */
 export async function getFindings() {
   const result = await withAuth(async (user: User) => {
-    if (user.role === "admin" || user.role === "superAdmin") {
+    // Check if user is admin using multi-role system
+    const isAdmin = user.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (isAdmin) {
       const data = await db.query.findings.findMany({
         with: {
           createdBy: true,
@@ -382,9 +389,10 @@ export async function getFindingById(findingId: string) {
       throw new Error("Finding not found");
     }
 
+    // Check permission: Admin, assignee, or creator
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
     if (
-      user.role !== "admin" &&
-      user.role !== "superAdmin" &&
+      !isAdmin &&
       finding.assignedToId !== user.id &&
       finding.createdById !== user.id
     ) {

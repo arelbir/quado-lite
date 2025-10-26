@@ -7,7 +7,7 @@ import { action } from "@/lib/safe-action"
 import { generateNewEmailVerificationToken } from "@/lib/tokens"
 import { DeleteManyScheme, getUsersSchema } from "@/schema/data/users"
 import { AppearanceSchema, EmailSchema, ProfileSchema } from "@/schema/settings"
-import { UserSchema, user, role, UserRole } from "@/drizzle/schema"
+import { UserSchema, user } from "@/drizzle/schema"
 import { deleteUserById, deleteUsersByIds, getUserByEmail, updateUser } from "@/server/data/user"
 import { sendVerificationEmail } from "@/server/mail/send-email"
 import { ActionReturnValue, AuthResponse } from "@/types/actions"
@@ -123,8 +123,8 @@ export const getUsers = action(getUsersSchema, async (params) => {
     } = params
 
     const userinfo = await currentUser()
-    // 普通用户没有权限查看用户列表
-    if (userinfo?.role === UserRole.enum.user) {
+    // Only authenticated users can view user list
+    if (!userinfo) {
       return { data: [], pageCount: 0 }
     }
 
@@ -154,19 +154,12 @@ export const getUsers = action(getUsersSchema, async (params) => {
           value: email,
         })
         : undefined,
-      // admin 只能查看自己创建的用户 superAdmin 可以查看所有用户
-      userinfo?.role === UserRole.enum.admin ? and(
-        eq(user.createdById, userinfo!.id),
+      // Non-super admins can only see users they created
+      !userinfo?.superAdmin ? and(
+        eq(user.createdById, userinfo.id),
         isNull(user.deletedAt),
         isNull(user.deletedById)
       ) : undefined,
-      !!userRole
-        ? filterColumn({
-          column: role.userRole,
-          value: userRole,
-          isSelectable: true,
-        })
-        : undefined,
       emailVerified === '1' ? isNotNull(user.emailVerified) : emailVerified === '0' ? isNull(user.emailVerified) : undefined,
       // Filter by createdAt
       fromDay && toDay
@@ -181,11 +174,10 @@ export const getUsers = action(getUsersSchema, async (params) => {
     const parent = alias(user, "parent")
     const { data, total } = await db.transaction(async (tx) => {
       const data = await tx
-        .select({ ...rest, role, createdBy: parent })
+        .select({ ...rest, createdBy: parent })
         .from(user)
         .limit(per_page)
         .offset(offset)
-        .leftJoin(role, eq(user.id, role.userId))
         // @ts-expect-error - Drizzle alias type inference limitation
         .leftJoin(parent, eq(parent.id, user.createdById))
         .where(
@@ -204,7 +196,6 @@ export const getUsers = action(getUsersSchema, async (params) => {
           count: count(),
         })
         .from(user)
-        .leftJoin(role, eq(user.id, role.userId))
         .where(
           !operator || operator === "and" ? and(...whereParams()) : or(...whereParams())
         )

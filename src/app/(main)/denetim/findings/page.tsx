@@ -3,7 +3,7 @@ import { db } from "@/drizzle/db";
 import { findings } from "@/drizzle/schema";
 import { count } from "drizzle-orm";
 import { ExportButton } from "@/components/export/export-button";
-import { exportFindingsToExcel } from "@/server/actions/export-actions";
+import { downloadFindingsReport } from "@/server/actions/report-actions";
 import { FindingsTableClient } from "./findings-table-client";
 import { getTranslations } from 'next-intl/server';
 import { paginate } from "@/lib/pagination-helper";
@@ -30,7 +30,7 @@ export default async function FindingsPage({ searchParams }: PageProps) {
         </div>
         <div className="flex gap-2">
           <ExportButton
-            onExport={exportFindingsToExcel}
+            onExport={downloadFindingsReport}
             filename={`${t('title').toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`}
           />
         </div>
@@ -54,7 +54,8 @@ async function FindingsTableServer({ searchParams }: PageProps) {
         with: {
           audit: { columns: { id: true, title: true } },
           assignedTo: { columns: { id: true, name: true } },
-        },
+          createdBy: { columns: { id: true, name: true } },
+        } as any,
         orderBy: (findings, { desc }) => [desc(findings.createdAt)],
       });
     },

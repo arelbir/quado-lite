@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { getFindingById } from "@/server/actions/finding-actions";
 import { getActionsByFinding } from "@/server/actions/action-actions";
 import { getDofsByFinding } from "@/server/actions/dof-actions";
+import { getCustomFieldValuesWithDefinitions } from "@/server/actions/custom-field-value-actions";
+import { CustomFieldsDisplay } from "@/components/forms/CustomFieldsDisplay";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -28,11 +30,17 @@ export default async function FindingDetailPage({ params }: PageProps) {
   const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   try {
-    const finding = await getFindingById(params.id);
+    const finding = await getFindingById(params.id) as any;
 
     if (!finding) {
       notFound();
     }
+
+    // Load custom fields
+    const customFieldsResult = await getCustomFieldValuesWithDefinitions('FINDING', params.id);
+    const customFields = customFieldsResult.success && customFieldsResult.data 
+      ? customFieldsResult.data 
+      : [];
 
     return (
       <div className="space-y-6">
@@ -107,6 +115,11 @@ export default async function FindingDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
 
+        {/* Custom Fields */}
+        {customFields.length > 0 && (
+          <CustomFieldsDisplay fields={customFields} />
+        )}
+
         {/* Actions & DOFs */}
         <div className="grid gap-6 md:grid-cols-2">
           <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
@@ -133,7 +146,7 @@ async function ActionsCard({ findingId }: { findingId: string }) {
     : defaultLocale;
   
   const t = await getTranslations({ locale, namespace: 'finding' });
-  const actions = await getActionsByFinding(findingId);
+  const actions = await getActionsByFinding(findingId) as any[];
 
   const statusIcons: Record<string, any> = {
     Assigned: Clock,
@@ -194,7 +207,7 @@ async function DofsCard({ findingId }: { findingId: string }) {
   
   const t = await getTranslations({ locale, namespace: 'finding' });
   const tDof = await getTranslations({ locale, namespace: 'dof' });
-  const dofs = await getDofsByFinding(findingId);
+  const dofs = await getDofsByFinding(findingId) as any[];
 
   return (
     <Card>

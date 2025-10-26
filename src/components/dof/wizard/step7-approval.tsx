@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { approveDof, rejectDof } from "@/server/actions/dof-actions";
+import { managerApproveDof, managerRejectDof } from "@/server/actions/dof-actions";
 import { useTranslations } from 'next-intl';
 import {
   AlertDialog,
@@ -30,7 +30,7 @@ export function Step7Approval({ dof }: Step7ApprovalProps) {
 
   const handleApprove = () => {
     startTransition(async () => {
-      const result = await approveDof(dof.id);
+      const result = await managerApproveDof(dof.id);
       if (result.success) {
         toast.success("DÖF onaylandı ve tamamlandı!");
         router.refresh();
@@ -42,9 +42,10 @@ export function Step7Approval({ dof }: Step7ApprovalProps) {
 
   const handleReject = () => {
     startTransition(async () => {
-      const result = await rejectDof(dof.id);
+      // TODO: Add rejection reason input in future
+      const result = await managerRejectDof(dof.id, "Rejected by manager");
       if (result.success) {
-        toast.success("DÖF reddedildi");
+        toast.success("DÖF reddedildi - Step6'ya geri döndü");
         router.refresh();
       } else {
         toast.error(result.error);

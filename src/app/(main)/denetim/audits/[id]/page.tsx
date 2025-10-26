@@ -4,6 +4,8 @@ import { db } from "@/drizzle/db";
 import { audits, findings, auditQuestions, user, questions } from "@/drizzle/schema";
 import { eq, asc } from "drizzle-orm";
 import { currentUser } from "@/lib/auth";
+import { getCustomFieldValuesWithDefinitions } from "@/server/actions/custom-field-value-actions";
+import { CustomFieldsDisplay } from "@/components/forms/CustomFieldsDisplay";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -47,8 +49,8 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           email: true,
         },
       },
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!audit) {
     notFound();
@@ -71,26 +73,26 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
           name: true,
         },
       },
-    },
+    } as any,
     orderBy: (findings, { desc }) => [desc(findings.createdAt)],
-  });
+  }) as any;
 
   // Denetim sorularını getir
   const questions = await db.query.auditQuestions.findMany({
     where: eq(auditQuestions.auditId, params.id),
     with: {
       question: true,
-    },
+    } as any,
     orderBy: [asc(auditQuestions.createdAt)],
-  });
+  }) as any;
 
   // Stats hesapla
-  const answeredCount = questions.filter(q => q.answer !== null).length;
-  const nonCompliantCount = questions.filter(q => q.isNonCompliant).length;
+  const answeredCount = questions.filter((q: any) => q.answer !== null).length;
+  const nonCompliantCount = questions.filter((q: any) => q.isNonCompliant).length;
   const completionPercentage = questions.length > 0 
     ? Math.round((answeredCount / questions.length) * 100) 
     : 0;
-  const openFindingsCount = auditFindings.filter(f => f.status !== "Completed").length;
+  const openFindingsCount = auditFindings.filter((f: any) => f.status !== "Completed").length;
 
   // User listesi (Quick dialogs için)
   const users = await db.select({
@@ -100,18 +102,24 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
   }).from(user);
 
   // Denetimde olmayan sorular (eklenebilecek sorular)
-  const existingQuestionIds = questions.map(q => q.questionId);
+  const existingQuestionIds = questions.map((q: any) => q.questionId);
   
   // Tüm soruları al ve client-side'da filtrele
   const allQuestions = await db.query.questions.findMany({
-    with: { bank: true },
+    with: { bank: true } as any,
     limit: 100,
   });
   
   // Denetimde olmayan soruları filtrele
   const availableQuestions = allQuestions.filter(
-    q => !existingQuestionIds.includes(q.id)
+    (q: any) => !existingQuestionIds.includes(q.id)
   );
+
+  // Custom fields
+  const customFieldsResult = await getCustomFieldValuesWithDefinitions('AUDIT', params.id);
+  const customFields = customFieldsResult.success && customFieldsResult.data 
+    ? customFieldsResult.data 
+    : [];
 
   return (
     <div className="space-y-6">
@@ -230,9 +238,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 <CardTitle className="text-base">{t('sections.recentAnswers')}</CardTitle>
               </CardHeader>
               <CardContent>
-                {questions.filter(q => q.answer).slice(0, 3).length > 0 ? (
+                {questions.filter((q: any) => q.answer).slice(0, 3).length > 0 ? (
                   <div className="space-y-2">
-                    {questions.filter(q => q.answer).slice(0, 3).map((q, index) => (
+                    {questions.filter((q: any) => q.answer).slice(0, 3).map((q: any, index: number) => (
                       <div key={q.id} className="flex items-start gap-2 p-2 border rounded text-sm">
                         <CheckCircle2 className="h-4 w-4 text-success mt-0.5" />
                         <p className="flex-1 line-clamp-1">{q.question?.questionText}</p>
@@ -254,7 +262,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
               <CardContent>
                 {auditFindings.slice(0, 3).length > 0 ? (
                   <div className="space-y-2">
-                    {auditFindings.slice(0, 3).map((finding) => (
+                    {auditFindings.slice(0, 3).map((finding: any) => (
                       <Link
                         key={finding.id}
                         href={`/denetim/findings/${finding.id}`}
@@ -354,19 +362,19 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-success">
-                    {auditFindings.filter(f => f.status === "Completed").length}
+                    {auditFindings.filter((f: any) => f.status === "Completed").length}
                   </p>
                   <p className="text-xs text-muted-foreground">{t('status.completed')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-warning">
-                    {auditFindings.filter(f => f.status === "InProgress").length}
+                    {auditFindings.filter((f: any) => f.status === "InProgress").length}
                   </p>
                   <p className="text-xs text-muted-foreground">{t('status.inProgress')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-destructive">
-                    {auditFindings.filter(f => f.status === "New" || f.status === "Assigned").length}
+                    {auditFindings.filter((f: any) => f.status === "New" || f.status === "Assigned").length}
                   </p>
                   <p className="text-xs text-muted-foreground">{t('messages.newFindings')}</p>
                 </div>
@@ -396,7 +404,7 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {auditFindings.map((finding) => (
+                  {auditFindings.map((finding: any) => (
                     <FindingCard 
                       key={finding.id} 
                       finding={finding} 
@@ -440,6 +448,11 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
               </div>
             </CardContent>
           </Card>
+
+          {/* Custom Fields */}
+          {customFields.length > 0 && (
+            <CustomFieldsDisplay fields={customFields} />
+          )}
         </TabsContent>
       </Tabs>
     </div>

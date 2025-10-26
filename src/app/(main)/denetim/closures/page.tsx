@@ -45,8 +45,8 @@ async function PendingClosures() {
   
   const t = await getTranslations({ locale, namespace: 'finding' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
-  const findings = await getFindings();
-  const pendingFindings = findings.filter(f => f.status === "PendingAuditorClosure");
+  const findings = await getFindings() as any[];
+  const pendingFindings = findings.filter((f: any) => f.status === "PendingAuditorClosure");
 
   if (pendingFindings.length === 0) {
     return (

@@ -43,11 +43,16 @@ async function DofsTableServer({ searchParams }: PageProps) {
   const user = authResult.user as any;
 
   // ✅ SERVER-SIDE PAGINATION
+  // Check if user is admin using multi-role system
+  const isAdmin = user.userRoles?.some((ur: any) => 
+    ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+  );
+
   const result = await paginate(
     // Query: Only fetch one page
     async (limit, offset) => {
       // Admin görür tüm DÖF'leri, normal user sadece kendisine atananları
-      if (user.role === "admin" || user.role === "superAdmin") {
+      if (isAdmin) {
         return db.query.dofs.findMany({
           limit,
           offset,
@@ -55,7 +60,7 @@ async function DofsTableServer({ searchParams }: PageProps) {
             finding: { columns: { id: true, details: true } },
             assignedTo: { columns: { id: true, name: true, email: true } },
             manager: { columns: { id: true, name: true, email: true } },
-          },
+          } as any,
           orderBy: (dofs, { desc }) => [desc(dofs.createdAt)],
         });
       } else {
@@ -70,14 +75,14 @@ async function DofsTableServer({ searchParams }: PageProps) {
             finding: { columns: { id: true, details: true } },
             assignedTo: { columns: { id: true, name: true, email: true } },
             manager: { columns: { id: true, name: true, email: true } },
-          },
+          } as any,
           orderBy: (dofs, { desc }) => [desc(dofs.createdAt)],
         });
       }
     },
     // Count: Total dofs for this user
     async () => {
-      if (user.role === "admin" || user.role === "superAdmin") {
+      if (isAdmin) {
         const result = await db.select({ value: count() }).from(dofs);
         return result[0]?.value ?? 0;
       } else {

@@ -37,6 +37,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createCompany, updateCompany } from "@/server/actions/organization-actions";
 import { Loader2 } from "lucide-react";
+import type { Company } from "@/lib/types";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -53,21 +54,6 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
-
-interface Company {
-  id: string;
-  name: string;
-  code: string;
-  legalName: string | null;
-  taxNumber: string | null;
-  country: string | null;
-  city: string | null;
-  address: string | null;
-  phone: string | null;
-  email: string | null;
-  website: string | null;
-  description: string | null;
-}
 
 interface CompanyDialogProps {
   open: boolean;

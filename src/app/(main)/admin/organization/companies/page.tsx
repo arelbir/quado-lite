@@ -24,9 +24,10 @@ export const metadata: Metadata = {
 
 export default async function CompaniesPage() {
   // Fetch all companies
-  const companies: Company[] = await db.query.companies.findMany({
+  const companiesData = await db.query.companies.findMany({
     orderBy: (companies, { asc }) => [asc(companies.name)],
   });
+  const companies: Company[] = companiesData as any;
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

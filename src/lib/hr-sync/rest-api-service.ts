@@ -349,8 +349,8 @@ export class RESTAPISyncService {
       ),
       with: {
         user: true
-      }
-    });
+      } as any
+    }) as any;
 
     if (mapping) return mapping.user;
 

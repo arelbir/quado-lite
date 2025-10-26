@@ -34,10 +34,10 @@ export async function generateActionReport(
         with: {
           createdBy: true,
         },
-        orderBy: (actionProgress, { asc }) => [asc(actionProgress.createdAt)],
+        orderBy: (actionProgress: any, { asc }: any) => [asc(actionProgress.createdAt)],
       },
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!action) {
     throw new Error("Action not found");

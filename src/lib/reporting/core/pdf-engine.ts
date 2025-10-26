@@ -22,7 +22,7 @@ export async function renderPDF(component: ReactElement | Promise<ReactElement>)
   const resolvedComponent = await Promise.resolve(component);
   
   const buffer = await ReactPDF.renderToBuffer(resolvedComponent);
-  return Buffer.from(buffer);
+  return buffer;
 }
 
 /**

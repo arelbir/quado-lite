@@ -10,8 +10,8 @@ export default async function EditPlanPage({ params }: { params: { id: string } 
     with: {
       auditor: true,
       template: true,
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!plan) {
     notFound();

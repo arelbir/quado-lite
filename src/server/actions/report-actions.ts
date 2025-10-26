@@ -10,6 +10,8 @@ import type { User } from "@/lib/types";
 import { generateAuditReport } from "@/lib/reporting/templates/audit-report";
 import { generateActionReport } from "@/lib/reporting/templates/action-report";
 import { generateDofReport } from "@/lib/reporting/templates/dof-report";
+import { generateFindingsListReport } from "@/lib/reporting/templates/findings-list-report";
+import { generateActionsListReport } from "@/lib/reporting/templates/actions-list-report";
 
 /**
  * Download Audit Report
@@ -92,12 +94,49 @@ export async function downloadDofReport(
 }
 
 /**
- * Download Findings Report
- * TODO: Refactor from export-actions.ts
+ * Download Findings List Report
+ * Simple list export of all findings
+ * 
+ * @param format - Export format (excel or pdf)
+ * @returns Base64 encoded report file
  */
 export async function downloadFindingsReport(
   format: "excel" | "pdf" = "excel"
-): Promise<Buffer> {
-  // Placeholder - refactor from export-actions.ts
-  return Buffer.from("");
+): Promise<string> {
+  const result = await withAuth<string>(async (user: User) => {
+    const buffer = await generateFindingsListReport(format);
+    // Convert Buffer to base64 for client transfer
+    const base64 = buffer.toString('base64');
+    return { success: true, data: base64 };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
+  }
+
+  return result.data!;
+}
+
+/**
+ * Download Actions List Report
+ * Simple list export of all actions
+ * 
+ * @param format - Export format (excel or pdf)
+ * @returns Base64 encoded report file
+ */
+export async function downloadActionsReport(
+  format: "excel" | "pdf" = "excel"
+): Promise<string> {
+  const result = await withAuth<string>(async (user: User) => {
+    const buffer = await generateActionsListReport(format);
+    // Convert Buffer to base64 for client transfer
+    const base64 = buffer.toString('base64');
+    return { success: true, data: base64 };
+  });
+
+  if (!result.success) {
+    throw new Error(result.error);
+  }
+
+  return result.data!;
 }

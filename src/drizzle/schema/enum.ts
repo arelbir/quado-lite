@@ -12,6 +12,8 @@ export const action = pgEnum("action", ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'
 export const status = pgEnum("Status", ['todo', 'inProgress', 'done', 'canceled'])
 export const label = pgEnum("Label", ['bug', 'feature', 'enhancement', 'documentation'])
 export const priority = pgEnum("Priority", ['low', 'medium', 'high'])
+// ⚠️ DEPRECATED: Legacy single-role system
+// Use role-system.ts (roles, userRoles tables) instead
 export const userRole = pgEnum("UserRole", ['user', 'admin', 'superAdmin'])
 export const menuStatus = pgEnum("MenuStatus", ['active', 'inactive'])
 export const userStatus = pgEnum("MenuStatus", ['active', 'inactive'])
@@ -21,9 +23,9 @@ export const theme = pgEnum("Theme", ['light', 'dark', 'system'])
 export const Theme = z.enum(theme.enumValues)
 export type Theme = z.infer<typeof Theme>
 
+// ⚠️ DEPRECATED: Use multi-role system instead
 export const UserRole = z.enum(userRole.enumValues)
 export type UserRole = z.infer<typeof UserRole>
-
 
 export const MenuType = z.enum(menuType.enumValues)
 export type MenuType = z.infer<typeof MenuType>

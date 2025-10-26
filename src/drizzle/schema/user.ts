@@ -1,17 +1,9 @@
-
 import { pgTable, timestamp, varchar, integer, uniqueIndex, foreignKey, uuid, type PgTableWithColumns } from "drizzle-orm/pg-core"
 import { theme, userStatus } from "./enum";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from 'drizzle-zod'
-import { role } from "./role";
 import { userMenuTable } from "./menu";
-import { audits } from "./audit";
-import { findings } from "./finding";
-import { actions } from "./action";
-import { dofs, dofActivities } from "./dof";
 import { companies, branches, departments, positions } from "./organization";
-import { userRoles } from "./role-system";
-import { userTeams, groupMembers } from "./teams-groups";
 
 
 export const user: PgTableWithColumns<any> = pgTable("User", {
@@ -136,10 +128,7 @@ export const session = pgTable("Session", {
 
 
 export const userRelation = relations(user, ({ one, many }) => ({
-	role: one(role, {
-		fields: [user.id],
-		references: [role.userId],
-	}),
+	// role: one(role, {...}), // ❌ LEGACY - Removed. Use userRoles instead.
 	createdBy: one(user, {
 		fields: [user.createdById],
 		references: [user.id],
@@ -191,51 +180,10 @@ export const userRelation = relations(user, ({ one, many }) => ({
 	directReports: many(user, {
 		relationName: 'user_manager', // Users reporting to this user
 	}),
-	// Audit System Relations
-	createdAudits: many(audits, {
-		relationName: 'audit_creator',
-	}),
-	assignedFindings: many(findings, {
-		relationName: 'finding_assigned',
-	}),
-	createdFindings: many(findings, {
-		relationName: 'finding_creator',
-	}),
-	assignedActions: many(actions, {
-		relationName: 'action_assigned',
-	}),
-	managedActions: many(actions, {
-		relationName: 'action_manager',
-	}),
-	createdActions: many(actions, {
-		relationName: 'action_creator',
-	}),
-	assignedDofs: many(dofs, {
-		relationName: 'dof_assigned',
-	}),
-	managedDofs: many(dofs, {
-		relationName: 'dof_manager',
-	}),
-	createdDofs: many(dofs, {
-		relationName: 'dof_creator',
-	}),
-	responsibleActivities: many(dofActivities, {
-		relationName: 'dof_activity_responsible',
-	}),
-	// 🔥 NEW: Multi-Role System Relations
-	userRoles: many(userRoles, {
-		relationName: 'user_roles',
-	}),
-	assignedRoles: many(userRoles, {
-		relationName: 'user_assigned_roles',
-	}),
-	// 🔥 NEW: Teams & Groups Relations (Week 4)
-	teams: many(userTeams, {
-		relationName: 'user_teams',
-	}),
-	groups: many(groupMembers, {
-		relationName: 'user_groups',
-	}),
+	// ℹ️ MANY relations removed to avoid circular dependencies
+	// They are defined in their respective schema files:
+	// - audit.ts, finding.ts, action.ts, dof.ts
+	// - role-system.ts, teams-groups.ts, workflow.ts
 }))
 
 export const accountRelation = relations(account, ({ one }) => ({

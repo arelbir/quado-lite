@@ -8,6 +8,7 @@
 import { db } from "@/drizzle/db";
 import { workflowDefinitions } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
+import { getCustomFieldValues } from "@/server/actions/custom-field-value-actions";
 
 /**
  * Cache for workflow definition IDs (to avoid repeated DB queries)
@@ -67,9 +68,17 @@ export async function getAuditWorkflowId(auditData: {
 
 /**
  * Build audit workflow metadata
+ * Now includes custom fields for workflow conditions/rules
  */
-export function buildAuditMetadata(audit: any) {
+export async function buildAuditMetadata(audit: any) {
+  // Load custom fields
+  const customFieldsResult = await getCustomFieldValues('AUDIT', audit.id);
+  const customFields = customFieldsResult.success && customFieldsResult.data 
+    ? customFieldsResult.data 
+    : {};
+
   return {
+    // Core fields
     riskLevel: audit.riskLevel || "medium",
     department: audit.departmentId,
     auditor: audit.auditorId || audit.createdById,
@@ -77,6 +86,9 @@ export function buildAuditMetadata(audit: any) {
     totalScore: audit.totalScore || 0,
     findingsCount: audit.findingsCount || 0,
     completedDate: audit.updatedAt,
+    
+    // Custom fields (available for workflow conditions)
+    customFields,
   };
 }
 
@@ -110,14 +122,25 @@ export async function getActionWorkflowId(actionData: {
 
 /**
  * Build action workflow metadata
+ * Now includes custom fields for workflow conditions/rules
  */
-export function buildActionMetadata(action: any) {
+export async function buildActionMetadata(action: any) {
+  // Load custom fields
+  const customFieldsResult = await getCustomFieldValues('ACTION', action.id);
+  const customFields = customFieldsResult.success && customFieldsResult.data 
+    ? customFieldsResult.data 
+    : {};
+
   return {
+    // Core fields
     priority: action.priority || "medium",
     type: action.type,
     findingId: action.findingId,
     assignedTo: action.assignedToId,
     dueDate: action.dueDate,
+    
+    // Custom fields (available for workflow conditions)
+    customFields,
   };
 }
 
@@ -134,13 +157,24 @@ export async function getDofWorkflowId(): Promise<string | null> {
 
 /**
  * Build DOF workflow metadata
+ * Now includes custom fields for workflow conditions/rules
  */
-export function buildDofMetadata(dof: any) {
+export async function buildDofMetadata(dof: any) {
+  // Load custom fields
+  const customFieldsResult = await getCustomFieldValues('DOF', dof.id);
+  const customFields = customFieldsResult.success && customFieldsResult.data 
+    ? customFieldsResult.data 
+    : {};
+
   return {
+    // Core fields
     findingId: dof.findingId,
     currentStep: dof.currentStep || 1,
     assignedTo: dof.assignedToId,
     managerId: dof.managerId,
+    
+    // Custom fields (available for workflow conditions)
+    customFields,
   };
 }
 
@@ -157,13 +191,24 @@ export async function getFindingWorkflowId(): Promise<string | null> {
 
 /**
  * Build finding workflow metadata
+ * Now includes custom fields for workflow conditions/rules
  */
-export function buildFindingMetadata(finding: any) {
+export async function buildFindingMetadata(finding: any) {
+  // Load custom fields
+  const customFieldsResult = await getCustomFieldValues('FINDING', finding.id);
+  const customFields = customFieldsResult.success && customFieldsResult.data 
+    ? customFieldsResult.data 
+    : {};
+
   return {
+    // Core fields
     severity: finding.severity,
     riskLevel: finding.riskLevel,
     hasActions: finding.actions?.length > 0,
     assignedTo: finding.assignedToId,
+    
+    // Custom fields (available for workflow conditions)
+    customFields,
   };
 }
 

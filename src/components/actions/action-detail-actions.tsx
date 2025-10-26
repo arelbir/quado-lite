@@ -7,7 +7,7 @@ import { CheckCircle2, XCircle, AlertCircle, Ban } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useToastMessages } from "@/lib/i18n/toast-messages";
 import { useButtonLabels } from "@/lib/i18n/button-labels";
-import { completeAction, approveAction, rejectAction, cancelAction } from "@/server/actions/action-actions";
+import { completeAction, managerApproveAction, managerRejectAction, cancelAction } from "@/server/actions/action-actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -62,7 +62,7 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
 
   const handleApprove = () => {
     startTransition(async () => {
-      const result = await approveAction(actionId);
+      const result = await managerApproveAction(actionId);
       if (result.success) {
         toast.action.approved();
         router.refresh();
@@ -79,7 +79,7 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
     }
 
     startTransition(async () => {
-      const result = await rejectAction(actionId, rejectReason);
+      const result = await managerRejectAction(actionId, rejectReason);
       if (result.success) {
         toast.action.rejected();
         setRejectReason("");

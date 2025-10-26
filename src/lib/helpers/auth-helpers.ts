@@ -27,9 +27,12 @@ export async function requireUser(): Promise<{ user: User } | { error: string }>
 /**
  * HELPER: Admin yetkisi kontrolü
  * Returns true if user is admin or superAdmin
+ * Uses new multi-role system
  */
 export function requireAdmin(user: User): boolean {
-  return user.role === "admin" || user.role === "superAdmin";
+  return user.userRoles?.some((ur: any) => 
+    ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+  ) || false;
 }
 
 /**

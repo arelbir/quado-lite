@@ -5,8 +5,9 @@
  */
 
 import { db } from "@/drizzle/db";
-import { user } from "@/drizzle/schema";
+import { user, roles, userRoles } from "@/drizzle/schema";
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 
 export async function seedAdmin() {
   console.log("\n👤 SEEDING: Admin User...");
@@ -45,6 +46,53 @@ export async function seedAdmin() {
 
   console.log(`  ✅ Admin user created: ${admin.email}`);
   console.log(`  🔑 Password: ${adminPassword}`);
+  console.log(`  ⏭️  SUPER_ADMIN role will be assigned after role seed`);
 
   return { adminId: admin.id };
+}
+
+/**
+ * Assign SUPER_ADMIN role to admin user
+ * This should be called AFTER role system seed
+ */
+export async function assignAdminRole(adminId: string) {
+  console.log("\n🔑 ASSIGNING: Admin Role...");
+
+  try {
+    // Get SUPER_ADMIN role
+    const superAdminRole = await db.query.roles.findFirst({
+      where: eq(roles.code, 'SUPER_ADMIN'),
+    });
+
+    if (!superAdminRole) {
+      console.log("  ⚠️  SUPER_ADMIN role not found. Run role seed first!");
+      return;
+    }
+
+    // Check if already assigned
+    const existing = await db.query.userRoles.findFirst({
+      where: (ur, { and, eq }) => and(
+        eq(ur.userId, adminId),
+        eq(ur.roleId, superAdminRole.id)
+      ),
+    });
+
+    if (existing) {
+      console.log("  ⏭️  Admin already has SUPER_ADMIN role");
+      return;
+    }
+
+    // Assign SUPER_ADMIN role to admin
+    await db.insert(userRoles).values({
+      userId: adminId,
+      roleId: superAdminRole.id,
+      contextType: 'Global',
+      isActive: true,
+      assignedBy: adminId,
+    });
+
+    console.log("  ✅ SUPER_ADMIN role assigned to admin");
+  } catch (error) {
+    console.error("  ❌ Failed to assign admin role:", error);
+  }
 }

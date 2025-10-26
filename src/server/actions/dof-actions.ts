@@ -36,7 +36,9 @@ export async function createDof(data: {
       return createNotFoundError<{ id: string }>("Finding");
     }
 
-    if (finding.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: Process owner or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (finding.assignedToId !== user.id && !isAdmin) {
       return createPermissionError<{ id: string }>("Only process owner can create DOF");
     }
 
@@ -104,7 +106,9 @@ export async function updateDofStep(
       return createNotFoundError("DOF");
     }
 
-    if (dof.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: Assigned user or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (dof.assignedToId !== user.id && !isAdmin) {
       return createPermissionError("Only assigned user can update DOF steps");
     }
 
@@ -161,7 +165,9 @@ export async function addDofActivity(data: {
       return createNotFoundError<{ id: string }>("DOF");
     }
 
-    if (dof.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: Assigned user or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (dof.assignedToId !== user.id && !isAdmin) {
       return createPermissionError<{ id: string }>("Only assigned user can add activities");
     }
 
@@ -205,7 +211,9 @@ export async function completeDofActivity(
       return createNotFoundError("Activity");
     }
 
-    if (activity.responsibleId !== user.id && user.role !== "admin") {
+    // Check permission: Responsible user or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (activity.responsibleId !== user.id && !isAdmin) {
       return createPermissionError("Only responsible user can complete this activity");
     }
 
@@ -239,7 +247,9 @@ export async function submitDofForApproval(
       return createNotFoundError("DOF");
     }
 
-    if (dof.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: Assigned user or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (dof.assignedToId !== user.id && !isAdmin) {
       return createPermissionError("Only assigned user can submit for approval");
     }
 
@@ -268,15 +278,11 @@ export async function submitDofForApproval(
 }
 
 /**
- * DEPRECATED: Use workflow system instead
- * This function is kept for backward compatibility
- * Use transitionWorkflow() from workflow-actions.ts
+ * Yönetici DÖF'ü Onayla
+ * Manager approves DOF → Completed (final)
+ * CAPA COMPLIANCE: Manager approval after all steps completed
  */
-export async function approveDof(
-  dofId: string
-): Promise<ActionResponse> {
-  console.warn('⚠️ approveDof() is deprecated. Use workflow system instead.');
-  
+export async function managerApproveDof(dofId: string): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
     const dof = await db.query.dofs.findFirst({
       where: eq(dofs.id, dofId),
@@ -286,7 +292,20 @@ export async function approveDof(
       return createNotFoundError("DOF");
     }
 
-    // Complete via workflow instead
+    // Check permission: Manager or admin
+    const isAdmin = user.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (dof.managerId !== user.id && !isAdmin) {
+      return createPermissionError("Only assigned manager can approve this DOF");
+    }
+
+    if (dof.status !== "Step6_EffectivenessCheck") {
+      return createPermissionError("Only DOFs at Step6 (Effectiveness Check) can be approved");
+    }
+
+    // Approve: Step6 → Completed
     await db
       .update(dofs)
       .set({
@@ -296,22 +315,21 @@ export async function approveDof(
       })
       .where(eq(dofs.id, dofId));
 
-    revalidateDOFPaths({ list: true });
+    revalidateDOFPaths({ list: true, specific: dofId });
+    revalidateFindingPaths({ list: true });
     return { success: true, data: undefined };
   });
 }
 
 /**
- * DEPRECATED: Use workflow system instead
- * This function is kept for backward compatibility
- * Use transitionWorkflow() from workflow-actions.ts
+ * Yönetici DÖF'ü Reddet
+ * Manager rejects DOF → Back to Step6 for rework
+ * CAPA COMPLIANCE: Reject loop - DOF returns to effectiveness check
  */
-export async function rejectDof(
+export async function managerRejectDof(
   dofId: string,
-  reason?: string
+  reason: string
 ): Promise<ActionResponse> {
-  console.warn('⚠️ rejectDof() is deprecated. Use workflow system instead.');
-  
   return withAuth(async (user: User) => {
     const dof = await db.query.dofs.findFirst({
       where: eq(dofs.id, dofId),
@@ -321,16 +339,30 @@ export async function rejectDof(
       return createNotFoundError("DOF");
     }
 
-    // Reject: Back to Step6 for rework (not "Rejected" status)
+    // Check permission: Manager or admin
+    const isAdmin = user.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (dof.managerId !== user.id && !isAdmin) {
+      return createPermissionError("Only assigned manager can reject this DOF");
+    }
+
+    if (dof.status !== "Step6_EffectivenessCheck") {
+      return createPermissionError("Only DOFs at Step6 can be rejected");
+    }
+
+    // Reject: Stay at Step6 for rework
+    // DOF assignee must review and resubmit
+    // Note: Rejection reason should be added to timeline/comments in future
     await db
       .update(dofs)
       .set({
-        status: "Step6_EffectivenessCheck",
         updatedAt: new Date(),
       })
       .where(eq(dofs.id, dofId));
 
-    revalidateDOFPaths({ list: true });
+    revalidateDOFPaths({ list: true, specific: dofId });
     return { success: true, data: undefined };
   });
 }
@@ -391,7 +423,9 @@ export async function getDofActivities(dofId: string) {
  */
 export async function getMyDofs() {
   const result = await withAuth(async (user: User) => {
-    if (user.role === "admin" || user.role === "superAdmin") {
+    // Check if user is admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (isAdmin) {
       const data = await db.query.dofs.findMany({
         with: {
           manager: true,

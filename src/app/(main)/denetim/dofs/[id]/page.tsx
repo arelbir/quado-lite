@@ -80,10 +80,10 @@ export default async function DofDetailPage({ params }: PageProps) {
               email: true,
             },
           },
-        },
+        } as any,
       },
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!dof) {
     notFound();

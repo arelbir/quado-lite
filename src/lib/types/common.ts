@@ -10,12 +10,18 @@
 
 export interface User {
   id: string;
-  role: "admin" | "superAdmin" | "user";
   name: string | null;
   email: string | null;
+  userRoles?: Array<{
+    role?: {
+      code?: string;
+      name?: string;
+    };
+  }>;
 }
 
-export type UserRole = User["role"];
+// ❌ REMOVED: Legacy UserRole type - Use multi-role system instead
+// Roles are now fetched from userRoles array with role.code
 
 // ============================================
 // PLAN TYPES
@@ -124,6 +130,7 @@ export interface Company {
   code: string;
   legalName: string | null;
   taxNumber: string | null;
+  description: string | null;
   country: string | null;
   city: string | null;
   address: string | null;

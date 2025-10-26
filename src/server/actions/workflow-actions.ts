@@ -871,7 +871,12 @@ export async function updateDelegation(data: {
       return createNotFoundError("Delegation");
     }
 
-    if (delegation.fromUserId !== currentUser.id && currentUser.role !== "admin") {
+    // Check permission: Creator or admin
+    const isAdmin = currentUser.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (delegation.fromUserId !== currentUser.id && !isAdmin) {
       return createPermissionError("Only delegation creator can update");
     }
 
@@ -908,7 +913,12 @@ export async function deactivateDelegation(delegationId: string): Promise<Action
       return createNotFoundError("Delegation");
     }
 
-    if (delegation.fromUserId !== currentUser.id && currentUser.role !== "admin") {
+    // Check permission: Creator or admin
+    const isAdmin = currentUser.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (delegation.fromUserId !== currentUser.id && !isAdmin) {
       return createPermissionError("Only delegation creator can deactivate");
     }
 

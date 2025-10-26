@@ -7,6 +7,7 @@ import { eq, and, not, sql } from "drizzle-orm";
 import type { ActionResponse, User, Action } from "@/lib/types";
 import { 
   withAuth, 
+  requireAdmin,
   createNotFoundError, 
   createPermissionError,
   revalidateActionPaths,
@@ -35,7 +36,9 @@ export async function createAction(data: {
       return createNotFoundError<{ id: string }>("Finding");
     }
 
-    if (finding.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: Process owner or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (finding.assignedToId !== user.id && !isAdmin) {
       return createPermissionError<{ id: string }>("Only process owner can create actions");
     }
 
@@ -106,7 +109,9 @@ export async function createDofAction(data: {
       return createNotFoundError<{ id: string }>("DÖF");
     }
 
-    if (dof.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: DOF owner or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (dof.assignedToId !== user.id && !isAdmin) {
       return createPermissionError<{ id: string }>("Only DÖF owner can create actions");
     }
 
@@ -149,7 +154,9 @@ export async function completeAction(
       return createNotFoundError("Action");
     }
 
-    if (action.assignedToId !== user.id && user.role !== "admin") {
+    // Check permission: Assigned user or admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (action.assignedToId !== user.id && !isAdmin) {
       return createPermissionError("Only assigned user can complete this action");
     }
 
@@ -169,15 +176,11 @@ export async function completeAction(
 }
 
 /**
- * DEPRECATED: Use workflow system instead
- * This function is kept for backward compatibility but should not be used
- * Use transitionWorkflow() from workflow-actions.ts
+ * FR-004: Yönetici Aksiyonu Onayla
+ * Manager approves completed action → Completed (final)
+ * CAPA COMPLIANCE: Manager approval step
  */
-export async function approveAction(
-  actionId: string
-): Promise<ActionResponse> {
-  console.warn('⚠️ approveAction() is deprecated. Use workflow system instead.');
-  
+export async function managerApproveAction(actionId: string): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
     const action = await db.query.actions.findFirst({
       where: eq(actions.id, actionId),
@@ -187,7 +190,20 @@ export async function approveAction(
       return createNotFoundError("Action");
     }
 
-    // Complete via workflow instead
+    // Check permission: Manager or admin
+    const isAdmin = user.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (action.managerId !== user.id && !isAdmin) {
+      return createPermissionError("Only assigned manager can approve this action");
+    }
+
+    if (action.status !== "InProgress") {
+      return createPermissionError("Only InProgress actions can be approved");
+    }
+
+    // Approve: InProgress → Completed
     await db
       .update(actions)
       .set({
@@ -197,22 +213,20 @@ export async function approveAction(
       })
       .where(eq(actions.id, actionId));
 
-    revalidateActionPaths({ list: true });
+    revalidateActionPaths({ list: true, specific: actionId });
     return { success: true, data: undefined };
   });
 }
 
 /**
- * DEPRECATED: Use workflow system instead
- * This function is kept for backward compatibility
- * Use transitionWorkflow() from workflow-actions.ts
+ * FR-004: Yönetici Aksiyonu Reddet
+ * Manager rejects action → Back to Assigned for rework
+ * CAPA COMPLIANCE: Reject loop - action returns to assignee
  */
-export async function rejectAction(
+export async function managerRejectAction(
   actionId: string,
-  reason?: string
+  reason: string
 ): Promise<ActionResponse> {
-  console.warn('⚠️ rejectAction() is deprecated. Use workflow system instead.');
-  
   return withAuth(async (user: User) => {
     const action = await db.query.actions.findFirst({
       where: eq(actions.id, actionId),
@@ -222,7 +236,20 @@ export async function rejectAction(
       return createNotFoundError("Action");
     }
 
-    // Reject: Back to Assigned for rework
+    // Check permission: Manager or admin
+    const isAdmin = user.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (action.managerId !== user.id && !isAdmin) {
+      return createPermissionError("Only assigned manager can reject this action");
+    }
+
+    if (action.status !== "InProgress") {
+      return createPermissionError("Only InProgress actions can be rejected");
+    }
+
+    // Reject: InProgress → Assigned (back to assignee for rework)
     await db
       .update(actions)
       .set({
@@ -345,7 +372,9 @@ export async function getActionsByFinding(findingId: string) {
  */
 export async function getMyActions() {
   const result = await withAuth(async (user: User) => {
-    if (user.role === "admin" || user.role === "superAdmin") {
+    // Check if user is admin
+    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
+    if (isAdmin) {
       const data = await db.query.actions.findMany({
         with: {
           createdBy: true,

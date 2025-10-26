@@ -4,7 +4,10 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/config/routes";
 import { action } from "@/lib/safe-action"
 import { LoginSchema, NewPasswordSchema, RegisterByAdminSchema, ResetSchema, SignupByTokenSchema, SignupSchema } from "@/schema/auth"
 import { signIn, signOut } from "@/server/auth";
-import { createUser, createUserByAdmin, getUserByEmail, getUserById, updateUserEmail, updateUserPassword } from "@/server/data/user";
+import { getUserByEmail, getUserById, updateUserEmail, updateUserPassword } from "@/server/data/user";
+import { db } from "@/drizzle/db";
+import { user, userRoles, roles } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
 import { AuthError } from "next-auth";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
@@ -65,11 +68,27 @@ export const signup = action<typeof SignupSchema, AuthResponse>(SignupSchema, as
     return { error: "Email already in use!" };
   }
 
-  await createUser({
+  // Create user with new multi-role system
+  const [newUser] = await db.insert(user).values({
     name,
     email,
     password: hashedPassword,
-  })
+    emailVerified: new Date(), // Auto-verify or send email based on your flow
+  }).returning({ id: user.id });
+
+  // Assign default USER role
+  const userRole = await db.query.roles.findFirst({
+    where: eq(roles.code, 'USER')
+  });
+
+  if (userRole && newUser) {
+    await db.insert(userRoles).values({
+      userId: newUser.id,
+      roleId: userRole.id,
+      contextType: 'Global',
+      isActive: true,
+    });
+  }
 
   const verificationToken = await generateVerificationToken(email);
 
@@ -94,12 +113,29 @@ export const signupByAdmin = action<typeof SignupByTokenSchema, AuthResponse>(Si
   if (existingUser) {
     return { error: "Email already in use!" };
   }
-  await createUserByAdmin({
+  // Create user with new multi-role system
+  const [newUser] = await db.insert(user).values({
     name: username,
     email: existingToken.email,
     password: hashedPassword,
-    adminId: existingToken.adminId
-  })
+    createdById: existingToken.adminId,
+    emailVerified: new Date(),
+  }).returning({ id: user.id });
+
+  // Assign default USER role
+  const userRole = await db.query.roles.findFirst({
+    where: eq(roles.code, 'USER')
+  });
+
+  if (userRole && newUser) {
+    await db.insert(userRoles).values({
+      userId: newUser.id,
+      roleId: userRole.id,
+      contextType: 'Global',
+      isActive: true,
+      assignedBy: existingToken.adminId,
+    });
+  }
 
   await deleteRegisterVerificationToken(existingToken.id)
 

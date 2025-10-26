@@ -34,11 +34,17 @@ export default async function DepartmentDetailPage({ params }: { params: { id: s
     with: {
       position: {
         columns: {
+          id: true,
           name: true,
         },
       },
     },
-  });
+  }) as Array<{
+    id: string;
+    name: string | null;
+    email: string | null;
+    position: { id: string; name: string } | null;
+  }>;
 
   return (
     <div className="flex flex-col gap-6 p-6">

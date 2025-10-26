@@ -176,5 +176,5 @@ export async function createBaseReport(options: BaseReportOptions): Promise<Buff
   
   // Render to buffer
   const buffer = await ReactPDF.renderToBuffer(doc);
-  return Buffer.from(buffer);
+  return buffer;
 }

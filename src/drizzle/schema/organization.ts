@@ -19,6 +19,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
+import { teams, groups } from "./teams-groups";
 
 /**
  * COMPANIES TABLE
@@ -236,6 +237,9 @@ export const positions = pgTable("Position", {
  */
 export const companyRelations = relations(companies, ({ many }) => ({
   branches: many(branches),
+  users: many(user, {
+    relationName: 'user_company',
+  }),
 }));
 
 export const branchRelations = relations(branches, ({ one, many }) => ({
@@ -250,6 +254,9 @@ export const branchRelations = relations(branches, ({ one, many }) => ({
     relationName: 'branch_manager',
   }),
   departments: many(departments),
+  users: many(user, {
+    relationName: 'user_branch',
+  }),
 }));
 
 export const departmentRelations = relations(departments, ({ one, many }) => ({
@@ -273,6 +280,12 @@ export const departmentRelations = relations(departments, ({ one, many }) => ({
   }),
   users: many(user, {
     relationName: 'user_department',
+  }),
+  teams: many(teams, {
+    relationName: 'department_teams',
+  }),
+  groups: many(groups, {
+    relationName: 'department_groups',
   }),
 }));
 

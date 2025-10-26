@@ -71,8 +71,8 @@ async function fetchAuditReportData(auditId: string): Promise<AuditReportData> {
     with: {
       createdBy: true,
       auditor: true,
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!audit) {
     throw new Error("Audit not found");
@@ -84,9 +84,9 @@ async function fetchAuditReportData(auditId: string): Promise<AuditReportData> {
     with: {
       assignedTo: true,
       createdBy: true,
-    },
-    orderBy: (findings, { desc }) => [desc(findings.createdAt)],
-  });
+    } as any,
+    orderBy: (findings: any, { desc }: any) => [desc(findings.createdAt)],
+  }) as any[];
 
   // Fetch actions
   const auditActions = await db.query.actions.findMany({
@@ -95,8 +95,8 @@ async function fetchAuditReportData(auditId: string): Promise<AuditReportData> {
       assignedTo: true,
       manager: true,
       finding: true,
-    },
-  });
+    } as any,
+  }) as any[];
 
   // Fetch DOFs
   const auditDofs = await db.query.dofs.findMany({
@@ -104,8 +104,8 @@ async function fetchAuditReportData(auditId: string): Promise<AuditReportData> {
     with: {
       assignedTo: true,
       manager: true,
-    },
-  });
+    } as any,
+  }) as any[];
 
   // Calculate statistics
   const statistics = calculateAuditStatistics(auditFindings, auditActions, auditDofs);

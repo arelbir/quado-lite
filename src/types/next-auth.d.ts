@@ -7,15 +7,19 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      role?: string; // Yeni roles sistemi - string (esnek roller)
-      superAdmin?: boolean; // Backward compatibility
+      // ⚠️ DEPRECATED: Use roles[] array instead
+      role?: string; 
+      roles?: string[]; // ✅ Multi-role system
+      superAdmin?: boolean;
       roleId?: string;
       roleDescription?: string;
     } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {
+    // ⚠️ DEPRECATED: Use roles[] array instead
     role?: string;
+    roles?: string[]; // ✅ Multi-role system
     superAdmin?: boolean;
     roleId?: string;
   }
@@ -23,7 +27,9 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
+    // ⚠️ DEPRECATED: Use roles[] array instead
     role?: string;
+    roles?: string[]; // ✅ Multi-role system
     superAdmin?: boolean;
     roleId?: string;
     roleDescription?: string;
@@ -33,7 +39,9 @@ declare module "next-auth/jwt" {
 
 declare module "next-auth/adapters" {
   interface AdapterUser extends DefaultUser {
+    // ⚠️ DEPRECATED: Use roles[] array instead
     role?: string;
+    roles?: string[]; // ✅ Multi-role system
     superAdmin?: boolean;
     roleId?: string;
     roleDescription?: string;

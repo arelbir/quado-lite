@@ -15,7 +15,7 @@ export async function UnifiedAuditsTable({ type }: UnifiedAuditsTableProps) {
 
   // Combine all records into unified format
   const allRecords: UnifiedRecord[] = [
-    ...plans.map((plan) => ({
+    ...plans.map((plan: any) => ({
       id: plan.id,
       type: "plan" as const,
       title: plan.title,
@@ -23,10 +23,10 @@ export async function UnifiedAuditsTable({ type }: UnifiedAuditsTableProps) {
       date: plan.scheduledDate || plan.createdAt,
       status: plan.status,
       scheduleType: plan.scheduleType,
-      auditorId: plan.auditorId, // 🔥 FIX: Denetçi kontrolü için
-      createdBy: plan.createdBy,
-      template: plan.template,
-      createdAudit: plan.createdAudit,
+      auditorId: plan.auditorId,
+      createdBy: plan.createdBy || null,
+      template: plan.template || null,
+      createdAudit: plan.createdAudit || null,
       createdAt: plan.createdAt,
     })),
     ...audits.map((audit) => ({

@@ -5,43 +5,22 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1761238411782,
-      "tag": "0000_violet_anthem",
+      "when": 1761427237177,
+      "tag": "0000_thick_wolf_cub",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1761318997777,
-      "tag": "0001_yielding_war_machine",
+      "when": 1761429254441,
+      "tag": "0001_dashing_loki",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "6",
-      "when": 1761319432539,
-      "tag": "0002_vengeful_fabian_cortez",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1761319973802,
-      "tag": "0003_sturdy_fenris",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1761320254902,
-      "tag": "0004_messy_black_panther",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1761347091472,
-      "tag": "0005_worthless_nekra",
+      "when": 1761429833112,
+      "tag": "0002_useful_greymalkin",
       "breakpoints": true
     }
   ]

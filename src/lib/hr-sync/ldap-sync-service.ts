@@ -294,8 +294,8 @@ export class LDAPSyncService {
       ),
       with: {
         user: true
-      }
-    });
+      } as any
+    }) as any;
 
     if (mapping) return mapping.user;
 

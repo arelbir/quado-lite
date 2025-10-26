@@ -46,9 +46,9 @@ export default async function DenetimDashboard() {
 
 async function StatsCards() {
   const t = await getTranslations('dashboard.stats');
-  const findings = await getFindings();
-  const actions = await getMyActions();
-  const dofs = await getMyDofs();
+  const findings = await getFindings() as any[];
+  const actions = await getMyActions() as any[];
+  const dofs = await getMyDofs() as any[];
 
   const stats = [
     {
@@ -108,7 +108,7 @@ async function StatsCards() {
 
 async function RecentFindings() {
   const t = await getTranslations('dashboard');
-  const findings = await getFindings();
+  const findings = await getFindings() as any[];
   const recentFindings = findings.slice(0, 5);
 
   return (
@@ -152,9 +152,9 @@ async function RecentFindings() {
 
 async function MyTasks() {
   const t = await getTranslations('dashboard');
-  const actions = await getMyActions();
-  const myPendingActions = actions.filter(a => 
-    a.status === "Assigned" || a.status === "PendingManagerApproval"
+  const actions = await getMyActions() as any[];
+  const myPendingActions = actions.filter((a: any) => 
+    a.status === "Assigned" || a.status === "InProgress"
   ).slice(0, 5);
 
   return (

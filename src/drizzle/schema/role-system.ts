@@ -22,10 +22,12 @@ import {
   boolean,
   json,
   foreignKey,
-  pgEnum 
+  pgEnum,
+  unique
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
+import { menuTable } from "./menu";
 
 /**
  * ENUMS
@@ -190,6 +192,43 @@ export const rolePermissions = pgTable("RolePermissions", {
 }));
 
 /**
+ * ROLE_MENUS TABLE (Junction) ✨ NEW
+ * Roles have menus
+ * When a user has a role, they automatically get the role's menus
+ */
+export const roleMenus = pgTable("RoleMenus", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  
+  roleId: uuid("roleId").notNull(),
+  menuId: uuid("menuId").notNull(),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  
+  // Audit
+  createdById: uuid("createdById"),
+},
+(table) => ({
+  roleFkey: foreignKey({
+    columns: [table.roleId],
+    foreignColumns: [roles.id],
+    name: "RoleMenus_roleId_fkey"
+  }).onDelete("cascade"),
+  menuFkey: foreignKey({
+    columns: [table.menuId],
+    foreignColumns: [menuTable.id],
+    name: "RoleMenus_menuId_fkey"
+  }).onDelete("cascade"),
+  createdByFkey: foreignKey({
+    columns: [table.createdById],
+    foreignColumns: [user.id],
+    name: "RoleMenus_createdById_fkey"
+  }).onDelete("set null"),
+  // Prevent duplicates
+  uniqueRoleMenu: unique("RoleMenus_roleId_menuId_unique").on(table.roleId, table.menuId),
+}));
+
+/**
  * RELATIONS
  */
 export const roleRelations = relations(roles, ({ many }) => ({
@@ -198,6 +237,9 @@ export const roleRelations = relations(roles, ({ many }) => ({
   }),
   permissions: many(rolePermissions, {
     relationName: 'role_permissions',
+  }),
+  menus: many(roleMenus, {
+    relationName: 'role_menus',
   }),
 }));
 
@@ -238,6 +280,24 @@ export const rolePermissionRelations = relations(rolePermissions, ({ one }) => (
   }),
 }));
 
+export const roleMenuRelations = relations(roleMenus, ({ one }) => ({
+  role: one(roles, {
+    fields: [roleMenus.roleId],
+    references: [roles.id],
+    relationName: 'role_menus',
+  }),
+  menu: one(menuTable, {
+    fields: [roleMenus.menuId],
+    references: [menuTable.id],
+    relationName: 'menu_roles',
+  }),
+  createdBy: one(user, {
+    fields: [roleMenus.createdById],
+    references: [user.id],
+    relationName: 'user_created_role_menus',
+  }),
+}));
+
 /**
  * TYPES
  * Note: Suffixed to avoid conflicts with legacy Role table
@@ -253,6 +313,9 @@ export type NewPermission = typeof permissions.$inferInsert;
 
 export type RolePermission = typeof rolePermissions.$inferSelect;
 export type NewRolePermission = typeof rolePermissions.$inferInsert;
+
+export type RoleMenu = typeof roleMenus.$inferSelect;
+export type NewRoleMenu = typeof roleMenus.$inferInsert;
 
 /**
  * HELPER TYPES
@@ -279,4 +342,10 @@ export type PermissionCheck = {
     departmentId?: string;
     type?: 'own' | 'any';
   };
+};
+
+export type RoleWithMenus = SystemRole & {
+  menus: (RoleMenu & {
+    menu: typeof menuTable.$inferSelect;
+  })[];
 };

@@ -1,79 +1,55 @@
 import { db } from "@/drizzle/db"
-import { menuTable, userMenuTable } from "@/drizzle/schema"
+import { menuTable } from "@/drizzle/schema"
 
-const superAdminId = process.env.SUPER_ADMIN_UUID as string
-const menus = [
+/**
+ * MODERN MENU STRUCTURE - 2025
+ * 
+ * Organized by functionality:
+ * 1. Dashboard & Quick Access
+ * 2. Workflow Operations (Actions, DOFs, Findings)
+ * 3. Audit Management
+ * 4. Infrastructure (Non-workflow - Templates, Question Banks)
+ * 5. Administration (Users, Roles, Organization)
+ * 6. System Settings
+ */
+
+const getMenus = (adminId: string) => [
+  // ================== DASHBOARD & HOME ==================
   {
     path: '/',
     label: "dashboard",
-    icon: "Home",
+    icon: "LayoutDashboard",
     parentId: null,
     status: "active",
-    createBy: superAdminId,
+    createBy: adminId,
     type: 'menu',
   },
   {
-    path: '/tasks',
-    label: 'tasks',
-    icon: "Package",
+    path: '/admin/workflows/my-tasks',
+    label: "myTasks",
+    icon: "CheckSquare",
     parentId: null,
     status: "active",
-    createBy: superAdminId,
+    createBy: adminId,
     type: 'menu',
   },
+  
+  // ================== AUDIT SYSTEM ==================
   {
-    path: '/settings',
-    label: 'settings',
-    icon: "Settings",
-    parentId: null,
-    status: "active",
-    createBy: superAdminId,
-    type: 'menu',
-  },
-  {
-    path: '/system',
-    label: 'system',
-    icon: "Package",
-    parentId: null,
-    status: "active",
-    createBy: superAdminId,
-    type: 'dir',
-    children: [
-      {
-        path: '/system/users',
-        label: "systemUsers",
-        icon: "Users",
-      },
-      {
-        path: '/system/menus',
-        label: "systemMenus",
-        icon: "Menu",
-      }
-    ],
-  },
-  {
-    path: "/denetim",
+    path: "/audit-system",
     label: "auditSystem",
     icon: "ClipboardCheck",
     parentId: null,
     status: "active",
-    createBy: superAdminId,
+    createBy: adminId,
     type: 'dir',
     children: [
       {
         path: "/denetim",
-        label: "dashboard",
+        label: "auditDashboard",
         icon: "LayoutDashboard",
         status: "active",
-        createBy: superAdminId,
-        type: 'menu',
-      },
-      {
-        path: "/admin/workflows/my-tasks",
-        label: "myTasks",
-        icon: "ClipboardCheck",
-        status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
@@ -81,7 +57,7 @@ const menus = [
         label: "myAudits",
         icon: "FileCheck",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
@@ -89,18 +65,28 @@ const menus = [
         label: "allAudits",
         icon: "ListChecks",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/denetim/plans",
+        label: "auditPlans",
+        icon: "Calendar",
+        status: "active",
+        createBy: adminId,
         type: 'menu',
       },
     ],
   },
+  
+  // ================== WORKFLOW OPERATIONS ==================
   {
-    path: "/operations",
-    label: "operations",
+    path: "/workflow-operations",
+    label: "workflowOperations",
     icon: "Workflow",
     parentId: null,
     status: "active",
-    createBy: superAdminId,
+    createBy: adminId,
     type: 'dir',
     children: [
       {
@@ -108,7 +94,7 @@ const menus = [
         label: "findings",
         icon: "AlertCircle",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
@@ -116,7 +102,7 @@ const menus = [
         label: "actions",
         icon: "CheckCircle2",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
@@ -124,26 +110,44 @@ const menus = [
         label: "dofs",
         icon: "Target",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
-        path: "/denetim/closures",
-        label: "closures",
-        icon: "FileCheck",
+        path: "/admin/workflows",
+        label: "workflowList",
+        icon: "List",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/admin/workflows/builder",
+        label: "workflowBuilder",
+        icon: "Workflow",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/admin/workflows/analytics",
+        label: "workflowAnalytics",
+        icon: "BarChart3",
+        status: "active",
+        createBy: adminId,
         type: 'menu',
       },
     ],
   },
+  
+  // ================== INFRASTRUCTURE (Non-workflow) ==================
   {
     path: "/infrastructure",
     label: "infrastructure",
     icon: "Database",
     parentId: null,
     status: "active",
-    createBy: superAdminId,
+    createBy: adminId,
     type: 'dir',
     children: [
       {
@@ -151,66 +155,15 @@ const menus = [
         label: "questionBanks",
         icon: "HelpCircle",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
         path: "/denetim/templates",
-        label: "templates",
+        label: "auditTemplates",
         icon: "FileText",
         status: "active",
-        createBy: superAdminId,
-        type: 'menu',
-      },
-    ],
-  },
-  {
-    path: "/admin",
-    label: "administration",
-    icon: "Shield",
-    parentId: null,
-    status: "active",
-    createBy: superAdminId,
-    type: 'dir',
-    children: [
-      {
-        path: "/admin/users",
-        label: "userManagement",
-        icon: "Users",
-        status: "active",
-        createBy: superAdminId,
-        type: 'menu',
-      },
-      {
-        path: "/admin/roles",
-        label: "roleManagement",
-        icon: "ShieldCheck",
-        status: "active",
-        createBy: superAdminId,
-        type: 'menu',
-      },
-      {
-        path: "/admin/organization/departments",
-        label: "departments",
-        icon: "Building2",
-        status: "active",
-        createBy: superAdminId,
-        type: 'menu',
-      },
-      {
-        path: "/admin/organization/positions",
-        label: "positions",
-        icon: "Briefcase",
-        status: "active",
-        createBy: superAdminId,
-        type: 'menu',
-      },
-      {
-        path: "/admin/organization/org-chart",
-        label: "orgChart",
-        icon: "Network",
-        status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
@@ -218,84 +171,178 @@ const menus = [
         label: "companies",
         icon: "Building",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
-        path: "/admin/hr-sync",
-        label: "hrSync",
-        icon: "RefreshCw",
+        path: "/admin/organization/branches",
+        label: "branches",
+        icon: "Building2",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/admin/organization/departments",
+        label: "departments",
+        icon: "Layers",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/admin/organization/positions",
+        label: "positions",
+        icon: "Briefcase",
+        status: "active",
+        createBy: adminId,
         type: 'menu',
       },
     ],
   },
+  
+  // ================== ADMINISTRATION ==================
   {
-    path: "/error",
-    label: "errorPages",
-    icon: "AlertCircle",
+    path: "/administration",
+    label: "administration",
+    icon: "Shield",
     parentId: null,
     status: "active",
-    createBy: superAdminId,
+    createBy: adminId,
     type: 'dir',
     children: [
       {
-        path: "/error/404",
-        label: "error404",
-        icon: "AlertTriangle",
+        path: "/admin/users",
+        label: "userManagement",
+        icon: "Users",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
       },
       {
-        path: "/error/500",
-        label: "error500",
-        icon: "ShieldAlert",
+        path: "/admin/roles",
+        label: "rolesPermissions",
+        icon: "ShieldCheck",
         status: "active",
-        createBy: superAdminId,
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/admin/organization/org-chart",
+        label: "organizationChart",
+        icon: "Network",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/admin/hr-sync",
+        label: "hrIntegration",
+        icon: "RefreshCw",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/system/menus",
+        label: "menuManagement",
+        icon: "Menu",
+        status: "active",
+        createBy: adminId,
         type: 'menu',
       },
     ],
-  }
+  },
+  
+  // ================== SYSTEM & SETTINGS ==================
+  {
+    path: "/system",
+    label: "system",
+    icon: "Settings",
+    parentId: null,
+    status: "active",
+    createBy: adminId,
+    type: 'dir',
+    children: [
+      {
+        path: "/settings",
+        label: "settings",
+        icon: "Settings",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/settings/appearance",
+        label: "appearance",
+        icon: "Palette",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+      {
+        path: "/system/users",
+        label: "systemUsers",
+        icon: "UserCog",
+        status: "active",
+        createBy: adminId,
+        type: 'menu',
+      },
+    ],
+  },
 ]
 
-async function runSeed() {
-  console.log("⏳ Running menus seed...")
+async function runSeed(adminId: string) {
+  console.log("⏳ Running modern menu seed...")
 
- await db.transaction(async (tx) => {
-  const start = Date.now()
+  const menus = getMenus(adminId);
 
-  const result = await tx.insert(menuTable).values(menus as any).returning()
+  await db.transaction(async (tx) => {
+    const start = Date.now()
 
-  if (result.length) {
-    const childrenMenus = menus.filter((menu) => menu.type === 'dir').map((menu) => {
-      const parent = result.find((m) => m.path === menu.path)
+    // 1. Insert parent menus (type: 'menu' or 'dir')
+    const parentMenus = menus.filter((menu: any) => !menu.children)
+    const result = await tx.insert(menuTable).values(parentMenus as any).returning()
 
-      return menu.children?.map((child) => ({
+    // 2. Insert directory placeholders and get their IDs
+    const dirMenus = menus.filter((menu: any) => menu.type === 'dir')
+    const dirResults = await tx.insert(menuTable).values(
+      dirMenus.map((menu: any) => ({
+        path: menu.path,
+        label: menu.label,
+        icon: menu.icon,
+        parentId: menu.parentId,
+        status: menu.status,
+        createBy: menu.createBy,
+        type: menu.type,
+      })) as any
+    ).returning()
+
+    // 3. Insert child menus with correct parentId
+    const childMenus = dirMenus.flatMap((menu: any) => {
+      const parent = dirResults.find((m) => m.path === menu.path)
+      return menu.children?.map((child: any) => ({
         ...child,
         parentId: parent?.id,
-        createBy: superAdminId,
+        createBy: adminId,
         type: 'menu',
-      }))
+        status: 'active',
+      })) || []
     })
-    const resultMenus = await tx.insert(menuTable).values(childrenMenus.flat() as any).returning()
 
-    await tx.insert(userMenuTable).values([...resultMenus, ...result].map((menu) => ({
-      userId: superAdminId,
-      menuId: menu.id,
-    })))
-  }
-  const end = Date.now()
+    if (childMenus.length > 0) {
+      await tx.insert(menuTable).values(childMenus as any).returning()
+    }
 
-  console.log(`✅ Seed completed in ${end - start}ms`)
- })
+    const end = Date.now()
+    console.log(`✅ Menu seed completed in ${end - start}ms`)
+    console.log(`   📊 Total menus: ${parentMenus.length + dirResults.length + childMenus.length}`)
+  })
 }
 
 // Export for master seed
-export async function seedMenus(adminId?: string) {
-  console.log("\n📋 SEEDING: Menus...");
-  // AdminId available for future use
-  await runSeed();
-  console.log("  ✅ Menus created");
+export async function seedMenus(adminId: string) {
+  console.log("\n📋 SEEDING: Modern Menu Structure...");
+  await runSeed(adminId);
+  console.log("  ✅ Menus created with new structure");
 }

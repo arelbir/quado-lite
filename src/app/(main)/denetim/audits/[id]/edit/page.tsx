@@ -8,8 +8,8 @@ export default async function EditAuditPage({ params }: { params: { id: string }
   const audit = await db.query.audits.findFirst({
     where: eq(audits.id, params.id),
     with: {
-      auditor: true,
-    },
+      auditor: { select: { id: true, name: true, email: true } },
+    } as any,
   });
 
   if (!audit) {
@@ -27,10 +27,11 @@ export default async function EditAuditPage({ params }: { params: { id: string }
     with: {
       question: {
         with: {
-          bank: true,
+          bank: { select: { id: true, name: true } },
         },
       },
-    },
+      createdBy: { select: { id: true, name: true, email: true } },
+    } as any,
     orderBy: [asc(auditQuestions.createdAt)],
   });
 
@@ -39,7 +40,7 @@ export default async function EditAuditPage({ params }: { params: { id: string }
   
   // Tüm soruları al
   const allQuestions = await db.query.questions.findMany({
-    with: { bank: true },
+    with: { bank: true } as any,
     limit: 100,
   });
   

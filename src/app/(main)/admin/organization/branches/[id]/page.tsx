@@ -22,13 +22,6 @@ export default async function BranchDetailPage({ params }: { params: { id: strin
           email: true,
         },
       },
-      departments: {
-        columns: {
-          id: true,
-          name: true,
-          code: true,
-        },
-      },
     },
   });
 
@@ -142,42 +135,15 @@ export default async function BranchDetailPage({ params }: { params: { id: strin
 
         {/* Description */}
         {(branch as any).description && (
-          <Card>
+          <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle>Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">{(branch as any).description}</p>
+              <p className="text-sm">{(branch as any).description}</p>
             </CardContent>
           </Card>
         )}
-
-        {/* Departments */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Departments
-            </CardTitle>
-            <CardDescription>{branch.departments?.length || 0} department(s)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {branch.departments && branch.departments.length > 0 ? (
-              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-                {branch.departments.map((dept) => (
-                  <Card key={dept.id}>
-                    <CardContent className="pt-6">
-                      <p className="font-medium">{dept.name}</p>
-                      <p className="text-sm text-muted-foreground">{dept.code}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No departments found</p>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

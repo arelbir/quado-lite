@@ -12,11 +12,12 @@
  * 4. Menus
  * 5. Question Banks
  * 6. Teams & Groups
- * 7. Manager & Leader Assignments ✨ NEW
+ * 7. Manager & Leader Assignments ✨
  * 8. Sample Data
+ * 9. Workflow Definitions ✨ NEW
  */
 
-import { seedAdmin } from "./00-admin";
+import { seedAdmin, assignAdminRole } from "./00-admin";
 import { seedOrganization } from "./01-organization";
 import { seedUsers } from "./02-users";
 import { seedRoleSystem } from "./03-roles";
@@ -25,6 +26,9 @@ import { seedQuestionBanks } from "./05-question-banks";
 import { seedTeamsAndGroups } from "./06-teams-groups";
 import { seedSampleData } from "./07-sample-data";
 import { seedAssignments } from "./08-assignments";
+import { seedWorkflows } from "./09-workflows";
+import { seedRoleMenus } from "./10-role-menus";
+import { seedWorkflows as seedVisualWorkflows } from "./11-workflows";
 
 async function masterSeed() {
   console.log("\n");
@@ -45,6 +49,9 @@ async function masterSeed() {
     // 3. Role System (with adminId)
     await seedRoleSystem(adminId);
     
+    // 3.5. Assign SUPER_ADMIN role to admin (AFTER role system)
+    await assignAdminRole(adminId);
+    
     // 4. Menus (with adminId)
     await seedMenus(adminId);
     
@@ -62,6 +69,16 @@ async function masterSeed() {
     // 8. Sample Data (with adminId)
     console.log("\n📊 SEEDING: Sample Data...");
     await seedSampleData(adminId);
+    
+    // 9. Workflow Definitions (with adminId)
+    await seedWorkflows(adminId);
+    
+    // 10. Role-Menu Mappings (AFTER roles & menus)
+    await seedRoleMenus(adminId);
+    
+    // 11. Visual Workflow Definitions (with adminId)
+    console.log("\n🎨 SEEDING: Visual Workflows...");
+    await seedVisualWorkflows();
 
     console.log("\n");
     console.log("═══════════════════════════════════════════════════");
@@ -78,6 +95,9 @@ async function masterSeed() {
     console.log("  ✅ Question Banks");
     console.log("  ✅ 10 Teams (with leaders ✨)");
     console.log("  ✅ 10 Groups (with owners)");
+    console.log("  ✅ 8 Workflow Definitions");
+    console.log("  ✅ 4 Visual Workflows (Designer) ✨ NEW");
+    console.log("  ✅ Role-Menu Mappings");
     console.log("\n🔑 LOGIN:");
     console.log("  📧 Any user: [firstname].[lastname]@abcteknoloji.com");
     console.log("  🔑 Password: 123456");
