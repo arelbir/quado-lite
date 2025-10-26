@@ -5,7 +5,7 @@ import { FadeLoader } from "react-spinners";
 import { useSearchParams } from "next/navigation";
 
 import { FormError } from "@/components/form-error";
-import { newVerification } from "@/action/auth";
+import { newVerification } from "@/server/actions/auth";
 import { FormSuccess } from "@/components/form-succcess";
 
 export const NewVerificationForm = () => {

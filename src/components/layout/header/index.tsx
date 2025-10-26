@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import { getGithubStar } from '@/server/other'
 import { Skeleton } from '@/components/ui/skeleton'
 import { NotificationBell } from '@/components/notifications/notification-bell'
-import { getUnreadCount } from '@/action/notification-actions'
+import { getUnreadCount } from '@/server/actions/notification-actions'
 import { LanguageSwitcher } from '@/components/language-switcher'
 
 

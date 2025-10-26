@@ -113,21 +113,19 @@ export const FINDING_STATUS_COLORS = {
 } as const;
 
 // ============================================
-// ACTION STATUS
+// ACTION STATUS (UPDATED: Workflow integration)
 // ============================================
 export const ACTION_STATUS_LABELS = {
   Assigned: "Atandı",
-  PendingManagerApproval: "Onay Bekliyor",
+  InProgress: "Devam Ediyor",
   Completed: "Tamamlandı",
-  Rejected: "Reddedildi",
   Cancelled: "İptal Edildi",
 } as const;
 
 export const ACTION_STATUS_COLORS = {
   Assigned: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
-  PendingManagerApproval: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+  InProgress: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
   Completed: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-  Rejected: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
   Cancelled: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
 } as const;
 
@@ -156,9 +154,8 @@ export const DOF_STATUS_LABELS = {
   Step4_Activities: "4. Faaliyetler",
   Step5_Implementation: "5. Uygulama",
   Step6_EffectivenessCheck: "6. Etkinlik Kontrolü",
-  PendingManagerApproval: "Yönetici Onayı",
   Completed: "Tamamlandı",
-  Rejected: "Reddedildi",
+  Cancelled: "İptal Edildi",
 } as const;
 
 export const DOF_STATUS_COLORS = {
@@ -168,9 +165,8 @@ export const DOF_STATUS_COLORS = {
   Step4_Activities: "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400",
   Step5_Implementation: "bg-violet-100 text-violet-800 dark:bg-violet-900/20 dark:text-violet-400",
   Step6_EffectivenessCheck: "bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400",
-  PendingManagerApproval: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
   Completed: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-  Rejected: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  Cancelled: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
 } as const;
 
 // ============================================

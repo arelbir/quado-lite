@@ -1,11 +1,13 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { createAudit } from "@/action/audit-actions";
+import { createAudit } from "@/server/actions/audit-actions";
+import { saveCustomFieldValues } from "@/server/actions/custom-field-value-actions";
+import { HybridForm } from "@/components/forms/HybridForm";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -40,29 +42,54 @@ export function CreateAuditForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function handleHybridSubmit(data: { core: any; custom: Record<string, any> }) {
     startTransition(async () => {
       try {
+        // 1. Create audit with core fields
         const result = await createAudit({
-          ...values,
-          auditDate: values.auditDate ? new Date(values.auditDate) : undefined,
+          ...data.core,
+          auditDate: data.core.auditDate ? new Date(data.core.auditDate) : undefined,
         });
         
-        if (result.success) {
-          toast.success("Denetim başarıyla oluşturuldu!");
-          router.push(`/denetim/audits/${result.data.id}`);
-        } else {
-          toast.error(result.error);
+        if (!result.success) {
+          toast.error(result.error || "Denetim oluşturulamadı");
+          return;
         }
+
+        // 2. Save custom fields if any
+        if (Object.keys(data.custom).length > 0) {
+          const customResult = await saveCustomFieldValues({
+            entityType: 'AUDIT',
+            entityId: result.data!.id,
+            values: data.custom,
+          });
+
+          if (!customResult.success) {
+            toast.warning("Denetim oluşturuldu ama custom field'lar kaydedilemedi");
+          }
+        }
+
+        toast.success("Denetim başarıyla oluşturuldu!");
+        router.push(`/denetim/audits/${result.data!.id}`);
       } catch (error) {
+        console.error('Create audit error:', error);
         toast.error("Bir hata oluştu");
       }
     });
   }
 
+  function onCoreSubmit(values: z.infer<typeof formSchema>) {
+    // This will be wrapped by HybridForm
+    return values;
+  }
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <HybridForm
+      entityType="AUDIT"
+      onSubmit={handleHybridSubmit}
+      coreFields={
+        <Form {...form}>
+          <div className="space-y-6">
         <FormField
           control={form.control}
           name="title"
@@ -112,21 +139,31 @@ export function CreateAuditForm() {
           )}
         />
 
-        <div className="flex gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-            disabled={isPending}
-          >
-            İptal
-          </Button>
-          <Button type="submit" disabled={isPending}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Denetim Oluştur
-          </Button>
-        </div>
-      </form>
-    </Form>
+          </div>
+        </Form>
+      }
+    >
+      <div className="flex gap-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={isPending}
+        >
+          İptal
+        </Button>
+        <Button 
+          onClick={() => {
+            form.handleSubmit(async (coreData) => {
+              await handleHybridSubmit({ core: coreData, custom: {} });
+            })();
+          }}
+          disabled={isPending}
+        >
+          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Denetim Oluştur
+        </Button>
+      </div>
+    </HybridForm>
   );
 }

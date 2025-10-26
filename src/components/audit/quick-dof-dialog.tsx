@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/select";
 import { FileCheck } from "lucide-react";
 import { toast } from "sonner";
-import { createDof } from "@/action/dof-actions";
+import { createDof } from "@/server/actions/dof-actions";
+import { useTranslations } from 'next-intl';
 
 interface QuickDofDialogProps {
   findingId: string;

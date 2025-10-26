@@ -1,11 +1,21 @@
 import { Suspense } from "react";
-import { getFindings } from "@/action/finding-actions";
+import { db } from "@/drizzle/db";
+import { findings } from "@/drizzle/schema";
+import { count } from "drizzle-orm";
 import { ExportButton } from "@/components/export/export-button";
-import { exportFindingsToExcel } from "@/action/export-actions";
+import { downloadFindingsReport } from "@/server/actions/report-actions";
 import { FindingsTableClient } from "./findings-table-client";
 import { getTranslations } from 'next-intl/server';
+import { paginate } from "@/lib/pagination-helper";
 
-export default async function FindingsPage() {
+interface PageProps {
+  searchParams: {
+    page?: string
+    per_page?: string
+  }
+}
+
+export default async function FindingsPage({ searchParams }: PageProps) {
   const t = await getTranslations('finding');
   const tCommon = await getTranslations('common');
   
@@ -20,20 +30,42 @@ export default async function FindingsPage() {
         </div>
         <div className="flex gap-2">
           <ExportButton
-            onExport={exportFindingsToExcel}
+            onExport={downloadFindingsReport}
             filename={`${t('title').toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`}
           />
         </div>
       </div>
 
       <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
-        <FindingsTableServer />
+        <FindingsTableServer searchParams={searchParams} />
       </Suspense>
     </div>
   );
 }
 
-async function FindingsTableServer() {
-  const findings = await getFindings();
-  return <FindingsTableClient data={findings} />;
+async function FindingsTableServer({ searchParams }: PageProps) {
+  // ✅ SERVER-SIDE PAGINATION
+  const result = await paginate(
+    // Query: Only fetch one page
+    async (limit, offset) => {
+      return db.query.findings.findMany({
+        limit,
+        offset,
+        with: {
+          audit: { columns: { id: true, title: true } },
+          assignedTo: { columns: { id: true, name: true } },
+          createdBy: { columns: { id: true, name: true } },
+        } as any,
+        orderBy: (findings, { desc }) => [desc(findings.createdAt)],
+      });
+    },
+    // Count: Total findings
+    async () => {
+      const result = await db.select({ value: count() }).from(findings);
+      return result[0]?.value ?? 0;
+    },
+    searchParams
+  );
+
+  return <FindingsTableClient data={result.data as any} pageCount={result.pageCount} />;
 }

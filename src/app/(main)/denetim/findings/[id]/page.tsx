@@ -1,7 +1,9 @@
 import { Suspense } from "react";
-import { getFindingById } from "@/action/finding-actions";
-import { getActionsByFinding } from "@/action/action-actions";
-import { getDofsByFinding } from "@/action/dof-actions";
+import { getFindingById } from "@/server/actions/finding-actions";
+import { getActionsByFinding } from "@/server/actions/action-actions";
+import { getDofsByFinding } from "@/server/actions/dof-actions";
+import { getCustomFieldValuesWithDefinitions } from "@/server/actions/custom-field-value-actions";
+import { CustomFieldsDisplay } from "@/components/forms/CustomFieldsDisplay";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -10,21 +12,36 @@ import { ArrowLeft, Plus, Clock, CheckCircle2, XCircle, Edit } from "lucide-reac
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function FindingDetailPage({ params }: PageProps) {
-  const t = await getTranslations('finding');
-  const tCommon = await getTranslations('common');
+  const { id } = await params;
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   try {
-    const finding = await getFindingById(params.id);
+    const finding = await getFindingById(id) as any;
 
     if (!finding) {
       notFound();
     }
+
+    // Load custom fields
+    const customFieldsResult = await getCustomFieldValuesWithDefinitions('FINDING', id);
+    const customFields = customFieldsResult.success && customFieldsResult.data 
+      ? customFieldsResult.data 
+      : [];
 
     return (
       <div className="space-y-6">
@@ -46,7 +63,7 @@ export default async function FindingDetailPage({ params }: PageProps) {
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" asChild>
-              <Link href={`/denetim/findings/${params.id}/edit`}>
+              <Link href={`/denetim/findings/${id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 {tCommon('actions.edit')}
               </Link>
@@ -99,14 +116,19 @@ export default async function FindingDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
 
+        {/* Custom Fields */}
+        {customFields.length > 0 && (
+          <CustomFieldsDisplay fields={customFields} />
+        )}
+
         {/* Actions & DOFs */}
         <div className="grid gap-6 md:grid-cols-2">
           <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
-            <ActionsCard findingId={params.id} />
+            <ActionsCard findingId={id} />
           </Suspense>
 
           <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
-            <DofsCard findingId={params.id} />
+            <DofsCard findingId={id} />
           </Suspense>
         </div>
       </div>
@@ -118,8 +140,14 @@ export default async function FindingDetailPage({ params }: PageProps) {
 }
 
 async function ActionsCard({ findingId }: { findingId: string }) {
-  const t = await getTranslations('finding');
-  const actions = await getActionsByFinding(findingId);
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
+  const actions = await getActionsByFinding(findingId) as any[];
 
   const statusIcons: Record<string, any> = {
     Assigned: Clock,
@@ -172,9 +200,15 @@ async function ActionsCard({ findingId }: { findingId: string }) {
 }
 
 async function DofsCard({ findingId }: { findingId: string }) {
-  const t = await getTranslations('finding');
-  const tDof = await getTranslations('dof');
-  const dofs = await getDofsByFinding(findingId);
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
+  const tDof = await getTranslations({ locale, namespace: 'dof' });
+  const dofs = await getDofsByFinding(findingId) as any[];
 
   return (
     <Card>

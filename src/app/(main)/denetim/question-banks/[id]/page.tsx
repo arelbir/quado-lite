@@ -9,6 +9,8 @@ import { ArrowLeft, Plus, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from 'next-intl/server';
 import { QuestionListItem } from "@/components/questions/question-list-item";
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
   params: {
@@ -22,7 +24,13 @@ interface PageProps {
  * Features: Soru listesi, soru ekleme, soru düzenleme
  */
 export default async function QuestionBankDetailPage({ params }: PageProps) {
-  const t = await getTranslations('audit.common');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'audit.common' });
   const bank = await db.query.questionBanks.findFirst({
     where: and(
       eq(questionBanks.id, params.id),

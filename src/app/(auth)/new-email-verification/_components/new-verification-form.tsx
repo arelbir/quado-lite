@@ -5,7 +5,7 @@ import { FadeLoader } from "react-spinners";
 import { useSearchParams } from "next/navigation";
 
 import { FormError } from "@/components/form-error";
-import { newEmailVerification } from "@/action/auth";
+import { newEmailVerification } from "@/server/actions/auth";
 import { FormSuccess } from "@/components/form-succcess";
 import { wait } from "@/lib/utils";
 import { signOut } from "next-auth/react";

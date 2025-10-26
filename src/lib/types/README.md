@@ -14,14 +14,22 @@ Bu klasör, projede kullanılan tüm type definition'ları merkezi olarak yönet
 
 ### 1. User Types
 ```typescript
-import type { User, UserRole } from "@/lib/types";
+import type { User } from "@/lib/types";
 
+// ✅ Multi-Role System
 const user: User = {
   id: "123",
-  role: "admin",
   name: "John Doe",
   email: "john@example.com",
+  userRoles: [
+    { role: { code: 'ADMIN', name: 'Administrator' } }
+  ]
 };
+
+// Check if user is admin
+const isAdmin = user.userRoles?.some(ur => 
+  ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+);
 ```
 
 ### 2. Plan Types
@@ -101,12 +109,22 @@ type AuthenticatedUser = WithRequired<User, "name" | "email">;
 
 ### User Type
 ```typescript
+// ✅ NEW: Multi-Role System
 interface User {
   id: string;
-  role: "admin" | "superAdmin" | "user";
   name: string | null;
   email: string | null;
+  userRoles?: Array<{
+    role?: {
+      code?: string;  // 'ADMIN', 'SUPER_ADMIN', 'USER', etc.
+      name?: string;  // Display name
+    };
+  }>;
 }
+
+// ❌ REMOVED: Legacy single-role field
+// role: "admin" | "superAdmin" | "user";
+// Use userRoles array instead!
 ```
 
 ### Plan Type

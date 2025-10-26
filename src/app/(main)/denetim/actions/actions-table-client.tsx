@@ -9,9 +9,10 @@ import { useActionStatusLabel } from "@/lib/i18n/status-helpers";
 
 interface ActionsTableClientProps {
   data: ActionRecord[];
+  pageCount?: number;
 }
 
-export function ActionsTableClient({ data }: ActionsTableClientProps) {
+export function ActionsTableClient({ data, pageCount }: ActionsTableClientProps) {
   const t = useTranslations('action');
   const tCommon = useTranslations('common');
   const columns = useActionColumns();
@@ -40,7 +41,7 @@ export function ActionsTableClient({ data }: ActionsTableClientProps) {
   const { table } = useDataTable({
     data,
     columns,
-    pageCount: Math.ceil(data.length / 10),
+    pageCount: pageCount ?? -1, // Server-side if provided, else client-side
     filterFields,
   });
 

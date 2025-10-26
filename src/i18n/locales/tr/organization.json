@@ -1,0 +1,224 @@
+{
+  "title": "Organizasyon Yönetimi",
+  "description": "Şirket, şube, departman ve pozisyon yönetimi",
+  
+  "companies": {
+    "title": "Şirketler",
+    "description": "Şirketlerinizi yönetin",
+    "createNew": "Yeni Şirket Oluştur",
+    "editCompany": "Şirketi Düzenle",
+    "deleteCompany": "Şirketi Sil",
+    "deleteConfirm": "Bu şirketi silmek istediğinizden emin misiniz?",
+    "fields": {
+      "name": "Şirket Adı",
+      "code": "Şirket Kodu",
+      "legalName": "Yasal Ünvan",
+      "taxNumber": "Vergi Numarası",
+      "country": "Ülke",
+      "city": "Şehir",
+      "address": "Adres",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "website": "Website",
+      "description": "Açıklama",
+      "isActive": "Aktif"
+    },
+    "placeholders": {
+      "name": "Şirket adını giriniz",
+      "code": "Şirket kodunu giriniz",
+      "legalName": "Yasal ünvanı giriniz",
+      "taxNumber": "Vergi numarasını giriniz",
+      "country": "Ülke seçiniz",
+      "city": "Şehir giriniz",
+      "address": "Adresi giriniz",
+      "phone": "Telefon numarasını giriniz",
+      "email": "E-posta adresini giriniz",
+      "website": "Website adresini giriniz",
+      "description": "Açıklama giriniz"
+    },
+    "messages": {
+      "created": "Şirket başarıyla oluşturuldu",
+      "updated": "Şirket başarıyla güncellendi",
+      "deleted": "Şirket başarıyla silindi",
+      "createError": "Şirket oluşturulurken hata oluştu",
+      "updateError": "Şirket güncellenirken hata oluştu",
+      "deleteError": "Şirket silinirken hata oluştu"
+    }
+  },
+
+  "branches": {
+    "title": "Şubeler",
+    "description": "Şube ofislerini ve lokasyonlarını yönetin",
+    "createNew": "Yeni Şube Oluştur",
+    "editBranch": "Şubeyi Düzenle",
+    "deleteBranch": "Şubeyi Sil",
+    "deleteConfirm": "Bu şubeyi silmek istediğinizden emin misiniz?",
+    "fields": {
+      "name": "Şube Adı",
+      "code": "Şube Kodu",
+      "company": "Şirket",
+      "type": "Şube Tipi",
+      "country": "Ülke",
+      "city": "Şehir",
+      "address": "Adres",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "description": "Açıklama",
+      "manager": "Şube Müdürü",
+      "departments": "Departmanlar",
+      "isActive": "Aktif"
+    },
+    "types": {
+      "Headquarters": "Genel Merkez",
+      "Regional Office": "Bölge Ofisi",
+      "Branch Office": "Şube Ofisi",
+      "Sales Office": "Satış Ofisi",
+      "Service Center": "Servis Merkezi"
+    },
+    "placeholders": {
+      "name": "Şube adını giriniz",
+      "code": "Şube kodunu giriniz",
+      "company": "Şirket seçiniz",
+      "type": "Şube tipini seçiniz",
+      "country": "Ülke seçiniz",
+      "city": "Şehir giriniz",
+      "address": "Adresi giriniz",
+      "phone": "Telefon numarasını giriniz",
+      "email": "E-posta adresini giriniz",
+      "description": "Açıklama giriniz",
+      "manager": "Şube müdürü seçiniz"
+    },
+    "messages": {
+      "created": "Şube başarıyla oluşturuldu",
+      "updated": "Şube başarıyla güncellendi",
+      "deleted": "Şube başarıyla silindi",
+      "createError": "Şube oluşturulurken hata oluştu",
+      "updateError": "Şube güncellenirken hata oluştu",
+      "deleteError": "Şube silinirken hata oluştu"
+    }
+  },
+
+  "departments": {
+    "title": "Departmanlar",
+    "description": "Organizasyon departman hiyerarşisini yönetin",
+    "createNew": "Yeni Departman Oluştur",
+    "editDepartment": "Departmanı Düzenle",
+    "deleteDepartment": "Departmanı Sil",
+    "deleteConfirm": "Bu departmanı silmek istediğinizden emin misiniz?",
+    "fields": {
+      "name": "Departman Adı",
+      "code": "Departman Kodu",
+      "branch": "Şube",
+      "parent": "Üst Departman",
+      "manager": "Departman Müdürü",
+      "description": "Açıklama",
+      "costCenter": "Maliyet Merkezi",
+      "budget": "Bütçe",
+      "isActive": "Aktif",
+      "employees": "Çalışanlar",
+      "subDepartments": "Alt Departmanlar"
+    },
+    "placeholders": {
+      "name": "Departman adını giriniz",
+      "code": "Departman kodunu giriniz",
+      "branch": "Şube seçiniz",
+      "parent": "Üst departman seçiniz (opsiyonel)",
+      "manager": "Departman müdürü seçiniz",
+      "description": "Açıklama giriniz",
+      "costCenter": "Maliyet merkezi kodunu giriniz",
+      "budget": "Bütçe giriniz"
+    },
+    "messages": {
+      "created": "Departman başarıyla oluşturuldu",
+      "updated": "Departman başarıyla güncellendi",
+      "deleted": "Departman başarıyla silindi",
+      "createError": "Departman oluşturulurken hata oluştu",
+      "updateError": "Departman güncellenirken hata oluştu",
+      "deleteError": "Departman silinirken hata oluştu",
+      "hasSubDepartments": "Alt departmanı olan departman silinemez"
+    }
+  },
+
+  "positions": {
+    "title": "Pozisyonlar",
+    "description": "İş pozisyonlarını ve kariyer seviyelerini yönetin",
+    "createNew": "Yeni Pozisyon Oluştur",
+    "editPosition": "Pozisyonu Düzenle",
+    "deletePosition": "Pozisyonu Sil",
+    "deleteConfirm": "Bu pozisyonu silmek istediğinizden emin misiniz?",
+    "fields": {
+      "name": "Pozisyon Adı",
+      "code": "Pozisyon Kodu",
+      "level": "Kariyer Seviyesi",
+      "category": "Kategori",
+      "description": "Açıklama",
+      "salaryGrade": "Maaş Derecesi",
+      "isActive": "Aktif"
+    },
+    "levels": {
+      "1": "Seviye 1 - Stajyer",
+      "2": "Seviye 2 - Jr. Uzman",
+      "3": "Seviye 3 - Uzman",
+      "4": "Seviye 4 - Sr. Uzman",
+      "5": "Seviye 5 - Takım Lideri",
+      "6": "Seviye 6 - Müdür",
+      "7": "Seviye 7 - Sr. Müdür",
+      "8": "Seviye 8 - Genel Müdür Yardımcısı",
+      "9": "Seviye 9 - Genel Müdür",
+      "10": "Seviye 10 - CEO"
+    },
+    "categories": {
+      "Management": "Yönetim",
+      "Technical": "Teknik",
+      "Administrative": "İdari",
+      "Operational": "Operasyonel",
+      "Sales": "Satış",
+      "Support": "Destek"
+    },
+    "placeholders": {
+      "name": "Pozisyon adını giriniz",
+      "code": "Pozisyon kodunu giriniz",
+      "level": "Kariyer seviyesi seçiniz",
+      "category": "Kategori seçiniz",
+      "description": "Açıklama giriniz",
+      "salaryGrade": "Maaş derecesini giriniz"
+    },
+    "messages": {
+      "created": "Pozisyon başarıyla oluşturuldu",
+      "updated": "Pozisyon başarıyla güncellendi",
+      "deleted": "Pozisyon başarıyla silindi",
+      "createError": "Pozisyon oluşturulurken hata oluştu",
+      "updateError": "Pozisyon güncellenirken hata oluştu",
+      "deleteError": "Pozisyon silinirken hata oluştu"
+    }
+  },
+
+  "common": {
+    "location": "Lokasyon",
+    "contact": "İletişim",
+    "details": "Detaylar",
+    "management": "Yönetim",
+    "status": "Durum",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "unassigned": "Atanmamış",
+    "selectCompany": "Şirket Seçiniz",
+    "selectBranch": "Şube Seçiniz",
+    "selectDepartment": "Departman Seçiniz",
+    "selectManager": "Yönetici Seçiniz",
+    "noManager": "Yönetici Yok"
+  },
+
+  "validation": {
+    "nameRequired": "Ad alanı zorunludur",
+    "codeRequired": "Kod alanı zorunludur",
+    "companyRequired": "Şirket seçimi zorunludur",
+    "typeRequired": "Tip seçimi zorunludur",
+    "levelRequired": "Seviye seçimi zorunludur",
+    "nameMin": "Ad en az 2 karakter olmalıdır",
+    "codeMin": "Kod en az 2 karakter olmalıdır",
+    "invalidEmail": "Geçersiz e-posta adresi",
+    "branchIdRequired": "Güncelleme için şube ID'si gereklidir",
+    "positionIdRequired": "Güncelleme için pozisyon ID'si gereklidir"
+  }
+}

@@ -1,15 +1,11 @@
 import { UserSchema } from "@/drizzle/schema";
 import { z } from "zod";
 
-export const UpdateUsersSchema = UserSchema.pick({
-  id: true,
-  name: true,
-  email: true,
-}).partial({
-  name: true,
-  email: true,
+export const UpdateUsersSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  email: z.string().email().optional(),
 })
-
 
 export const createUserSchema = z.object({
   name: z.string().min(3).max(50),

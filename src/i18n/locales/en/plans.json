@@ -1,0 +1,8 @@
+{
+  "title": "Audit Plans",
+  "createPlan": "Create Plan",
+  "editPlan": "Edit Plan",
+  "startAdhocAudit": "Start Adhoc Audit",
+  "createScheduledAudit": "Create Scheduled Audit",
+  "planInfo": "Plan Information"
+}

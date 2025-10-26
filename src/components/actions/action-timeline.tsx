@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Clock, User, XCircle, MessageSquare, Ban } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
+import { useTranslations } from 'next-intl';
 
 interface ActionTimelineProps {
   action: {
@@ -38,12 +39,13 @@ interface ActionTimelineProps {
 }
 
 export function ActionTimeline({ action }: ActionTimelineProps) {
+  const t = useTranslations('action');
   const events = [];
 
   // 1. Oluşturulma
   events.push({
-    title: "Aksiyon Oluşturuldu",
-    description: `${action.createdBy?.name || action.createdBy?.email || "Bilinmeyen"} tarafından`,
+    title: t('timeline.created'),
+    description: `${action.createdBy?.name || action.createdBy?.email || t('timeline.unknown')} ${t('timeline.createdBy')}`,
     date: action.createdAt,
     icon: User,
     color: "text-blue-600 dark:text-blue-400",
@@ -52,8 +54,8 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
   // 2. Atama
   if (action.assignedTo) {
     events.push({
-      title: "Sorumluya Atandı",
-      description: `${action.assignedTo.name || action.assignedTo.email} sorumlu olarak atandı`,
+      title: t('timeline.assigned'),
+      description: `${action.assignedTo.name || action.assignedTo.email} ${t('timeline.assignedDescription')}`,
       date: action.createdAt,
       icon: User,
       color: "text-purple-600 dark:text-purple-400",
@@ -64,8 +66,8 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
   if (action.progressNotes && action.progressNotes.length > 0) {
     action.progressNotes.forEach((progress) => {
       events.push({
-        title: "İlerleme Notu",
-        description: `${progress.createdBy?.name || progress.createdBy?.email || "Sorumlu"}: "${progress.note}"`,
+        title: t('timeline.progressNote'),
+        description: `${progress.createdBy?.name || progress.createdBy?.email || t('fields.responsiblePerson')}: "${progress.note}"`,
         date: progress.createdAt,
         icon: MessageSquare,
         color: "text-blue-600 dark:text-blue-400",
@@ -75,12 +77,12 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
 
   // 3. Tamamlanma
   if (action.completedAt) {
-    let description = `${action.assignedTo?.name || action.assignedTo?.email} aksiyonu tamamladı`;
+    let description = `${action.assignedTo?.name || action.assignedTo?.email} ${t('timeline.completedDescription')}`;
     if (action.completionNotes) {
       description += `\n\n"${action.completionNotes}"`;
     }
     events.push({
-      title: "Sorumlu Tamamladı",
+      title: t('timeline.completed'),
       description,
       date: action.completedAt,
       icon: CheckCircle2,
@@ -91,8 +93,8 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
   // 4. Onay/Red
   if (action.status === "Completed" && action.updatedAt) {
     events.push({
-      title: "Yönetici Onayladı",
-      description: `${action.manager?.name || action.manager?.email} aksiyonu onayladı`,
+      title: t('timeline.approved'),
+      description: `${action.manager?.name || action.manager?.email} ${t('timeline.approvedDescription')}`,
       date: action.updatedAt,
       icon: CheckCircle2,
       color: "text-green-600 dark:text-green-400",
@@ -101,11 +103,11 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
   
   // Red History - Her zaman göster (döngü takibi için)
   if (action.rejectionReason) {
-    let description = `${action.manager?.name || action.manager?.email} reddetti ve tekrar atadı`;
-    description += `\n\n📌 Red Nedeni: "${action.rejectionReason}"`;
-    description += `\n\n→ Aksiyon tekrar "Atandı" durumuna döndü`;
+    let description = `${action.manager?.name || action.manager?.email} ${t('timeline.rejectedDescription')}`;
+    description += `\n\n📋 ${t('timeline.rejectedNote')}: "${action.rejectionReason}"`;
+    description += `\n\n→ ${t('timeline.rejectedReassigned')}`;
     events.push({
-      title: "Reddedildi & Geri Atandı",
+      title: t('timeline.rejected'),
       description,
       date: action.updatedAt || action.createdAt,
       icon: XCircle,
@@ -115,8 +117,8 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
   
   if (action.status === "PendingManagerApproval") {
     events.push({
-      title: "Yönetici Onayı Bekleniyor",
-      description: `${action.manager?.name || action.manager?.email} onaylamalı`,
+      title: t('timeline.pendingApprovalTitle'),
+      description: `${action.manager?.name || action.manager?.email} ${t('timeline.pendingApprovalDescription')}`,
       date: action.completedAt || action.updatedAt || action.createdAt,
       icon: Clock,
       color: "text-yellow-600 dark:text-yellow-400",
@@ -125,12 +127,12 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
 
   // Cancelled - İptal edildi (döngüden çıkış)
   if (action.status === "Cancelled") {
-    let description = "Aksiyon iptal edildi (döngü kırıldı)";
+    let description = t('timeline.cancelledDescription');
     if (action.rejectionReason) {
-      description += `\n\n📌 İptal Nedeni: "${action.rejectionReason}"`;
+      description += `\n\n📋 ${t('timeline.cancelledNote')}: "${action.rejectionReason}"`;
     }
     events.push({
-      title: "İptal Edildi",
+      title: t('timeline.cancelled'),
       description,
       date: action.updatedAt || action.createdAt,
       icon: Ban,
@@ -146,7 +148,7 @@ export function ActionTimeline({ action }: ActionTimelineProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Geçmiş</CardTitle>
+        <CardTitle className="text-sm">{t('sections.timeline')}</CardTitle>
       </CardHeader>
       <CardContent>
         {/* Scrollable Timeline Container */}

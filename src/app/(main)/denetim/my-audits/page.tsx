@@ -10,13 +10,21 @@ import { Calendar, ClipboardCheck, AlertCircle, Play, Eye } from "lucide-react";
 import Link from "next/link";
 import { AUDIT_STATUS_LABELS, AUDIT_STATUS_COLORS } from "@/lib/constants/status-labels";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 /**
  * My Audits Page - Denetimlerim
  * Sadece benim denetimlerim, son 1 yıl içinde, aktif olanlar
  */
 export default async function MyAuditsPage() {
-  const t = await getTranslations('audit.myAudits');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'audit.myAudits' });
   const user = await currentUser();
   
   if (!user) {

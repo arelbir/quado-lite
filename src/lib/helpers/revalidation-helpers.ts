@@ -62,6 +62,29 @@ export function revalidateDOFPaths(options: {
 }
 
 /**
+ * HELPER: Revalidate organization-related paths
+ */
+export function revalidateOrganizationPaths(options: {
+  companies?: boolean;
+  branches?: boolean;
+  departments?: boolean;
+  positions?: boolean;
+  specificCompany?: string;
+  specificBranch?: string;
+  specificDepartment?: string;
+  specificPosition?: string;
+}) {
+  if (options.companies) revalidatePath("/admin/organization/companies");
+  if (options.branches) revalidatePath("/admin/organization/branches");
+  if (options.departments) revalidatePath("/admin/organization/departments");
+  if (options.positions) revalidatePath("/admin/organization/positions");
+  if (options.specificCompany) revalidatePath(`/admin/organization/companies/${options.specificCompany}`);
+  if (options.specificBranch) revalidatePath(`/admin/organization/branches/${options.specificBranch}`);
+  if (options.specificDepartment) revalidatePath(`/admin/organization/departments/${options.specificDepartment}`);
+  if (options.specificPosition) revalidatePath(`/admin/organization/positions/${options.specificPosition}`);
+}
+
+/**
  * HELPER: Revalidate all common paths
  */
 export function revalidateCommonPaths() {

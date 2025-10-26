@@ -19,6 +19,7 @@
     "endDate": "Bitiş Tarihi",
     "plannedDate": "Planlanan Tarih",
     "actualDate": "Gerçekleşen Tarih",
+    "auditDate": "Denetim Tarihi",
     "status": "Durum",
     "type": "Denetim Tipi",
     "scope": "Kapsam",
@@ -35,6 +36,12 @@
     "total": "Toplam",
     "lastFindings": "Son Bulgular",
     "noFindings": "Henüz bulgu bulunmuyor"
+  },
+  
+  "plans": {
+    "title": "Denetim Planları",
+    "scheduled": "Planlı Denetimler",
+    "adhoc": "Ani Denetimler"
   },
   
   "myAudits": {
@@ -55,8 +62,19 @@
     "auditDate": "Denetim Tarihi",
     "notSet": "Belirlenmemiş",
     "createdAt": "Oluşturulma",
-    "startAudit": "Denetimi Başlat",
-    "viewDetails": "Detaylar"
+    "actions": {
+      "startAudit": "Denetimi Başlat",
+      "viewDetails": "Detayları Görüntüle",
+      "addFinding": "Bulgu Ekle",
+      "completeAudit": "Denetimi Tamamla",
+      "closeAudit": "Denetimi Kapat",
+      "generateReport": "Rapor Oluştur",
+      "addQuestion": "Soru Ekle",
+      "quickAction": "Hızlı Aksiyon",
+      "quickDOF": "Hızlı DÖF",
+      "assignFinding": "Bulgu Ata",
+      "downloadReport": "Rapor İndir"
+    }
   },
   
   "status": {
@@ -78,17 +96,40 @@
   "messages": {
     "created": "Denetim başarıyla oluşturuldu",
     "updated": "Denetim güncellendi",
+    "auditUpdated": "Denetim güncellendi",
+    "updateBasicInfo": "Temel bilgileri ve soruları güncelleyin",
+    "selectAuditorMessage": "Denetimi yapacak kişiyi seçin",
     "deleted": "Denetim silindi",
     "notFound": "Denetim bulunamadı",
     "cannotDelete": "Bu denetim silinemez (ilişkili kayıtlar var)",
     "confirmDelete": "Bu denetimi silmek istediğinizden emin misiniz?",
-    "noAudits": "Henüz denetim bulunmuyor",
-    "loadingAudits": "Denetimler yükleniyor..."
+    "loadingAudits": "Denetimler yükleniyor...",
+    "questionsAnswered": "soru cevaplandı",
+    "answered": "cevaplandı",
+    "questionsAvailable": "soru var",
+    "noAnswersYet": "Henüz cevap yok",
+    "noFindingsYet": "Henüz bulgu eklenmemiş",
+    "newFindings": "Yeni",
+    "selectProcess": "Süreç seçin",
+    "noQuestions": "Henüz soru eklenmedi",
+    "auditCompletedSuccess": "Denetim tamamlandı! Bulgular süreç sahipleri tarafından işleniyor.",
+    "auditClosedSuccess": "Denetim kapatıldı ve arşivlendi.",
+    "confirmCompleteAudit": "Bu denetimi tamamlamak üzeresiniz.",
+    "confirmCloseAudit": "Tüm bulgular tamamlandı. Denetimi kapatmak istediğinizden emin misiniz?",
+    "openFindings": "açık bulgu var",
+    "findingsUnderReview": "Bulgular süreç sahipleri tarafından tamamlanana kadar denetim \"İncelemede\" statüsünde kalacak.",
+    "allTasksCompleted": "Tüm işlemler tamamlandı",
+    "reportDownloaded": "Rapor indirildi!",
+    "reportError": "Rapor oluşturulurken hata oluştu."
   },
   
   "sections": {
     "overview": "Genel Bakış",
     "details": "Denetim Detayları",
+    "basicInfo": "Denetim Bilgileri",
+    "questions": "Denetim Soruları",
+    "progress": "İlerleme",
+    "recentAnswers": "Son Cevaplanan Sorular",
     "findings": "Bulgular",
     "team": "Denetim Ekibi",
     "checklist": "Denetim Kontrol Listesi",
@@ -100,6 +141,8 @@
     "searchAudit": "Denetim ara...",
     "selectAuditor": "Denetçi seçiniz",
     "selectDepartment": "Departman seçiniz",
-    "enterDescription": "Açıklama giriniz"
+    "enterDescription": "Açıklama giriniz",
+    "selectDateRange": "Tarih aralığı seçin",
+    "searchTitle": "Başlık ara..."
   }
 }

@@ -67,6 +67,15 @@ export const authConfig = {
 
       if (data.superAdmin) return true
 
+      // Allow detail routes (not in menu but use parent permission)
+      // Pattern 1: -detail or /detail suffix
+      // Pattern 2: UUID in path (e.g., /templates/[uuid], /audits/[uuid])
+      if (pathname.includes('-detail') || 
+          pathname.includes('/detail') ||
+          /\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/.test(pathname)) {
+        return true;
+      }
+
       // Menus kontrolü
       if (!data.menus || !Array.isArray(data.menus)) {
         return NextResponse.redirect(new URL("/not-found", request.url))

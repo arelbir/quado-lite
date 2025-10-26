@@ -7,13 +7,12 @@ import { user } from "./user";
 import { relations } from "drizzle-orm";
 import { actionProgress } from "./action-progress";
 
-// Action Status Enum
+// Action Status Enum (UPDATED: Workflow integration - removed approval statuses)
 export const actionStatusEnum = pgEnum("action_status", [
-  "Assigned",              // Sorumluya atandı
-  "PendingManagerApproval", // Sorumlu tamamladı, Yönetici onayı bekliyor
-  "Completed",             // Yönetici onayladı, kapandı
-  "Rejected",              // Yönetici reddetti, Sorumluya geri döndü (artık kullanılmıyor, döngü için Assigned'a dönüyor)
-  "Cancelled"              // İptal edildi, döngüden çıkış (Final state)
+  "Assigned",              // Sorumluya atandı (Initial state)
+  "InProgress",            // Üzerinde çalışılıyor (NEW: Added for workflow)
+  "Completed",             // Workflow onaylandı, kapandı (Final state)
+  "Cancelled"              // İptal edildi, döngüden çıkış (Exit state)
 ]);
 
 // Action Type Enum (YENİ: Hibrit yaklaşım için)

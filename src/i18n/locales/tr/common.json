@@ -35,13 +35,21 @@
   "status": {
     "loading": "Yükleniyor...",
     "saving": "Kaydediliyor...",
+    "generating": "Oluşturuluyor...",
     "success": "Başarılı!",
     "error": "Hata!",
     "noData": "Veri bulunamadı",
     "processing": "İşleniyor...",
     "completed": "Tamamlandı",
     "pending": "Beklemede",
-    "failed": "Başarısız"
+    "failed": "Başarısız",
+    "audit": {
+      "Active": "Aktif",
+      "InProgress": "Devam Ediyor",
+      "Completed": "Tamamlandı",
+      "Cancelled": "İptal Edildi",
+      "PendingClosure": "Kapatma Bekliyor"
+    }
   },
   "common": {
     "yes": "Evet",
@@ -56,5 +64,11 @@
     "noResults": "Sonuç bulunamadı",
     "allRightsReserved": "Tüm hakları saklıdır"
   },
-  "total": "Toplam"
+  "total": "Toplam",
+  "table": {
+    "rowsSelected": "satır seçildi",
+    "page": "Sayfa",
+    "previous": "Önceki",
+    "next": "Sonraki"
+  }
 }

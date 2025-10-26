@@ -1,17 +1,13 @@
-
-import { pgTable, timestamp, varchar, integer, uniqueIndex, foreignKey, uuid } from "drizzle-orm/pg-core"
+import { pgTable, timestamp, varchar, integer, uniqueIndex, foreignKey, uuid, type PgTableWithColumns } from "drizzle-orm/pg-core"
 import { theme, userStatus } from "./enum";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from 'drizzle-zod'
-import { role } from "./role";
 import { userMenuTable } from "./menu";
-import { audits } from "./audit";
-import { findings } from "./finding";
-import { actions } from "./action";
-import { dofs, dofActivities } from "./dof";
+import { companies, branches, departments, positions } from "./organization";
+import { userRoles } from "./role-system";
 
 
-export const user = pgTable("User", {
+export const user: PgTableWithColumns<any> = pgTable("User", {
 	id: uuid("id").defaultRandom().primaryKey().notNull(),
 	name: varchar("name"),
 	email: varchar("email"),
@@ -20,15 +16,40 @@ export const user = pgTable("User", {
 	image: varchar("image"),
 	theme: theme("theme").default('system'),
 	status: userStatus("status").default('active'),
+	
+	// 🔥 NEW: Organization fields (Week 1 - Enterprise User Management)
+	companyId: uuid("companyId"),
+	branchId: uuid("branchId"),
+	departmentId: uuid("departmentId"),
+	positionId: uuid("positionId"),
+	managerId: uuid("managerId"), // Direct manager
+	employeeNumber: varchar("employeeNumber", { length: 50 }),
+	
+	// Employment details
+	hireDate: timestamp("hireDate"),
+	terminationDate: timestamp("terminationDate"),
+	employmentType: varchar("employmentType", { length: 50 }), // FullTime, PartTime, Contract, Intern
+	workLocation: varchar("workLocation", { length: 50 }), // OnSite, Remote, Hybrid
+	
+	// Contact
+	phoneNumber: varchar("phoneNumber", { length: 50 }),
+	mobileNumber: varchar("mobileNumber", { length: 50 }),
+	emergencyContact: varchar("emergencyContact", { length: 255 }),
+	
+	// Locale
+	timezone: varchar("timezone", { length: 50 }),
+	locale: varchar("locale", { length: 10 }),
+	
 	createdAt: timestamp("createdAt").defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt"),
 	deletedAt: timestamp("deletedAt"),
 	deletedById: uuid("deletedById"),
 	createdById: uuid("createdById"),
 },
-	(table) => {
+	(table): Record<string, any> => {
 		return {
 			emailKey: uniqueIndex("User_email_key").on(table.email),
+			employeeNumberKey: uniqueIndex("User_employeeNumber_key").on(table.employeeNumber),
 			userCreatedByIdFkey: foreignKey({
 				columns: [table.createdById],
 				foreignColumns: [table.id],
@@ -38,6 +59,32 @@ export const user = pgTable("User", {
 				columns: [table.deletedById],
 				foreignColumns: [table.id],
 				name: "User_deletedById_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			// 🔥 Organization foreign keys
+			userCompanyIdFkey: foreignKey({
+				columns: [table.companyId],
+				foreignColumns: [companies.id],
+				name: "User_companyId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			userBranchIdFkey: foreignKey({
+				columns: [table.branchId],
+				foreignColumns: [branches.id],
+				name: "User_branchId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			userDepartmentIdFkey: foreignKey({
+				columns: [table.departmentId],
+				foreignColumns: [departments.id],
+				name: "User_departmentId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			userPositionIdFkey: foreignKey({
+				columns: [table.positionId],
+				foreignColumns: [positions.id],
+				name: "User_positionId_fkey"
+			}).onUpdate("cascade").onDelete("set null"),
+			userManagerIdFkey: foreignKey({
+				columns: [table.managerId],
+				foreignColumns: [table.id],
+				name: "User_managerId_fkey"
 			}).onUpdate("cascade").onDelete("set null"),
 		}
 	});
@@ -82,9 +129,9 @@ export const session = pgTable("Session", {
 
 
 export const userRelation = relations(user, ({ one, many }) => ({
-	role: one(role, {
-		fields: [user.id],
-		references: [role.userId],
+	// role: one(role, {...}), // ❌ LEGACY - Removed. Use userRoles instead.
+	userRoles: many(userRoles, {
+		relationName: 'user_roles',
 	}),
 	createdBy: one(user, {
 		fields: [user.createdById],
@@ -108,37 +155,39 @@ export const userRelation = relations(user, ({ one, many }) => ({
 	menus: many(userMenuTable, {
 		relationName: 'user_menu_u',
 	}),
-	// Audit System Relations
-	createdAudits: many(audits, {
-		relationName: 'audit_creator',
+	// 🔥 NEW: Organization Relations
+	company: one(companies, {
+		fields: [user.companyId],
+		references: [companies.id],
+		relationName: 'user_company',
 	}),
-	assignedFindings: many(findings, {
-		relationName: 'finding_assigned',
+	branch: one(branches, {
+		fields: [user.branchId],
+		references: [branches.id],
+		relationName: 'user_branch',
 	}),
-	createdFindings: many(findings, {
-		relationName: 'finding_creator',
+	department: one(departments, {
+		fields: [user.departmentId],
+		references: [departments.id],
+		relationName: 'user_department',
 	}),
-	assignedActions: many(actions, {
-		relationName: 'action_assigned',
+	position: one(positions, {
+		fields: [user.positionId],
+		references: [positions.id],
+		relationName: 'user_position',
 	}),
-	managedActions: many(actions, {
-		relationName: 'action_manager',
+	manager: one(user, {
+		fields: [user.managerId],
+		references: [user.id],
+		relationName: 'user_manager',
 	}),
-	createdActions: many(actions, {
-		relationName: 'action_creator',
+	directReports: many(user, {
+		relationName: 'user_manager', // Users reporting to this user
 	}),
-	assignedDofs: many(dofs, {
-		relationName: 'dof_assigned',
-	}),
-	managedDofs: many(dofs, {
-		relationName: 'dof_manager',
-	}),
-	createdDofs: many(dofs, {
-		relationName: 'dof_creator',
-	}),
-	responsibleActivities: many(dofActivities, {
-		relationName: 'dof_activity_responsible',
-	}),
+	// ℹ️ MANY relations removed to avoid circular dependencies
+	// They are defined in their respective schema files:
+	// - audit.ts, finding.ts, action.ts, dof.ts
+	// - role-system.ts, teams-groups.ts, workflow.ts
 }))
 
 export const accountRelation = relations(account, ({ one }) => ({

@@ -4,14 +4,15 @@ import { auditPlans, user } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { CreatePlanForm } from "../../new/create-plan-form";
 
-export default async function EditPlanPage({ params }: { params: { id: string } }) {
+export default async function EditPlanPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const plan = await db.query.auditPlans.findFirst({
-    where: eq(auditPlans.id, params.id),
+    where: eq(auditPlans.id, id),
     with: {
       auditor: true,
       template: true,
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!plan) {
     notFound();
@@ -19,7 +20,7 @@ export default async function EditPlanPage({ params }: { params: { id: string } 
 
   // Pending durumda değilse düzenlenemez
   if (plan.status !== "Pending") {
-    redirect(`/denetim/plans/${params.id}`);
+    redirect(`/denetim/plans/${id}`);
   }
 
   // Kullanıcı listesi (Denetçi seçimi için)

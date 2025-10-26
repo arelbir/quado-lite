@@ -1,5 +1,5 @@
 "use client"
-import { updateProfile } from '@/action/user'
+import { updateProfile } from '@/server/actions/user'
 import { LoadingButton } from '@/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'

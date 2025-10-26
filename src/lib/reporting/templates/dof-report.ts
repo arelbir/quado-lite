@@ -30,8 +30,8 @@ export async function generateDofReport(
       assignedTo: true,
       manager: true,
       createdBy: true,
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!dof) {
     throw new Error("DOF not found");
@@ -40,7 +40,7 @@ export async function generateDofReport(
   // Fetch activities separately
   const activities = await db.query.dofActivities.findMany({
     where: eq(dofActivities.dofId, dofId),
-    orderBy: (dofActivities, { asc }) => [asc(dofActivities.createdAt)],
+    orderBy: (dofActivities: any, { asc }: any) => [asc(dofActivities.createdAt)],
   });
 
   // Build report sections

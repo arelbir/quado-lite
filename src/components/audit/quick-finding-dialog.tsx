@@ -30,9 +30,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { updateFinding } from "@/action/finding-actions";
+import { updateFinding } from "@/server/actions/finding-actions";
+import { useTranslations } from 'next-intl';
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
   riskType: z.enum(["Kritik", "Yüksek", "Orta", "Düşük"], {

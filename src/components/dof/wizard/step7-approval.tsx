@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { approveDof, rejectDof } from "@/action/dof-actions";
+import { managerApproveDof, managerRejectDof } from "@/server/actions/dof-actions";
+import { useTranslations } from 'next-intl';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +30,7 @@ export function Step7Approval({ dof }: Step7ApprovalProps) {
 
   const handleApprove = () => {
     startTransition(async () => {
-      const result = await approveDof(dof.id);
+      const result = await managerApproveDof(dof.id);
       if (result.success) {
         toast.success("DÖF onaylandı ve tamamlandı!");
         router.refresh();
@@ -41,9 +42,10 @@ export function Step7Approval({ dof }: Step7ApprovalProps) {
 
   const handleReject = () => {
     startTransition(async () => {
-      const result = await rejectDof(dof.id);
+      // TODO: Add rejection reason input in future
+      const result = await managerRejectDof(dof.id, "Rejected by manager");
       if (result.success) {
-        toast.success("DÖF reddedildi");
+        toast.success("DÖF reddedildi - Step6'ya geri döndü");
         router.refresh();
       } else {
         toast.error(result.error);
@@ -52,8 +54,9 @@ export function Step7Approval({ dof }: Step7ApprovalProps) {
   };
 
   const isCompleted = dof.status === "Completed";
-  const isRejected = dof.status === "Rejected";
-  const isPendingApproval = dof.status === "PendingManagerApproval";
+  // Rejected status removed - workflow handles rejections now
+  // DOF stays at Step6 when submitted, workflow takes over
+  const isPendingApproval = dof.status === "Step6_EffectivenessCheck" || dof.status === "PendingManagerApproval";
 
   return (
     <div className="space-y-6">
@@ -117,21 +120,7 @@ export function Step7Approval({ dof }: Step7ApprovalProps) {
         </Card>
       )}
 
-      {isRejected && (
-        <Card className="border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/20">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <XCircle className="h-8 w-8 text-red-600" />
-              <div>
-                <p className="font-medium text-red-900 dark:text-red-100">DÖF Reddedildi</p>
-                <p className="text-sm text-red-700 dark:text-red-300">
-                  Yönetici tarafından reddedildi
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Rejected status removed - DOF returns to Step6 for rework instead */}
 
       {isPendingApproval && (
         <Card>

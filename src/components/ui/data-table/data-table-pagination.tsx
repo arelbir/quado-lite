@@ -24,6 +24,16 @@ export function DataTablePagination<TData>({
   table,
   pageSizeOptions = [10, 20, 30, 40, 50],
 }: DataTablePaginationProps<TData>) {
+  // Calculate page count for client-side pagination
+  const pageCount = table.getPageCount()
+  const totalRows = table.getFilteredRowModel().rows.length
+  const pageSize = table.getState().pagination.pageSize
+  
+  // If pageCount is -1 (client-side), calculate it manually
+  const displayPageCount = pageCount === -1 
+    ? Math.max(1, Math.ceil(totalRows / pageSize))
+    : pageCount
+
   return (
     <div className="flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8">
       <div className="flex-1 whitespace-nowrap text-sm text-muted-foreground">
@@ -53,7 +63,7 @@ export function DataTablePagination<TData>({
         </div>
         <div className="flex items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          {displayPageCount}
         </div>
         <div className="flex items-center space-x-2">
           <Button

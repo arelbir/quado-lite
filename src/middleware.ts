@@ -38,13 +38,6 @@ export default auth((req) => {
   }
 
   if (!isLoggedIn && !isPublicRoute) {
-    // let callbackUrl = nextUrl.pathname;
-    // if (nextUrl.search) {
-    //   callbackUrl += nextUrl.search;
-    // }
-
-    // const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-
     return Response.redirect(new URL(
       `/login`,
       nextUrl
@@ -53,6 +46,9 @@ export default auth((req) => {
 
   return void 0;
 });
+
+// Use Node.js runtime for database and bcrypt support
+export const runtime = 'nodejs';
 
 // Optionally, don't invoke Middleware on some paths
 export const config = {

@@ -9,9 +9,10 @@ import { useFindingStatusLabel, useRiskTypeLabel } from "@/lib/i18n/status-helpe
 
 interface FindingsTableClientProps {
   data: Finding[];
+  pageCount?: number;
 }
 
-export function FindingsTableClient({ data }: FindingsTableClientProps) {
+export function FindingsTableClient({ data, pageCount }: FindingsTableClientProps) {
   const t = useTranslations('finding');
   const tCommon = useTranslations('common');
   const columns = useFindingColumns();
@@ -54,7 +55,7 @@ export function FindingsTableClient({ data }: FindingsTableClientProps) {
   const { table } = useDataTable({
     data,
     columns,
-    pageCount: Math.ceil(data.length / 10),
+    pageCount: pageCount ?? -1, // Server-side if provided, else client-side
     filterFields,
   });
 

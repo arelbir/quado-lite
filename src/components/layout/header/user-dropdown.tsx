@@ -36,10 +36,24 @@ export const UserDropdown = async () => {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
 
-          <DropdownMenuLabel>
-            <p>Role: {user.role?.userRole}</p>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          {user.userRoles && user.userRoles.length > 0 && (
+            <>
+              <DropdownMenuLabel>
+                <div className="text-xs text-muted-foreground">Roles</div>
+                {user.userRoles.slice(0, 3).map((ur: any) => (
+                  <div key={ur.id} className="text-sm font-normal">
+                    {ur.role.name}
+                  </div>
+                ))}
+                {user.userRoles.length > 3 && (
+                  <div className="text-xs text-muted-foreground">
+                    +{user.userRoles.length - 3} more
+                  </div>
+                )}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem asChild>
             <Link href="/settings">
               <Icons.Settings className="size-4 mr-2" />

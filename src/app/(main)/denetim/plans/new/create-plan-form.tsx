@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { createScheduledPlan, startAdhocAudit } from "@/action/audit-plan-actions";
+import { createScheduledPlan, startAdhocAudit } from "@/server/actions/audit-plan-actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from 'next-intl';
 import {
   Command,
   CommandEmpty,
@@ -108,6 +109,9 @@ export function CreatePlanForm({
   initialData 
 }: CreatePlanFormProps) {
   const router = useRouter();
+  const t = useTranslations('plans');
+  const tCommon = useTranslations('common');
+  const tAudit = useTranslations('audit');
   const [isPending, startTransition] = useTransition();
   // Edit mode'da defaultType'ı initialData'ya göre belirle
   const [planType, setPlanType] = useState<"scheduled" | "adhoc">(
@@ -511,10 +515,10 @@ export function CreatePlanForm({
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {mode === "edit" 
-              ? "Kaydet" 
+              ? tCommon('actions.save')
               : planType === "scheduled" 
-                ? "Planı Oluştur" 
-                : "Denetimi Başlat"
+                ? t('createPlan')
+                : tAudit('myAudits.startAudit')
             }
           </Button>
           <Button 
@@ -523,7 +527,7 @@ export function CreatePlanForm({
             onClick={() => router.back()}
             disabled={isPending}
           >
-            İptal
+            {tCommon('actions.cancel')}
           </Button>
         </div>
       </form>

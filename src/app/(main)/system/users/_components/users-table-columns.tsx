@@ -21,7 +21,7 @@ import { User } from "@/types/model/user"
 import { format } from "date-fns"
 import { DeleteUsersDialog } from "./delete-users-dialog"
 import { UpdateUserSheet } from "./update-user-sheet"
-import { getMenusByUserIdAction, getUserMenus } from "@/action/menu"
+import { getMenusByUserIdAction, getUserMenus } from "@/server/actions/menu"
 import { MenuWithValue } from "@/types/model/menu"
 import { useAction } from "next-safe-action/hooks"
 import { isExecuting } from "next-safe-action/status"
@@ -113,14 +113,34 @@ export function getColumns(): ColumnDef<User>[] {
         <p title="Role" >Role</p>
       ),
       cell: ({ row }) => {
-        const role = row.getValue("role") || {} as any
-
-        const getVariant = () => {
-          if (role.userRole === "admin") return "warning"
-          if (role.userRole === "user") return "secondary"
-          return "success"
+        // ✅ Multi-role system: Display user's roles
+        const user = row.original as any;
+        const userRoles = user.userRoles || [];
+        
+        if (userRoles.length === 0) {
+          return <Badge variant="secondary">No Roles</Badge>;
         }
-        return <Badge className="capitalize" variant={getVariant()}>{role.userRole}</Badge>
+        
+        // Display first role (primary)
+        const primaryRole = userRoles[0]?.role;
+        const roleCode = primaryRole?.code || 'USER';
+        
+        const getVariant = () => {
+          if (roleCode.includes('ADMIN')) return "warning";
+          if (roleCode === 'USER') return "secondary";
+          return "success";
+        };
+        
+        return (
+          <div className="flex gap-1 flex-wrap">
+            <Badge className="capitalize" variant={getVariant()}>
+              {primaryRole?.name || roleCode}
+            </Badge>
+            {userRoles.length > 1 && (
+              <Badge variant="outline">+{userRoles.length - 1}</Badge>
+            )}
+          </div>
+        );
       },
     },
     {

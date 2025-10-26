@@ -57,7 +57,7 @@ export async function generateSimpleTestPDF(): Promise<Buffer> {
     const buffer = await ReactPDF.renderToBuffer(doc);
     console.log('[PDF] Rendered successfully, buffer size:', buffer.length);
     
-    return Buffer.from(buffer);
+    return buffer;
   } catch (error) {
     console.error('[PDF] ERROR:', error);
     console.error('[PDF] ERROR STACK:', error instanceof Error ? error.stack : 'No stack');

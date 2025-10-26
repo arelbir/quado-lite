@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { toast } from "sonner";
 import { AddQuestionDialog } from "@/components/audit/add-question-dialog";
+import { useTranslations } from 'next-intl';
 
 interface Question {
   id: string;
@@ -67,6 +68,8 @@ interface EditAuditFormProps {
 }
 
 export function EditAuditForm({ audit, currentQuestions, availableQuestions, availableUsers }: EditAuditFormProps) {
+  const t = useTranslations('audit');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [auditorOpen, setAuditorOpen] = useState(false);
@@ -110,11 +113,11 @@ export function EditAuditForm({ audit, currentQuestions, availableQuestions, ava
 
       if (!response.ok) throw new Error();
 
-      toast.success("Denetim güncellendi");
+      toast.success(t('messages.auditUpdated'));
       router.push(`/denetim/audits/${audit.id}`);
       router.refresh();
     } catch (error) {
-      toast.error("Güncellenirken hata oluştu");
+      toast.error(tCommon('status.error'));
     } finally {
       setIsPending(false);
     }
@@ -129,9 +132,9 @@ export function EditAuditForm({ audit, currentQuestions, availableQuestions, ava
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Denetimi Düzenle</h1>
+          <h1 className="text-2xl font-bold">{t('edit')}</h1>
           <p className="text-sm text-muted-foreground">
-            Temel bilgileri ve soruları güncelleyin
+            {t('messages.updateBasicInfo')}
           </p>
         </div>
       </div>
@@ -141,11 +144,11 @@ export function EditAuditForm({ audit, currentQuestions, availableQuestions, ava
         <form onSubmit={handleSubmit}>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle>Denetim Bilgileri</CardTitle>
+              <CardTitle>{t('sections.basicInfo')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 max-h-[600px] overflow-y-auto">
             <div className="space-y-2">
-              <Label htmlFor="title">Denetim Başlığı *</Label>
+              <Label htmlFor="title">{t('fields.title')} *</Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -156,7 +159,7 @@ export function EditAuditForm({ audit, currentQuestions, availableQuestions, ava
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Açıklama</Label>
+              <Label htmlFor="description">{t('fields.description')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -167,7 +170,7 @@ export function EditAuditForm({ audit, currentQuestions, availableQuestions, ava
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auditDate">Denetim Tarihi</Label>
+              <Label htmlFor="auditDate">{t('fields.auditDate')}</Label>
               <Input
                 id="auditDate"
                 type="date"
@@ -226,18 +229,18 @@ export function EditAuditForm({ audit, currentQuestions, availableQuestions, ava
                 </PopoverContent>
               </Popover>
               <p className="text-xs text-muted-foreground">
-                Denetimi yapacak kişiyi seçin
+                {t('messages.selectAuditor')}
               </p>
             </div>
 
             <div className="flex gap-2 pt-4">
               <Button type="submit" disabled={isPending}>
                 <Save className="h-4 w-4 mr-2" />
-                {isPending ? "Kaydediliyor..." : "Kaydet"}
+                {isPending ? tCommon('status.saving') : tCommon('actions.save')}
               </Button>
               <Button type="button" variant="outline" asChild>
                 <Link href={`/denetim/audits/${audit.id}`}>
-                  İptal
+                  {tCommon('actions.cancel')}
                 </Link>
               </Button>
             </div>
@@ -251,11 +254,11 @@ export function EditAuditForm({ audit, currentQuestions, availableQuestions, ava
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Denetim Soruları</CardTitle>
+                  <CardTitle>{t('sections.questions')}</CardTitle>
                   <CardDescription>
-                    {currentQuestions.length} soru var
+                    {currentQuestions.length} {t('sections.questions').toLowerCase()}
                     {currentQuestions.length > 8 && (
-                      <span className="ml-2 text-xs">• Scroll edilebilir</span>
+                      <span className="ml-2 text-xs">• Scrollable</span>
                     )}
                   </CardDescription>
                 </div>

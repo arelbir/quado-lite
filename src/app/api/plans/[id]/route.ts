@@ -13,12 +13,17 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await currentUser();
+    const user = await currentUser() as any;
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== "admin" && user.role !== "superAdmin") {
+    // Check if user is admin using multi-role system
+    const isAdmin = user.userRoles?.some((ur: any) => 
+      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
+    );
+    
+    if (!isAdmin) {
       return NextResponse.json({ error: "Only admins can edit plans" }, { status: 403 });
     }
 

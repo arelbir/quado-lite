@@ -12,9 +12,20 @@ import {
   questions,
   auditTemplates,
   user,
-  role
+  teams,
+  groups,
+  menuTable,
+  userMenuTable,
+  rolePermissions,
+  userRoles,
+  roles,
+  permissions,
+  positions,
+  departments,
+  branches,
+  companies
 } from "@/drizzle/schema";
-import { notInArray, sql } from "drizzle-orm";
+import { notInArray } from "drizzle-orm";
 
 /**
  * Cleanup Script: Seed verilerini temizle
@@ -63,13 +74,23 @@ async function cleanupSeedData() {
       console.log("   🗑️  Deleting audits...");
       await tx.delete(audits);
       
-      // 8. Question Banks & Templates (optional cleanup)
+      // 9. Question Banks & Templates
       console.log("   🗑️  Deleting questions & templates...");
       await tx.delete(questions);
       await tx.delete(questionBanks);
       await tx.delete(auditTemplates);
       
-      // 7. Seed Kullanıcıları Sil (admin hariç)
+      // 10. Teams & Groups
+      console.log("   🗑️  Deleting teams & groups...");
+      await tx.delete(groups); // Groups first (has foreign key to teams)
+      await tx.delete(teams);
+      
+      // 11. User-Related Tables (must delete before users)
+      console.log("   🗑️  Deleting user menus & roles...");
+      await tx.delete(userMenuTable);
+      await tx.delete(userRoles);
+      
+      // 12. Seed Kullanıcıları Sil (admin hariç)
       console.log("   🗑️  Deleting seed users (keeping admins)...");
       
       // Admin emaillerini koru
@@ -82,11 +103,24 @@ async function cleanupSeedData() {
       await tx.delete(user).where(
         notInArray(user.email, protectedEmails)
       );
+      
+      // 13. Menus, Roles & Permissions
+      console.log("   🗑️  Deleting menus, roles & permissions...");
+      await tx.delete(menuTable);
+      await tx.delete(rolePermissions);
+      await tx.delete(roles);
+      await tx.delete(permissions);
+      
+      // 14. Organization Structure
+      console.log("   🗑️  Deleting organization structure...");
+      await tx.delete(positions);
+      await tx.delete(departments);
+      await tx.delete(branches);
+      await tx.delete(companies);
     });
     
-    console.log("✅ Cleanup completed successfully!");
-    console.log("");
-    console.log("📊 Deleted:");
+    console.log("\n✅ Cleanup completed successfully!");
+    console.log("\n📊 Deleted:");
     console.log("   - All action progress notes");
     console.log("   - All DOF activities");
     console.log("   - All actions");
@@ -95,13 +129,16 @@ async function cleanupSeedData() {
     console.log("   - All audit plans");
     console.log("   - All audits");
     console.log("   - All questions & templates");
+    console.log("   - All teams & groups");
+    console.log("   - All user menus & role assignments");
     console.log("   - All seed users (except admins)");
-    console.log("");
-    console.log("✅ Admins are safe:");
+    console.log("   - All menus");
+    console.log("   - All roles & permissions");
+    console.log("   - All organization structure (companies, branches, departments, positions)");
+    console.log("\n✅ Admins are safe:");
     console.log(`   - ${process.env.SUPER_ADMIN_EMAIL}`);
     console.log("   - admin@example.com");
-    console.log("");
-    console.log("🌱 Now you can run: pnpm seed:all");
+    console.log("\n🌱 Database is now clean! Run: npm run seed:master");
     
     process.exit(0);
   } catch (error) {

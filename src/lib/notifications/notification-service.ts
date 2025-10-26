@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/drizzle/db";
 import { notifications, notificationPreferences } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -17,7 +15,12 @@ export type NotificationCategory =
   | "dof_rejected"
   | "plan_created"
   | "audit_completed"
-  | "audit_reminder";
+  | "audit_reminder"
+  | "workflow_assignment"
+  | "workflow_deadline_approaching"
+  | "workflow_escalated"
+  | "workflow_approved"
+  | "workflow_rejected";
 
 export type RelatedEntityType = "finding" | "action" | "dof" | "audit" | "plan";
 

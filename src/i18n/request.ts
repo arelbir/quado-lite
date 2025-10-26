@@ -26,6 +26,8 @@ export default getRequestConfig(async ({ locale }) => {
       myTasks: (await import(`./locales/${validLocale}/myTasks.json`)).default,
       templates: (await import(`./locales/${validLocale}/templates.json`)).default,
       questionBanks: (await import(`./locales/${validLocale}/questionBanks.json`)).default,
+      questions: (await import(`./locales/${validLocale}/questions.json`)).default,
+      plans: (await import(`./locales/${validLocale}/plans.json`)).default,
     },
   };
 });

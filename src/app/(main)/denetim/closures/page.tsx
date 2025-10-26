@@ -1,16 +1,24 @@
 import { Suspense } from "react";
-import { getFindings } from "@/action/finding-actions";
+import { getFindings } from "@/server/actions/finding-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
-import { closeFinding, rejectFinding } from "@/action/finding-actions";
+import { closeFinding, rejectFinding } from "@/server/actions/finding-actions";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 export default async function ClosuresPage() {
-  const t = await getTranslations('finding');
-  const tCommon = await getTranslations('common');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   return (
     <div className="space-y-6">
@@ -29,10 +37,16 @@ export default async function ClosuresPage() {
 }
 
 async function PendingClosures() {
-  const t = await getTranslations('finding');
-  const tCommon = await getTranslations('common');
-  const findings = await getFindings();
-  const pendingFindings = findings.filter(f => f.status === "PendingAuditorClosure");
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'finding' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+  const findings = await getFindings() as any[];
+  const pendingFindings = findings.filter((f: any) => f.status === "PendingAuditorClosure");
 
   if (pendingFindings.length === 0) {
     return (

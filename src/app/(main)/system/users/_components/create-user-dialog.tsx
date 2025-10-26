@@ -41,7 +41,7 @@ import {
 import { type Task, } from "@/drizzle/schema"
 import { type CreateUser, createUserSchema } from "@/schema/data/users"
 import { User } from "@/types/model/user"
-import { createByAdmin } from "@/action/auth"
+import { createByAdmin } from "@/server/actions/auth"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { useAction } from "next-safe-action/hooks"
 import {  Link } from "@/components/ui/link"

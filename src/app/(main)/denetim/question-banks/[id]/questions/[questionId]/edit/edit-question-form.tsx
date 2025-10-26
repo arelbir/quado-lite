@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { updateQuestion, deleteQuestion } from "@/action/question-actions";
+import { updateQuestion, deleteQuestion } from "@/server/actions/question-actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Loader2, Plus, X, Trash2, CheckCircle2, BarChart3, FileText, Circle, CheckSquare } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   questionText: z.string().min(10, "En az 10 karakter gerekli"),
@@ -71,6 +72,7 @@ interface EditQuestionFormProps {
  * Pattern: DRY - Create form'a benzer ama edit logic
  */
 export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
+  const t = useTranslations('questions');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [options, setOptions] = useState<string[]>([]);
@@ -161,7 +163,7 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
           name="questionType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Soru Tipi *</FormLabel>
+              <FormLabel>{t('fields.questionType')} *</FormLabel>
               <Select 
                 onValueChange={(value) => {
                   field.onChange(value);
@@ -175,38 +177,38 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Soru tipi seçin" />
+                    <SelectValue placeholder={t('placeholders.selectType')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="YesNo">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4" />
-                      <span>Evet/Hayır</span>
+                      <span>{t('types.yesNo')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="Scale">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4" />
-                      <span>1-5 Ölçek</span>
+                      <span>{t('types.scale')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="Text">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      <span>Metin</span>
+                      <span>{t('types.text')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="SingleChoice">
                     <div className="flex items-center gap-2">
                       <Circle className="h-4 w-4" />
-                      <span>Tek Seçim</span>
+                      <span>{t('types.singleChoice')}</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="Checklist">
                     <div className="flex items-center gap-2">
                       <CheckSquare className="h-4 w-4" />
-                      <span>Çoklu Seçim</span>
+                      <span>{t('types.checklist')}</span>
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -221,10 +223,10 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
           name="questionText"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Soru Metni *</FormLabel>
+              <FormLabel>{t('fields.questionText')} *</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Soru metnini girin"
+                  placeholder={t('placeholders.enterQuestion')}
                   className="min-h-[100px]"
                   {...field}
                   disabled={isPending}
@@ -240,10 +242,10 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
           name="helpText"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Yardımcı Metin</FormLabel>
+              <FormLabel>{t('fields.helpText')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Denetçiye ipucu (opsiyonel)"
+                  placeholder={t('placeholders.helpTextOptional')}
                   {...field}
                   disabled={isPending}
                 />
@@ -272,7 +274,7 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
               {options.map((option, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
-                    placeholder={`Seçenek ${index + 1}`}
+                    placeholder={`${t('fields.options')} ${index + 1}`}
                     value={option}
                     onChange={(e) => updateOption(index, e.target.value)}
                     disabled={isPending}
@@ -307,9 +309,9 @@ export function EditQuestionForm({ bankId, question }: EditQuestionFormProps) {
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>Zorunlu Soru</FormLabel>
+                <FormLabel>{t('fields.isRequired')}</FormLabel>
                 <FormDescription>
-                  Denetçi bu soruyu cevaplamak zorunda
+                  {t('messages.requiredQuestion')}
                 </FormDescription>
               </div>
             </FormItem>

@@ -7,7 +7,7 @@ import { CheckCircle2, XCircle, AlertCircle, Ban } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useToastMessages } from "@/lib/i18n/toast-messages";
 import { useButtonLabels } from "@/lib/i18n/button-labels";
-import { completeAction, approveAction, rejectAction, cancelAction } from "@/action/action-actions";
+import { completeAction, managerApproveAction, managerRejectAction, cancelAction } from "@/server/actions/action-actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -62,7 +62,7 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
 
   const handleApprove = () => {
     startTransition(async () => {
-      const result = await approveAction(actionId);
+      const result = await managerApproveAction(actionId);
       if (result.success) {
         toast.action.approved();
         router.refresh();
@@ -79,7 +79,7 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
     }
 
     startTransition(async () => {
-      const result = await rejectAction(actionId, rejectReason);
+      const result = await managerRejectAction(actionId, rejectReason);
       if (result.success) {
         toast.action.rejected();
         setRejectReason("");
@@ -182,8 +182,8 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
     );
   }
 
-  // PendingManagerApproval - Sadece yönetici onaylayabilir/reddedebilir
-  if (status === "PendingManagerApproval") {
+  // InProgress - Workflow approval sürecinde (eski: PendingManagerApproval)
+  if (status === "InProgress" || status === "PendingManagerApproval") {
     return (
       <div className="flex gap-2">
         {/* Onayla */}
@@ -249,12 +249,12 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
           <AlertDialogTrigger asChild>
             <Button variant="outline" disabled={isPending}>
               <Ban className="h-4 w-4 mr-2" />
-              İptal Et
+              {t('cancel')}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Aksiyonu İptal Et</AlertDialogTitle>
+              <AlertDialogTitle>{t('cancel')}</AlertDialogTitle>
               <AlertDialogDescription>
                 {t('messages.confirmCancelManager')}
               </AlertDialogDescription>
@@ -291,14 +291,8 @@ export function ActionDetailActions({ actionId, status }: ActionDetailActionsPro
     );
   }
 
-  if (status === "Rejected") {
-    return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <AlertCircle className="h-4 w-4 text-red-600" />
-        <span>{t('status.rejected')}</span>
-      </div>
-    );
-  }
+  // Rejected status removed - workflow handles rejections now
+  // Actions return to "Assigned" status for rework instead
 
   // Cancelled - İptal edildi (döngüden çıkış)
   if (status === "Cancelled") {

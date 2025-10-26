@@ -32,7 +32,7 @@ function buildMenu(menus: MenuWithChildren[], t: any): MenuItem[] {
       path: menu.path,
       label: translatedLabel,
       icon: <Icon className='size-4' />,
-      children: menu.children.length > 0 ? buildMenu(menu.children, t) : []
+      children: menu.children && menu.children.length > 0 ? buildMenu(menu.children, t) : []
     }
   })
 }

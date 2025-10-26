@@ -1,15 +1,23 @@
 import { Suspense } from "react";
-import { getAuditTemplates } from "@/action/audit-template-actions";
+import { getAuditTemplates } from "@/server/actions/audit-template-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 export default async function TemplatesPage() {
-  const t = await getTranslations('templates');
-  const tCommon = await getTranslations('common');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'templates' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
   
   return (
     <div className="space-y-6">
@@ -36,7 +44,13 @@ export default async function TemplatesPage() {
 }
 
 async function TemplatesGrid() {
-  const t = await getTranslations('templates');
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'templates' });
   const templates = await getAuditTemplates();
 
   if (templates.length === 0) {

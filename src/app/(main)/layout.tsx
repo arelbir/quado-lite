@@ -9,11 +9,12 @@ import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 
 
-const layout = async ({ children }: { children: React.ReactNode }) => {
+export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   
   // Get locale from cookie
-  const cookieStore = cookies();
+  // cookies() returns Promise in Next.js 14.2.3+
+  const cookieStore = await cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
     ? (localeCookie.value as Locale)
@@ -24,7 +25,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
       <div className=" min-h-screen w-full flex">
         <div className="sticky bg-background top-0 h-screen z-[49]">
           <Suspense fallback={<SidebarSkeleton />}>
-            <Sidebar userId={session?.user.id} locale={locale} />
+            <Sidebar userId={session?.user?.id} locale={locale} />
           </Suspense>
         </div>
         <div className="flex flex-col flex-1">
@@ -41,5 +42,3 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
     </SessionProvider>
   )
 }
-
-export default layout

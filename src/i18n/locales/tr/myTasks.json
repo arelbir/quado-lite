@@ -1,4 +1,9 @@
 {
   "title": "Bekleyen İşlerim",
-  "description": "Üzerime atanmış tüm görevler ve onay bekleyen işler"
+  "description": "Üzerime atanmış tüm görevler ve onay bekleyen işler",
+  "myActions": "Aksiyonlarım",
+  "myDofs": "DÖF'lerim",
+  "myApprovals": "Onaylarım",
+  "myFindings": "Bulgularım",
+  "pendingApprovals": "Onay bekleyen işler"
 }

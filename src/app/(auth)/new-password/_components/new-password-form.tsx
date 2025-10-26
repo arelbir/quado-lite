@@ -16,7 +16,7 @@ import { useSearchParams } from "next/navigation"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-succcess"
 import { NewPasswordSchema } from "@/schema/auth"
-import { newPassword } from "@/action/auth"
+import { newPassword } from "@/server/actions/auth"
 import { Icons } from "@/components/icons"
 import { PasswordInput } from "@/components/ui/password-input"
 

@@ -1,8 +1,8 @@
 import { pgTable, timestamp, varchar, uniqueIndex, foreignKey, boolean, uuid } from "drizzle-orm/pg-core"
 import { menuStatus, menuType } from "./enum";
-import { role } from "./role";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
+// import { roleMenus } from "./role-system"; // ❌ REMOVED: Causes circular dependency
 
 
 export const menuTable = pgTable("Menu", {
@@ -39,7 +39,9 @@ export const menuRelations = relations(menuTable, ({ many, one }) => ({
   }),
   users: many(userMenuTable, {
     relationName: 'user_menu_m',
-  })
+  }),
+  // roles: Auto-generated inverse relation from role-system.ts (roleMenuRelations)
+  // This prevents circular dependency: menu.ts ↔ role-system.ts
 }))
 
 export const userMenuTable = pgTable('user_menu', {

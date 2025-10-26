@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Lock, AlertCircle } from "lucide-react";
-import { completeAudit, closeAudit } from "@/action/audit-actions";
+import { completeAudit, closeAudit } from "@/server/actions/audit-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useTranslations } from 'next-intl';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +39,8 @@ export function AuditStatusActions({
   currentUserId,
   currentUserRole
 }: AuditStatusActionsProps) {
+  const t = useTranslations('audit');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -51,7 +54,7 @@ export function AuditStatusActions({
     startTransition(async () => {
       const result = await completeAudit(audit.id);
       if (result.success) {
-        toast.success("Denetim tamamlandı! Bulgular süreç sahipleri tarafından işleniyor.");
+        toast.success(t('messages.auditCompletedSuccess'));
         router.refresh();
       } else {
         toast.error(result.error);
@@ -63,7 +66,7 @@ export function AuditStatusActions({
     startTransition(async () => {
       const result = await closeAudit(audit.id);
       if (result.success) {
-        toast.success("Denetim kapatıldı ve arşivlendi.");
+        toast.success(t('messages.auditClosedSuccess'));
         router.refresh();
       } else {
         toast.error(result.error);
@@ -112,21 +115,21 @@ export function AuditStatusActions({
           <AlertDialogTrigger asChild>
             <Button size="sm" disabled={isPending}>
               <CheckCircle2 className="h-4 w-4 mr-2" />
-              Denetimi Tamamla
+              {t('actions.completeAudit')}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Denetimi Tamamla?</AlertDialogTitle>
+              <AlertDialogTitle>{t('actions.completeAudit')}?</AlertDialogTitle>
               <AlertDialogDescription className="space-y-2">
-                <p>Bu denetimi tamamlamak üzeresiniz.</p>
+                <p>{t('messages.confirmCompleteAudit')}</p>
                 {openFindingsCount > 0 && (
                   <div className="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800">
                     <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium">
-                      ⚠️ {openFindingsCount} açık bulgu var
+                      ⚠️ {openFindingsCount} {t('messages.openFindings')}
                     </p>
                     <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                      Bulgular süreç sahipleri tarafından tamamlanana kadar denetim "İncelemede" statüsünde kalacak.
+                      {t('messages.findingsUnderReview')}
                     </p>
                   </div>
                 )}
@@ -161,12 +164,12 @@ export function AuditStatusActions({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Denetimi Kapat?</AlertDialogTitle>
+              <AlertDialogTitle>{t('actions.closeAudit')}?</AlertDialogTitle>
               <AlertDialogDescription>
-                <p className="mb-3">Tüm bulgular tamamlandı. Denetimi kapatmak istediğinizden emin misiniz?</p>
+                <p className="mb-3">{t('messages.confirmCloseAudit')}</p>
                 <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800">
                   <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                    ✅ Tüm işlemler tamamlandı
+                    ✅ {t('messages.allTasksCompleted')}
                   </p>
                   <p className="text-xs text-green-700 dark:text-green-300 mt-1">
                     Denetim kapatıldığında arşive taşınacak ve sadece raporlarda görünecek.

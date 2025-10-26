@@ -9,11 +9,13 @@ import { ArrowLeft, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { DeleteTemplateButton } from "@/components/templates/delete-template-button";
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -22,10 +24,18 @@ interface PageProps {
  * Features: Soru havuzlarını görüntüleme ve yönetme
  */
 export default async function TemplateDetailPage({ params }: PageProps) {
-  const t = await getTranslations('audit.common');
+  const { id } = await params;
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'templates' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
   const template = await db.query.auditTemplates.findFirst({
     where: and(
-      eq(auditTemplates.id, params.id),
+      eq(auditTemplates.id, id),
       isNull(auditTemplates.deletedAt)
     ),
     with: {
@@ -35,8 +45,8 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           email: true,
         },
       },
-    },
-  });
+    } as any,
+  }) as any;
 
   if (!template) {
     notFound();
@@ -54,10 +64,10 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           inArray(questionBanks.id, bankIds),
         with: {
           questions: {
-            where: (questions, { isNull }) => isNull(questions.deletedAt),
+            where: (questions: any, { isNull }: any) => isNull(questions.deletedAt),
           },
-        },
-      })
+        } as any,
+      }) as any[]
     : [];
 
   // Tüm soru sayısını hesapla
@@ -71,24 +81,24 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/denetim/templates">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Geri
+              {tCommon('actions.back')}
             </Link>
           </Button>
           <div>
             <h1 className="text-2xl font-bold">{template.name}</h1>
             <p className="text-sm text-muted-foreground">
-              {template.description || "Şablon detayları"}
+              {template.description || t('description')}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Button asChild>
-            <Link href={`/denetim/templates/${params.id}/edit`}>
-              Düzenle
+            <Link href={`/denetim/templates/${id}/edit`}>
+              {tCommon('actions.edit')}
             </Link>
           </Button>
           <DeleteTemplateButton 
-            templateId={params.id}
+            templateId={id}
             templateName={template.name}
           />
         </div>
@@ -98,12 +108,12 @@ export default async function TemplateDetailPage({ params }: PageProps) {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Soru Havuzu</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('questionBanks')}</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{banks.length}</div>
-            <p className="text-xs text-muted-foreground">Seçili havuz sayısı</p>
+            <p className="text-xs text-muted-foreground">{t('messages.selectedBanksCount')}</p>
           </CardContent>
         </Card>
 
@@ -113,13 +123,13 @@ export default async function TemplateDetailPage({ params }: PageProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalQuestions}</div>
-            <p className="text-xs text-muted-foreground">Tüm havuzlardaki sorular</p>
+            <p className="text-xs text-muted-foreground">{t('messages.allQuestionsInBanks')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kategori</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('fields.category')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Badge variant="outline">{template.category}</Badge>
@@ -130,23 +140,23 @@ export default async function TemplateDetailPage({ params }: PageProps) {
       {/* Question Banks List */}
       <Card>
         <CardHeader>
-          <CardTitle>Soru Havuzları</CardTitle>
+          <CardTitle>{t('questionBanks')}</CardTitle>
           <CardDescription>
-            Bu şablonda kullanılan soru havuzları
+            {t('messages.banksInTemplate')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {banks.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Soru havuzu yok</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('noQuestionBanks')}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Bu şablona henüz soru havuzu eklenmemiş
+                {t('messages.noBanksAddedYet')}
               </p>
               <Button asChild>
-                <Link href={`/denetim/templates/${params.id}/edit`}>
+                <Link href={`/denetim/templates/${id}/edit`}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Soru Havuzu Ekle
+                  {tCommon('actions.add')}
                 </Link>
               </Button>
             </div>
@@ -165,18 +175,18 @@ export default async function TemplateDetailPage({ params }: PageProps) {
                         )}
                       </div>
                       <Badge variant="secondary">
-                        {bank.questions?.length || 0} Soru
+                        {bank.questions?.length || 0} {tCommon('questions')}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
-                        Kategori: {bank.category}
+                        {t('fields.category')}: {bank.category}
                       </span>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/denetim/question-banks/${bank.id}`}>
-                          Soruları Görüntüle
+                          {tCommon('actions.view')}
                         </Link>
                       </Button>
                     </div>

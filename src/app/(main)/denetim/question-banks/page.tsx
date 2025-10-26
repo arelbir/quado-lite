@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getQuestionBanks } from "@/action/question-bank-actions";
+import { getQuestionBanks } from "@/server/actions/question-bank-actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, HelpCircle } from "lucide-react";
@@ -37,7 +37,7 @@ export default async function QuestionBanksPage() {
 
 async function QuestionBanksGrid() {
   const t = await getTranslations('questionBanks');
-  const questionBanks = await getQuestionBanks();
+  const questionBanks = await getQuestionBanks() as any[];
 
   if (questionBanks.length === 0) {
     return (

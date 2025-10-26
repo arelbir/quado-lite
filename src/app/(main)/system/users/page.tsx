@@ -5,7 +5,7 @@ import { UsersTableProvider } from "./_components/users-table-provider"
 import { DataTableSkeleton } from "@/components/ui/data-table/data-table-skeleton"
 import { UsersTable } from "./_components/users-table"
 import { searchParamsSchema } from "@/schema/data/users"
-import { getUsers } from "@/action/user"
+import { getUsers } from "@/server/actions/user"
 import { DateRangePicker } from "@/components/date-range-picker"
 import { getMenuList } from "@/server/data/menu"
 

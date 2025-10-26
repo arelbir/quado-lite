@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { copyQuestion } from "@/action/question-actions";
+import { copyQuestion } from "@/server/actions/question-actions";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,

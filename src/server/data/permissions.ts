@@ -3,6 +3,7 @@ import { MenuWithChildren, user } from "@/drizzle/schema";
 import { SQL, eq } from "drizzle-orm";
 import { getMenuHierarchy } from '@/lib/array-util'
 import { getMenusByUserId } from "./menu";
+import { getMenusByUserRoles } from "./role-menu";
 
 
 export const getUserPermissions = async ({ userId, email, menusWhere }: { userId?: string, email?: string, menusWhere?: SQL }) => {
@@ -12,23 +13,22 @@ export const getUserPermissions = async ({ userId, email, menusWhere }: { userId
     columns: {
       id: true,
     },
-    with: {
-      role: {
-        columns: {
-          userRole: true,
-          superAdmin: true
-        },
-      },
-      createdUsers: true
-    }
-  })
-  if (!res?.role) return null
-  let menus = await getMenusByUserId(res.id)
+  });
+  
+  if (!res) return null
+  
+  // NEW: Use role-based menu system
+  const roleMenus = await getMenusByUserRoles(res.id);
+  
+  // FALLBACK: If no role menus, try old user_menu table
+  let menus = roleMenus.length > 0 ? roleMenus : await getMenusByUserId(res.id);
+  
+  // Build menu hierarchy
   menus = getMenuHierarchy(menus as MenuWithChildren[]) 
+  
   return {
-    role: res.role,
+    role: null, // Deprecated - use getUserRoles from role-menu.ts instead
     menus: menus as MenuWithChildren[],
-
   }
 }
 
