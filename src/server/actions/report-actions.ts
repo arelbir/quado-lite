@@ -5,7 +5,8 @@
 
 "use server";
 
-import { withAuth } from "@/lib/helpers";
+import { withAuth, createPermissionError } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import type { User } from "@/lib/types";
 import { generateAuditReport } from "@/lib/reporting/templates/audit-report";
 import { generateActionReport } from "@/lib/reporting/templates/action-report";
@@ -25,6 +26,17 @@ export async function downloadAuditReport(
   format: "excel" | "pdf" = "excel"
 ): Promise<string> {
   const result = await withAuth<string>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "report",
+      action: "export",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     try {
       const buffer = await generateAuditReport(auditId, format);
       // Convert Buffer to base64 for client transfer
@@ -55,6 +67,17 @@ export async function downloadActionReport(
   format: "excel" | "pdf" = "excel"
 ): Promise<string> {
   const result = await withAuth<string>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "report",
+      action: "export",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const buffer = await generateActionReport(actionId, format);
     // Convert Buffer to base64 for client transfer
     const base64 = buffer.toString('base64');
@@ -80,6 +103,17 @@ export async function downloadDofReport(
   format: "excel" | "pdf" = "excel"
 ): Promise<string> {
   const result = await withAuth<string>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "report",
+      action: "export",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const buffer = await generateDofReport(dofId, format);
     // Convert Buffer to base64 for client transfer
     const base64 = buffer.toString('base64');
@@ -104,6 +138,17 @@ export async function downloadFindingsReport(
   format: "excel" | "pdf" = "excel"
 ): Promise<string> {
   const result = await withAuth<string>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "report",
+      action: "export",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const buffer = await generateFindingsListReport(format);
     // Convert Buffer to base64 for client transfer
     const base64 = buffer.toString('base64');
@@ -128,6 +173,17 @@ export async function downloadActionsReport(
   format: "excel" | "pdf" = "excel"
 ): Promise<string> {
   const result = await withAuth<string>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "report",
+      action: "export",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const buffer = await generateActionsListReport(format);
     // Convert Buffer to base64 for client transfer
     const base64 = buffer.toString('base64');

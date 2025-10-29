@@ -6,10 +6,10 @@ import { eq, and, isNull } from "drizzle-orm";
 import type { ActionResponse, User } from "@/lib/types";
 import { 
   withAuth, 
-  requireAdmin,
   createPermissionError,
   revalidateAuditPaths,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 
 /**
  * Soru havuzu oluştur
@@ -20,8 +20,15 @@ export async function createQuestionBank(data: {
   category: "Kalite" | "Çevre" | "İSG" | "Bilgi Güvenliği" | "Gıda Güvenliği" | "Diğer";
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError<{ id: string }>("Only admins can create question banks");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question-bank",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [bank] = await db
@@ -43,8 +50,19 @@ export async function createQuestionBank(data: {
 /**
  * Tüm soru havuzlarını listele
  */
-export async function getQuestionBanks() {
-  const result = await withAuth(async () => {
+export async function getQuestionBanks(): Promise<any> {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question-bank",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const data = await db.query.questionBanks.findMany({
       where: isNull(questionBanks.deletedAt),
       with: {
@@ -76,8 +94,19 @@ export async function getQuestionBanks() {
 /**
  * Tek bir soru havuzunu detaylı getir
  */
-export async function getQuestionBankById(bankId: string) {
-  const result = await withAuth(async () => {
+export async function getQuestionBankById(bankId: string): Promise<any> {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question-bank",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const data = await db.query.questionBanks.findFirst({
       where: and(
         eq(questionBanks.id, bankId),
@@ -130,8 +159,15 @@ export async function updateQuestionBank(
   }
 ): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only admins can update question banks");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question-bank",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -152,8 +188,15 @@ export async function updateQuestionBank(
  */
 export async function deleteQuestionBank(bankId: string): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only admins can delete question banks");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question-bank",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -172,7 +215,18 @@ export async function deleteQuestionBank(bankId: string): Promise<ActionResponse
  * Aktif soru havuzlarını getir (şablon oluştururken kullanılır)
  */
 export async function getActiveQuestionBanks() {
-  const result = await withAuth(async () => {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question-bank",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const data = await db.query.questionBanks.findMany({
       where: and(
         eq(questionBanks.isActive, true),

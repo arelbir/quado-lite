@@ -18,10 +18,12 @@ import { deleteVerificationToken, getVerificationTokenByToken } from "@/server/d
 import { AuthResponse } from "@/types/actions";
 import { deleteNewEmailVerificationToken, getNewEmailVerificationTokenByToken } from "@/server/data/email-verification-token";
 import { deleteRegisterVerificationToken, getRegisterVerificationTokenByToken } from "@/server/data/signup-verification-token";
+import { normalizeEmailForLogin } from "@/lib/utils/email";
 
 
 export const login = action<typeof LoginSchema, AuthResponse | undefined>(LoginSchema, async (params: LoginSchema) => {
-  const { email } = params;
+  // ✅ Normalize email (Turkish chars → ASCII)
+  const email = normalizeEmailForLogin(params.email);
 
   const existingUser = await getUserByEmail(email);
 
@@ -40,7 +42,7 @@ export const login = action<typeof LoginSchema, AuthResponse | undefined>(LoginS
   }
 
   try {
-    await signIn("credentials", { ...params, redirectTo: DEFAULT_LOGIN_REDIRECT });
+    await signIn("credentials", { ...params, email, redirectTo: DEFAULT_LOGIN_REDIRECT });
   } catch (error) {
     if (!(error instanceof AuthError)) throw error;
 

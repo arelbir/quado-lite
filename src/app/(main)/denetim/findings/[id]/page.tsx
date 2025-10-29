@@ -8,12 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Plus, Clock, CheckCircle2, XCircle, Edit } from "lucide-react";
+import { ArrowLeft, Plus, Clock, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
+import { auth } from "@/server/auth";
+import { getFindingPermissions } from "@/lib/permissions/finding-permissions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -29,6 +31,10 @@ export default async function FindingDetailPage({ params }: PageProps) {
   
   const t = await getTranslations({ locale, namespace: 'finding' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
+  
+  // Get current user for permissions
+  const session = await auth();
+  const currentUser = session?.user as any;
   
   try {
     const finding = await getFindingById(id) as any;
@@ -62,12 +68,6 @@ export default async function FindingDetailPage({ params }: PageProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" asChild>
-              <Link href={`/denetim/findings/${id}/edit`}>
-                <Edit className="h-4 w-4 mr-2" />
-                {tCommon('actions.edit')}
-              </Link>
-            </Button>
             <StatusBadge status={finding.status as any} type="finding" />
           </div>
         </div>
@@ -124,11 +124,11 @@ export default async function FindingDetailPage({ params }: PageProps) {
         {/* Actions & DOFs */}
         <div className="grid gap-6 md:grid-cols-2">
           <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
-            <ActionsCard findingId={id} />
+            <ActionsCard findingId={id} finding={finding} currentUser={currentUser} />
           </Suspense>
 
           <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
-            <DofsCard findingId={id} />
+            <DofsCard findingId={id} finding={finding} currentUser={currentUser} />
           </Suspense>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default async function FindingDetailPage({ params }: PageProps) {
   }
 }
 
-async function ActionsCard({ findingId }: { findingId: string }) {
+async function ActionsCard({ findingId, finding, currentUser }: { findingId: string; finding: any; currentUser: any }) {
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -147,7 +147,11 @@ async function ActionsCard({ findingId }: { findingId: string }) {
     : defaultLocale;
   
   const t = await getTranslations({ locale, namespace: 'finding' });
+
   const actions = await getActionsByFinding(findingId) as any[];
+  
+  // Check permissions (unified system)
+  const permissions = await getFindingPermissions(currentUser, finding);
 
   const statusIcons: Record<string, any> = {
     Assigned: Clock,
@@ -164,11 +168,13 @@ async function ActionsCard({ findingId }: { findingId: string }) {
             <CardTitle>{t('sections.actionsTitle')}</CardTitle>
             <CardDescription>{t('sections.actionsDescription')}</CardDescription>
           </div>
-          <Button size="sm" variant="outline" asChild>
-            <Link href={`/denetim/findings/${findingId}/actions/new`}>
-              <Plus className="h-4 w-4" />
-            </Link>
-          </Button>
+          {permissions.canCreateAction && (
+            <Button size="sm" variant="outline" asChild>
+              <Link href={`/denetim/findings/${findingId}/actions/new`}>
+                <Plus className="h-4 w-4" />
+              </Link>
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -199,7 +205,7 @@ async function ActionsCard({ findingId }: { findingId: string }) {
   );
 }
 
-async function DofsCard({ findingId }: { findingId: string }) {
+async function DofsCard({ findingId, finding, currentUser }: { findingId: string; finding: any; currentUser: any }) {
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
   const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
@@ -209,6 +215,9 @@ async function DofsCard({ findingId }: { findingId: string }) {
   const t = await getTranslations({ locale, namespace: 'finding' });
   const tDof = await getTranslations({ locale, namespace: 'dof' });
   const dofs = await getDofsByFinding(findingId) as any[];
+  
+  // Check permissions (unified system)
+  const permissions = await getFindingPermissions(currentUser, finding);
 
   return (
     <Card>
@@ -218,11 +227,13 @@ async function DofsCard({ findingId }: { findingId: string }) {
             <CardTitle>{t('sections.dofsTitle')}</CardTitle>
             <CardDescription>{t('sections.dofsDescription')}</CardDescription>
           </div>
-          <Button size="sm" variant="outline" asChild>
-            <Link href={`/denetim/findings/${findingId}/dof/new`}>
-              <Plus className="h-4 w-4" />
-            </Link>
-          </Button>
+          {permissions.canCreateDOF && (
+            <Button size="sm" variant="outline" asChild>
+              <Link href={`/denetim/findings/${findingId}/dof/new`}>
+                <Plus className="h-4 w-4" />
+              </Link>
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>

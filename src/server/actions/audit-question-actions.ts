@@ -4,14 +4,26 @@ import { db } from "@/drizzle/db";
 import { auditQuestions, findings, questions, questionBanks } from "@/drizzle/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import type { ActionResponse, User } from "@/lib/types";
-import { withAuth, revalidateAuditPaths } from "@/lib/helpers";
+import { withAuth, revalidateAuditPaths, createPermissionError } from "@/lib/helpers";
 import { getAuditQuestionsWithDetails } from "@/lib/db/query-helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 
 /**
  * Denetim sorularını getir
  */
 export async function getAuditQuestions(auditId: string) {
-  const result = await withAuth(async () => {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit-question",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const data = await getAuditQuestionsWithDetails(auditId);
     return { success: true, data };
   });
@@ -33,6 +45,17 @@ export async function answerAuditQuestion(data: {
   isNonCompliant: boolean;
 }): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit-question",
+      action: "answer",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db
       .update(auditQuestions)
       .set({
@@ -58,7 +81,7 @@ export async function answerAuditQuestion(data: {
         const aq = auditQuestion as any; // Type assertion for Drizzle with clause
         await db.insert(findings).values({
           auditId: aq.auditId,
-          details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\nCevap: ${data.answer}\n${data.notes ? `Not: ${data.notes}` : ""}`,
+          details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText} | Cevap: ${data.answer}${data.notes ? ` | Not: ${data.notes}` : ""}`,
           status: "New",
           riskType: "Orta",
           createdById: user.id,
@@ -83,6 +106,17 @@ export async function answerMultipleQuestions(
   }>
 ): Promise<ActionResponse<{ nonCompliantCount: number }>> {
   return withAuth<{ nonCompliantCount: number }>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit-question",
+      action: "answer",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ nonCompliantCount: number }>(perm.reason || "Permission denied");
+    }
+
     let nonCompliantCount = 0;
 
     for (const answerData of answers) {
@@ -112,7 +146,7 @@ export async function answerMultipleQuestions(
           const aq = auditQuestion as any; // Type assertion for Drizzle with clause
           await db.insert(findings).values({
             auditId: aq.auditId,
-            details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\nCevap: ${answerData.answer}\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`,
+            details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText} | Cevap: ${answerData.answer}${answerData.notes ? ` | Not: ${answerData.notes}` : ""}`,
             status: "New",
             riskType: "Orta",
             createdById: user.id,
@@ -140,7 +174,18 @@ export async function updateQuestionAnswer(
     isNonCompliant?: boolean;
   }
 ): Promise<ActionResponse> {
-  return withAuth(async () => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit-question",
+      action: "answer",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db
       .update(auditQuestions)
       .set({
@@ -167,6 +212,17 @@ export async function saveAllAuditAnswers(data: {
   }>;
 }): Promise<ActionResponse<{ saved: number; nonCompliantCount: number }>> {
   return withAuth<{ saved: number; nonCompliantCount: number }>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit-question",
+      action: "answer",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ saved: number; nonCompliantCount: number }>(perm.reason || "Permission denied");
+    }
+
     let nonCompliantCount = 0;
     let saved = 0;
 
@@ -200,14 +256,14 @@ export async function saveAllAuditAnswers(data: {
           const existingFinding = await db.query.findings.findFirst({
             where: and(
               eq(findings.auditId, data.auditId),
-              eq(findings.details, `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\\nCevap: ${answerData.answer}\\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`)
+              eq(findings.details, `[Otomatik Bulgu] Soru: ${aq.question?.questionText} | Cevap: ${answerData.answer}${answerData.notes ? ` | Not: ${answerData.notes}` : ""}`)
             ),
           });
 
           if (!existingFinding) {
             await db.insert(findings).values({
               auditId: data.auditId,
-              details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText}\\nCevap: ${answerData.answer}\\n${answerData.notes ? `Not: ${answerData.notes}` : ""}`,
+              details: `[Otomatik Bulgu] Soru: ${aq.question?.questionText} | Cevap: ${answerData.answer}${answerData.notes ? ` | Not: ${answerData.notes}` : ""}`,
               status: "New",
               riskType: "Orta",
               createdById: user.id,
@@ -230,7 +286,18 @@ export async function saveAllAuditAnswers(data: {
  * Denetim tamamlama durumunu kontrol et
  */
 export async function checkAuditCompletion(auditId: string) {
-  const result = await withAuth(async () => {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit-question",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const allQuestions = await db.query.auditQuestions.findMany({
       where: eq(auditQuestions.auditId, auditId),
     });

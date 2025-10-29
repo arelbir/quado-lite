@@ -6,7 +6,7 @@ import { DofsTableClient } from "./dofs-table-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTranslations } from 'next-intl/server';
-import { requireUser } from "@/lib/helpers/auth-helpers";
+import { requireUser, requireAdmin } from "@/lib/helpers/auth-helpers";
 import { paginate } from "@/lib/pagination-helper";
 
 interface PageProps {
@@ -43,10 +43,8 @@ async function DofsTableServer({ searchParams }: PageProps) {
   const user = authResult.user as any;
 
   // ✅ SERVER-SIDE PAGINATION
-  // Check if user is admin using multi-role system
-  const isAdmin = user.userRoles?.some((ur: any) => 
-    ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-  );
+  // Check if user is admin using requireAdmin helper
+  const isAdmin = requireAdmin(user);
 
   const result = await paginate(
     // Query: Only fetch one page

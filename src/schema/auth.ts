@@ -2,8 +2,16 @@ import { z } from "zod";
 
 /** Login */
 export const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email({
+      message: "Geçerli bir email adresi giriniz",
+    }),
+  password: z.string().min(6, {
+    message: "Şifre en az 6 karakter olmalıdır",
+  }),
 })
 
 export type LoginSchema = z.infer<typeof LoginSchema>

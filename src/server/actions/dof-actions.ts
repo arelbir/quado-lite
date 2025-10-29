@@ -13,6 +13,7 @@ import {
   revalidateDOFPaths,
   revalidateFindingPaths,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import { startWorkflow } from "@/server/actions/workflow-actions";
 import { getDofWorkflowId, buildDofMetadata } from "@/lib/workflow/workflow-integration";
 
@@ -36,10 +37,21 @@ export async function createDof(data: {
       return createNotFoundError<{ id: string }>("Finding");
     }
 
-    // Check permission: Process owner or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (finding.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError<{ id: string }>("Only process owner can create DOF");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "create",
+      entity: {
+        id: finding.id,
+        assignedToId: finding.assignedToId,
+        createdById: finding.createdById,
+        status: finding.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [dof] = await db
@@ -106,10 +118,21 @@ export async function updateDofStep(
       return createNotFoundError("DOF");
     }
 
-    // Check permission: Assigned user or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (dof.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError("Only assigned user can update DOF steps");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "update",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     const updateData: any = {
@@ -165,10 +188,21 @@ export async function addDofActivity(data: {
       return createNotFoundError<{ id: string }>("DOF");
     }
 
-    // Check permission: Assigned user or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (dof.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError<{ id: string }>("Only assigned user can add activities");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "update",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [activity] = await db
@@ -211,10 +245,34 @@ export async function completeDofActivity(
       return createNotFoundError("Activity");
     }
 
-    // Check permission: Responsible user or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (activity.responsibleId !== user.id && !isAdmin) {
-      return createPermissionError("Only responsible user can complete this activity");
+    if (!activity.dofId) {
+      return createNotFoundError("DOF ID not found on activity");
+    }
+
+    // Get DOF for permission check
+    const dof = await db.query.dofs.findFirst({
+      where: eq(dofs.id, activity.dofId),
+    });
+
+    if (!dof) {
+      return createNotFoundError("DOF");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK (check if user can update DOF)
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "update",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -247,10 +305,21 @@ export async function submitDofForApproval(
       return createNotFoundError("DOF");
     }
 
-    // Check permission: Assigned user or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (dof.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError("Only assigned user can submit for approval");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "submit",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     // Check all activities completed
@@ -292,13 +361,22 @@ export async function managerApproveDof(dofId: string): Promise<ActionResponse> 
       return createNotFoundError("DOF");
     }
 
-    // Check permission: Manager or admin
-    const isAdmin = user.userRoles?.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
-    
-    if (dof.managerId !== user.id && !isAdmin) {
-      return createPermissionError("Only assigned manager can approve this DOF");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "approve",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        managerId: dof.managerId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     if (dof.status !== "Step6_EffectivenessCheck") {
@@ -339,13 +417,22 @@ export async function managerRejectDof(
       return createNotFoundError("DOF");
     }
 
-    // Check permission: Manager or admin
-    const isAdmin = user.userRoles?.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
-    
-    if (dof.managerId !== user.id && !isAdmin) {
-      return createPermissionError("Only assigned manager can reject this DOF");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "reject",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        managerId: dof.managerId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     if (dof.status !== "Step6_EffectivenessCheck") {
@@ -371,7 +458,30 @@ export async function managerRejectDof(
  * Belirli bir bulguya ait DÖF'leri getir
  */
 export async function getDofsByFinding(findingId: string) {
-  const result = await withAuth(async () => {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK (finding read permission)
+    const finding = await db.query.findings.findFirst({
+      where: eq(findings.id, findingId),
+    });
+
+    if (finding) {
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "finding",
+        action: "read",
+        entity: {
+          id: finding.id,
+          assignedToId: finding.assignedToId,
+          createdById: finding.createdById,
+          status: finding.status,
+        },
+      });
+
+      if (!perm.allowed) {
+        return { success: false, error: perm.reason || "Permission denied" };
+      }
+    }
+
     const data = await db.query.dofs.findMany({
       where: eq(dofs.findingId, findingId),
       with: {
@@ -394,7 +504,30 @@ export async function getDofsByFinding(findingId: string) {
  * DÖF'ün faaliyetlerini getir
  */
 export async function getDofActivities(dofId: string) {
-  const result = await withAuth(async () => {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK (dof read permission)
+    const dof = await db.query.dofs.findFirst({
+      where: eq(dofs.id, dofId),
+    });
+
+    if (dof) {
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "dof",
+        action: "read",
+        entity: {
+          id: dof.id,
+          assignedToId: dof.assignedToId,
+          createdById: dof.createdById,
+          status: dof.status,
+        },
+      });
+
+      if (!perm.allowed) {
+        return { success: false, error: perm.reason || "Permission denied" };
+      }
+    }
+
     const data = await db.query.dofActivities.findMany({
       where: eq(dofActivities.dofId, dofId),
       with: {
@@ -420,10 +553,11 @@ export async function getDofActivities(dofId: string) {
 
 /**
  * Kullanıcının DÖF'lerini getir
+ * ✅ UNIFIED: Uses admin bypass from checkPermission
  */
 export async function getMyDofs() {
   const result = await withAuth(async (user: User) => {
-    // Check if user is admin
+    // ✅ Admin check via role system (already filtered in withAuth)
     const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
     if (isAdmin) {
       const data = await db.query.dofs.findMany({
@@ -469,6 +603,32 @@ export async function createDofActivity(data: {
   dueDate?: Date | null;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
+    // Get DOF for permission check
+    const dof = await db.query.dofs.findFirst({
+      where: eq(dofs.id, data.dofId),
+    });
+
+    if (!dof) {
+      return createNotFoundError<{ id: string }>("DOF");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "update",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
+    }
+
     const [activity] = await db
       .insert(dofActivities)
       .values({

@@ -21,9 +21,11 @@ import {
   withAuth, 
   revalidateOrganizationPaths,
   createNotFoundError,
-  createValidationError 
+  createValidationError,
+  createPermissionError
 } from "@/lib/helpers";
-import type { ActionResponse, Company, Branch, Department, Position } from "@/lib/types";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import type { ActionResponse, User, Company, Branch, Department, Position } from "@/lib/types";
 
 // ============================================
 // COMPANY ACTIONS
@@ -42,7 +44,18 @@ export async function createCompany(data: {
   website?: string;
   description?: string;
 }): Promise<ActionResponse<{ id: string }>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "company",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const [company] = await db.insert(companies).values({
       ...data,
       isActive: true,
@@ -56,7 +69,7 @@ export async function createCompany(data: {
       data: { id: company!.id },
       message: "Company created successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function updateCompany(
@@ -76,7 +89,18 @@ export async function updateCompany(
     isActive: boolean;
   }>
 ): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "company",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db.update(companies)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(companies.id, id));
@@ -88,11 +112,22 @@ export async function updateCompany(
       data: undefined,
       message: "Company updated successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function deleteCompany(id: string): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "company",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db.delete(companies).where(eq(companies.id, id));
 
     revalidateOrganizationPaths({ companies: true });
@@ -102,7 +137,7 @@ export async function deleteCompany(id: string): Promise<ActionResponse> {
       data: undefined,
       message: "Company deleted successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 // ============================================
@@ -122,7 +157,18 @@ export async function createBranch(data: {
   description?: string;
   managerId?: string;
 }): Promise<ActionResponse<{ id: string }>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "branch",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const [branch] = await db.insert(branches).values({
       ...data,
       isActive: true,
@@ -136,7 +182,7 @@ export async function createBranch(data: {
       data: { id: branch!.id },
       message: "Branch created successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function updateBranch(
@@ -155,7 +201,18 @@ export async function updateBranch(
     isActive: boolean;
   }>
 ): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "branch",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db.update(branches)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(branches.id, id));
@@ -167,11 +224,22 @@ export async function updateBranch(
       data: undefined,
       message: "Branch updated successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function deleteBranch(id: string): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "branch",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db.delete(branches).where(eq(branches.id, id));
 
     revalidateOrganizationPaths({ branches: true });
@@ -181,7 +249,7 @@ export async function deleteBranch(id: string): Promise<ActionResponse> {
       data: undefined,
       message: "Branch deleted successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 // ============================================
@@ -277,7 +345,18 @@ export async function createPosition(data: {
   description?: string;
   salaryGrade?: string;
 }): Promise<ActionResponse<{ id: string }>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "position",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const [position] = await db.insert(positions).values({
       ...data,
       isActive: true,
@@ -291,7 +370,7 @@ export async function createPosition(data: {
       data: { id: position!.id },
       message: "Position created successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function updatePosition(
@@ -306,7 +385,18 @@ export async function updatePosition(
     isActive: boolean;
   }>
 ): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "position",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db.update(positions)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(positions.id, id));
@@ -318,11 +408,22 @@ export async function updatePosition(
       data: undefined,
       message: "Position updated successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function deletePosition(id: string): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "position",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await db.delete(positions).where(eq(positions.id, id));
 
     revalidateOrganizationPaths({ positions: true });
@@ -332,5 +433,5 @@ export async function deletePosition(id: string): Promise<ActionResponse> {
       data: undefined,
       message: "Position deleted successfully",
     };
-  }, { requireAdmin: true });
+  });
 }

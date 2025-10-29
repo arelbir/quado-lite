@@ -59,11 +59,13 @@ interface Department {
 
 interface DepartmentTreeClientProps {
   departments: Department[];
+  branches: any[];
   users: any; // Add type for users
 }
 
 export function DepartmentTreeClient({ 
-  departments, 
+  departments,
+  branches,
   users 
 }: DepartmentTreeClientProps) {
   const router = useRouter();
@@ -294,6 +296,7 @@ export function DepartmentTreeClient({
         department={editingDept}
         parentId={parentIdForNew}
         departments={departments}
+        branches={branches}
         users={users}
         onSuccess={() => window.location.reload()}
       />

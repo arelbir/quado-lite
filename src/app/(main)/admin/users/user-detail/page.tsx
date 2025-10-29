@@ -37,13 +37,22 @@ export default function UserDetailPage() {
         return res.json();
       }),
       fetch(`/api/users/${id}/roles`).then(res => res.json()),
-      fetch(`/api/roles`).then(res => res.json()),
+      fetch(`/api/roles`).then(async res => {
+        const data = await res.json() as any;
+        // If API returns error object, return empty array
+        if (!res.ok || data.error) {
+          console.error("❌ [API Roles] Error:", data.error || 'Failed to fetch roles');
+          return [];
+        }
+        // Ensure it's an array
+        return Array.isArray(data) ? data : [];
+      }),
     ])
       .then(([userData, userRolesData, availableRolesData]) => {
         console.log("✅ [USER DETAIL CLIENT] User loaded:", (userData as any).name);
         setUserDetail(userData as any);
-        setUserRoles((userRolesData as any) || []);
-        setAvailableRoles((availableRolesData as any) || []);
+        setUserRoles(Array.isArray(userRolesData) ? userRolesData : []);
+        setAvailableRoles(Array.isArray(availableRolesData) ? availableRolesData : []);
         setLoading(false);
       })
       .catch(err => {

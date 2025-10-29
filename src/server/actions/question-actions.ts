@@ -6,11 +6,11 @@ import { eq } from "drizzle-orm";
 import type { ActionResponse, User } from "@/lib/types";
 import { 
   withAuth, 
-  requireAdmin,
   createPermissionError,
   createNotFoundError,
   revalidateAuditPaths,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 
 /**
  * Soru oluştur
@@ -25,8 +25,15 @@ export async function createQuestion(data: {
   orderIndex?: string;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError<{ id: string }>("Only admins can create questions");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const checklistOptionsJson = data.checklistOptions
@@ -67,8 +74,15 @@ export async function updateQuestion(
   }
 ): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only admins can update questions");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     const checklistOptionsJson = data.checklistOptions
@@ -94,8 +108,15 @@ export async function updateQuestion(
  */
 export async function deleteQuestion(questionId: string): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only admins can delete questions");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -114,7 +135,18 @@ export async function deleteQuestion(questionId: string): Promise<ActionResponse
  * Tek bir soruyu getir (düzenleme için)
  */
 export async function getQuestionById(questionId: string) {
-  const result = await withAuth(async () => {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const question = await db.query.questions.findFirst({
       where: eq(questions.id, questionId),
       with: {
@@ -165,8 +197,15 @@ export async function copyQuestion(data: {
   duplicate?: boolean;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError<{ id: string }>("Only admins can copy questions");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const originalQuestion = await db.query.questions.findFirst({
@@ -207,8 +246,15 @@ export async function updateQuestionOrder(
   updates: Array<{ id: string; orderIndex: string }>
 ): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only admins can reorder questions");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "question",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     for (const update of updates) {

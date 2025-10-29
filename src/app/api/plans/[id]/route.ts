@@ -3,6 +3,7 @@ import { db } from "@/drizzle/db";
 import { auditPlans } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { currentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/helpers/auth-helpers";
 
 /**
  * PATCH /api/plans/[id]
@@ -18,10 +19,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin using multi-role system
-    const isAdmin = user.userRoles?.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
+    // Check if user is admin using requireAdmin helper
+    const isAdmin = requireAdmin(user);
     
     if (!isAdmin) {
       return NextResponse.json({ error: "Only admins can edit plans" }, { status: 403 });

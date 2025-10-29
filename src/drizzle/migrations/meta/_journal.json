@@ -8,6 +8,13 @@
       "when": 1761478340471,
       "tag": "0000_mighty_speed",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1761745544379,
+      "tag": "0001_whole_azazel",
+      "breakpoints": true
     }
   ]
 }

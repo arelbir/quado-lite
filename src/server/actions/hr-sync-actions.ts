@@ -8,7 +8,9 @@ import { withAuth } from "@/lib/helpers/auth-helpers";
 import {
   createValidationError,
   createNotFoundError,
+  createPermissionError,
 } from "@/lib/helpers/error-helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 
 interface ActionResponse {
   success: boolean;
@@ -40,6 +42,17 @@ export async function createHRSyncConfig(
 ): Promise<ActionResponse> {
   return withAuth(
     async (user) => {
+      // ✅ UNIFIED PERMISSION CHECK
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "hr-sync",
+        action: "create",
+      });
+
+      if (!perm.allowed) {
+        return createPermissionError(perm.reason || "Permission denied");
+      }
+
       // Validate
       if (!data.name || data.name.trim().length < 2) {
         return createValidationError("Config name must be at least 2 characters");
@@ -73,8 +86,7 @@ export async function createHRSyncConfig(
         message: "HR sync config created successfully",
         data: newConfig,
       };
-    },
-    { requireAdmin: true }
+    }
   );
 }
 
@@ -87,6 +99,17 @@ export async function updateHRSyncConfig(
 ): Promise<ActionResponse> {
   return withAuth(
     async (user) => {
+      // ✅ UNIFIED PERMISSION CHECK
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "hr-sync",
+        action: "update",
+      });
+
+      if (!perm.allowed) {
+        return createPermissionError(perm.reason || "Permission denied");
+      }
+
       // Fetch config
       const config = await db.query.hrSyncConfigs.findFirst({
         where: eq(hrSyncConfigs.id, configId),
@@ -122,8 +145,7 @@ export async function updateHRSyncConfig(
         message: "HR sync config updated successfully",
         data: null,
       };
-    },
-    { requireAdmin: true }
+    }
   );
 }
 
@@ -135,6 +157,17 @@ export async function deleteHRSyncConfig(
 ): Promise<ActionResponse> {
   return withAuth(
     async (user) => {
+      // ✅ UNIFIED PERMISSION CHECK
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "hr-sync",
+        action: "delete",
+      });
+
+      if (!perm.allowed) {
+        return createPermissionError(perm.reason || "Permission denied");
+      }
+
       const config = await db.query.hrSyncConfigs.findFirst({
         where: eq(hrSyncConfigs.id, configId),
       });
@@ -153,8 +186,7 @@ export async function deleteHRSyncConfig(
         message: "HR sync config deleted successfully",
         data: null,
       };
-    },
-    { requireAdmin: true }
+    }
   );
 }
 
@@ -166,6 +198,17 @@ export async function triggerManualSync(
 ): Promise<ActionResponse> {
   return withAuth(
     async (user) => {
+      // ✅ UNIFIED PERMISSION CHECK
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "hr-sync",
+        action: "sync",
+      });
+
+      if (!perm.allowed) {
+        return createPermissionError(perm.reason || "Permission denied");
+      }
+
       const config = await db.query.hrSyncConfigs.findFirst({
         where: eq(hrSyncConfigs.id, configId),
       });
@@ -201,8 +244,7 @@ export async function triggerManualSync(
         message: "Sync triggered successfully. Processing in background...",
         data: syncLog,
       };
-    },
-    { requireAdmin: true }
+    }
   );
 }
 
@@ -214,6 +256,17 @@ export async function toggleConfigStatus(
 ): Promise<ActionResponse> {
   return withAuth(
     async (user) => {
+      // ✅ UNIFIED PERMISSION CHECK
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "hr-sync",
+        action: "update",
+      });
+
+      if (!perm.allowed) {
+        return createPermissionError(perm.reason || "Permission denied");
+      }
+
       const config = await db.query.hrSyncConfigs.findFirst({
         where: eq(hrSyncConfigs.id, configId),
       });
@@ -237,7 +290,6 @@ export async function toggleConfigStatus(
         message: `Config ${!config.isActive ? "activated" : "deactivated"} successfully`,
         data: null,
       };
-    },
-    { requireAdmin: true }
+    }
   );
 }

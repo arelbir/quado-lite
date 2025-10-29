@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { user } from "@/drizzle/schema";
 import { getUserById } from "./data/user";
 import { getUserRoles } from "./data/role-menu";
+import { normalizeEmailForLogin } from "@/lib/utils/email";
 
 export const {
   handlers: { GET, POST },
@@ -66,9 +67,12 @@ export const {
         if (!credentials.password)
           throw new Error('"password" is required in credentials');
 
+        // ✅ Normalize email (Turkish chars → ASCII)
+        const normalizedEmail = normalizeEmailForLogin(credentials.email as string);
+
         // Get user without relations (avoid circular dependency)
         const maybeUser = await db.query.user.findFirst({
-          where: eq(user.email, credentials.email as string),
+          where: eq(user.email, normalizedEmail),
           columns: {
             id: true,
             email: true,

@@ -1,6 +1,6 @@
 /**
  * Otomatik bulgu metnini parse eder
- * Format: [Otomatik Bulgu] Soru: ... Cevap: ... Not: ...
+ * Format: [Otomatik Bulgu] Soru: ... | Cevap: ... | Not: ...
  */
 export interface ParsedFinding {
   isAutomatic: boolean;
@@ -23,19 +23,19 @@ export function parseFindingDetails(details: string): ParsedFinding {
 
   result.isAutomatic = true;
 
-  // Soru parse
-  const questionMatch = details.match(/Soru:\s*(.+?)(?:\s+Cevap:|$)/);
+  // Soru parse - pipe separator ile
+  const questionMatch = details.match(/Soru:\s*(.+?)(?:\s*\|\s*Cevap:|$)/);
   if (questionMatch && questionMatch[1]) {
     result.question = questionMatch[1].trim();
   }
 
-  // Cevap parse
-  const answerMatch = details.match(/Cevap:\s*(.+?)(?:\s+Not:|$)/);
+  // Cevap parse - pipe separator ile
+  const answerMatch = details.match(/Cevap:\s*(.+?)(?:\s*\|\s*Not:|$)/);
   if (answerMatch && answerMatch[1]) {
     result.answer = answerMatch[1].trim();
   }
 
-  // Not parse
+  // Not parse - pipe separator ile
   const notesMatch = details.match(/Not:\s*(.+?)$/);
   if (notesMatch && notesMatch[1]) {
     result.notes = notesMatch[1].trim();

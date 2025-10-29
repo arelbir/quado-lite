@@ -149,8 +149,6 @@ export function UsersTableClient({ users, companies, branches, departments, posi
     pageCount: pageCount ?? -1, // Server-side pagination
     filterFields,
     defaultPerPage: 10,
-    // ✅ Disable client-side filtering (server handles it)
-    enableAdvancedFilter: false,
     // ✅ CRITICAL: Use database ID as row ID (not index)
     getRowId: (row: User) => row.id,
   });

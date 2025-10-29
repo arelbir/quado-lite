@@ -252,7 +252,7 @@ const getMenus = (adminId: string) => [
         type: 'menu',
       },
       {
-        path: "/system/menus",
+        path: "/admin/menus",
         label: "menuManagement",
         icon: "Menu",
         status: "active",
@@ -284,14 +284,6 @@ const getMenus = (adminId: string) => [
         path: "/settings/appearance",
         label: "appearance",
         icon: "Palette",
-        status: "active",
-        createBy: adminId,
-        type: 'menu',
-      },
-      {
-        path: "/system/users",
-        label: "systemUsers",
-        icon: "UserCog",
         status: "active",
         createBy: adminId,
         type: 'menu',

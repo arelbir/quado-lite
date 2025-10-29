@@ -88,9 +88,9 @@ export function UserRoleManagement({
   const [loading, setLoading] = useState(false);
 
   // Get roles that are not already assigned
-  const unassignedRoles = availableRoles.filter(
-    (role) => !userRoles.some((ur) => ur.roleId === role.id)
-  );
+  const unassignedRoles = availableRoles?.filter(
+    (role) => !userRoles?.some((ur) => ur.role?.id === role.id)
+  ) || [];
 
   const handleAddRole = async () => {
     if (!selectedRoleId) {
