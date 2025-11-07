@@ -54,7 +54,7 @@ export async function createAuditTemplate(data: {
  * Tüm şablonları listele
  */
 export async function getAuditTemplates(): Promise<any> {
-  const result = await withAuth(async (user: User) => {
+  const result = await withAuth<any[]>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -99,7 +99,7 @@ export async function getAuditTemplates(): Promise<any> {
  * Tek bir şablonu detaylı getir
  */
 export async function getAuditTemplateById(templateId: string): Promise<any> {
-  const result = await withAuth(async (user: User) => {
+  const result = await withAuth<any>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,

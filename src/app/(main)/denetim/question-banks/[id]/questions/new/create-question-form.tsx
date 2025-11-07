@@ -30,44 +30,43 @@ import { toast } from "sonner";
 import { Loader2, Plus, X, CheckCircle2, BarChart3, FileText, Circle, CheckSquare } from "lucide-react";
 import { useTranslations } from 'next-intl';
 
-/**
- * Validation Schema (Conditional)
- */
-const formSchema = z.object({
-  questionText: z.string().min(10, "En az 10 karakter gerekli"),
-  questionType: z.enum(["YesNo", "Scale", "Text", "SingleChoice", "Checklist"]),
-  helpText: z.string().optional(),
-  isMandatory: z.boolean().default(true),
-  checklistOptions: z.array(z.string()).optional(),
-}).refine(
-  (data) => {
-    if (data.questionType === "SingleChoice" || data.questionType === "Checklist") {
-      return data.checklistOptions && data.checklistOptions.length >= 2;
-    }
-    return true;
-  },
-  {
-    message: "En az 2 seçenek gerekli",
-    path: ["checklistOptions"],
-  }
-);
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = {
+  questionText: string;
+  questionType: "YesNo" | "Scale" | "Text" | "SingleChoice" | "Checklist";
+  helpText?: string;
+  isMandatory: boolean;
+  checklistOptions?: string[];
+};
 
 interface CreateQuestionFormProps {
   bankId: string;
 }
 
-/**
- * Create Question Form
- * Pattern: Complex conditional form
- * Features: Dynamic options based on question type
- */
 export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
   const t = useTranslations('questions');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [options, setOptions] = useState<string[]>([""]);
+
+  const formSchema = z.object({
+    questionText: z.string().min(10, t('validation.min10Chars')),
+    questionType: z.enum(["YesNo", "Scale", "Text", "SingleChoice", "Checklist"]),
+    helpText: z.string().optional(),
+    isMandatory: z.boolean().default(true),
+    checklistOptions: z.array(z.string()).optional(),
+  }).refine(
+    (data) => {
+      if (data.questionType === "SingleChoice" || data.questionType === "Checklist") {
+        return data.checklistOptions && data.checklistOptions.length >= 2;
+      }
+      return true;
+    },
+    {
+      message: t('validation.min2Options'),
+      path: ["checklistOptions"],
+    }
+  );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -109,14 +108,14 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
         });
         
         if (result.success) {
-          toast.success("Soru başarıyla eklendi!");
+          toast.success(t('messages.questionCreated'));
           router.push(`/denetim/question-banks/${bankId}`);
           router.refresh();
         } else {
           toast.error(result.error);
         }
       } catch (error) {
-        toast.error("Bir hata oluştu");
+        toast.error(tCommon('status.error'));
       }
     });
   }
@@ -181,7 +180,7 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
                 </SelectContent>
               </Select>
               <FormDescription>
-                Soru cevap formatını belirler
+                {t('messages.questionTypeDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -221,7 +220,7 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
                 />
               </FormControl>
               <FormDescription>
-                Denetçiye gösterilecek yardımcı açıklama
+                {t('messages.helpTextDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -231,7 +230,7 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
         {needsOptions && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <FormLabel>Seçenekler *</FormLabel>
+              <FormLabel>{t('fields.options')} *</FormLabel>
               <Button
                 type="button"
                 variant="outline"
@@ -240,7 +239,7 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
                 disabled={isPending}
               >
                 <Plus className="h-4 w-4 mr-1" />
-                Seçenek Ekle
+                {t('actions.addOption')}
               </Button>
             </div>
             <div className="space-y-2">
@@ -267,7 +266,7 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
               ))}
             </div>
             <FormDescription>
-              En az 2 seçenek gereklidir
+              {t('messages.min2OptionsRequired')}
             </FormDescription>
           </div>
         )}
@@ -299,7 +298,7 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
         <div className="flex items-center gap-4">
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Ekle
+            {tCommon('actions.add')}
           </Button>
           <Button 
             type="button" 
@@ -307,7 +306,7 @@ export function CreateQuestionForm({ bankId }: CreateQuestionFormProps) {
             onClick={() => router.back()}
             disabled={isPending}
           >
-            İptal
+            {tCommon('actions.cancel')}
           </Button>
         </div>
       </form>

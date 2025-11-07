@@ -17,7 +17,7 @@ export async function createVisualWorkflow(data: {
   nodes: any[];
   edges: any[];
 }): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -67,7 +67,7 @@ export async function updateVisualWorkflow(
     version?: string;
   }
 ): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -116,7 +116,7 @@ export async function saveWorkflowVersion(
     edges: any[];
   }
 ): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -155,7 +155,7 @@ export async function saveWorkflowVersion(
  * Publish workflow (make it ACTIVE)
  */
 export async function publishVisualWorkflow(id: string): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -198,7 +198,7 @@ export async function publishVisualWorkflow(id: string): Promise<any> {
  * Archive workflow
  */
 export async function archiveVisualWorkflow(id: string): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -239,7 +239,7 @@ export async function archiveVisualWorkflow(id: string): Promise<any> {
  * Get all workflows
  */
 export async function getVisualWorkflows(): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -277,7 +277,7 @@ export async function getVisualWorkflows(): Promise<any> {
  * Get workflow by ID
  */
 export async function getVisualWorkflowById(id: string): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -319,7 +319,7 @@ export async function getVisualWorkflowById(id: string): Promise<any> {
  * Get workflow versions
  */
 export async function getWorkflowVersions(workflowId: string): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -358,7 +358,7 @@ export async function getWorkflowVersions(workflowId: string): Promise<any> {
  * Restore archived workflow (make it DRAFT)
  */
 export async function restoreVisualWorkflow(id: string): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,
@@ -399,7 +399,7 @@ export async function restoreVisualWorkflow(id: string): Promise<any> {
  * Delete workflow
  */
 export async function deleteVisualWorkflow(id: string): Promise<any> {
-  return withAuth(async (user: any) => {
+  return withAuth<any>(async (user: any) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user,

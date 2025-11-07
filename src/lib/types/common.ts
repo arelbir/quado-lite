@@ -12,6 +12,42 @@ export interface User {
   id: string;
   name: string | null;
   email: string | null;
+  password?: string;
+  image?: string | null;
+  theme?: string;
+  status?: string;
+  
+  // Organization fields
+  companyId?: string | null;
+  branchId?: string | null;
+  departmentId?: string | null;
+  positionId?: string | null;
+  managerId?: string | null;
+  employeeNumber?: string | null;
+  
+  // Employment details
+  hireDate?: Date | null;
+  terminationDate?: Date | null;
+  employmentType?: string | null;
+  workLocation?: string | null;
+  
+  // Contact
+  phoneNumber?: string | null;
+  mobileNumber?: string | null;
+  emergencyContact?: string | null;
+  
+  // Locale
+  timezone?: string | null;
+  locale?: string | null;
+  
+  // Timestamps
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  deletedAt?: Date | null;
+  deletedById?: string | null;
+  createdById?: string | null;
+  
+  // Legacy fields for JWT/session
   roles?: string[]; // From JWT session - e.g., ['SUPER_ADMIN', 'ADMIN']
   userRoles?: Array<{
     role?: {
@@ -193,6 +229,24 @@ export interface Position {
   level: string | null;
   category: string | null;
   salaryGrade: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  createdById: string | null;
+  deletedById: string | null;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string | null;
+  permissions?: Array<{
+    id: string;
+    name: string;
+    resource?: string;
+    action?: string;
+  }>;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date | null;

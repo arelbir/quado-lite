@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
 import { useWorkflowStore } from '../Hooks/useWorkflowStore';
+import { useTranslations } from 'next-intl';
 
 export function ToolbarPanel() {
+  const t = useTranslations('workflow');
   const addNode = useWorkflowStore((state) => state.addNode);
   const nodes = useWorkflowStore((state) => state.nodes);
 
@@ -22,11 +24,11 @@ export function ToolbarPanel() {
       },
       data: {
         label: 
-          type === 'start' ? 'Start' : 
-          type === 'end' ? 'End' : 
-          type === 'decision' ? 'Decision' :
-          type === 'approval' ? 'Approval' :
-          'New Step',
+          type === 'start' ? t('step.start') : 
+          type === 'end' ? t('step.end') : 
+          type === 'decision' ? t('step.decision') :
+          type === 'approval' ? t('step.approval') :
+          t('step.newStep'),
         ...(type === 'process' && {
           assignedRole: '',
           deadlineHours: 24,
@@ -47,7 +49,7 @@ export function ToolbarPanel() {
   return (
     <Card className="p-4">
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold mb-3">Add Node</h3>
+        <h3 className="text-sm font-semibold mb-3">{t('toolbar.addNode')}</h3>
         
         <Button
           variant="outline"
@@ -56,7 +58,7 @@ export function ToolbarPanel() {
           onClick={() => handleAddNode('start')}
         >
           <Icons.Play className="size-4 text-green-500" />
-          <span>Start</span>
+          <span>{t('step.start')}</span>
         </Button>
         
         <Button
@@ -66,7 +68,7 @@ export function ToolbarPanel() {
           onClick={() => handleAddNode('process')}
         >
           <Icons.CheckCircle2 className="size-4 text-blue-500" />
-          <span>Process Step</span>
+          <span>{t('step.process')}</span>
         </Button>
         
         <Button
@@ -76,7 +78,7 @@ export function ToolbarPanel() {
           onClick={() => handleAddNode('end')}
         >
           <Icons.Flag className="size-4 text-red-500" />
-          <span>End</span>
+          <span>{t('step.end')}</span>
         </Button>
         
         <Button
@@ -86,7 +88,7 @@ export function ToolbarPanel() {
           onClick={() => handleAddNode('decision')}
         >
           <Icons.GitBranch className="size-4 text-yellow-500" />
-          <span>Decision</span>
+          <span>{t('step.decision')}</span>
         </Button>
         
         <Button
@@ -96,7 +98,7 @@ export function ToolbarPanel() {
           onClick={() => handleAddNode('approval')}
         >
           <Icons.ShieldCheck className="size-4 text-purple-500" />
-          <span>Approval</span>
+          <span>{t('step.approval')}</span>
         </Button>
       </div>
     </Card>

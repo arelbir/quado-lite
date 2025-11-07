@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTranslations } from 'next-intl';
 
 interface Department {
   id: string;
@@ -68,6 +69,8 @@ export function DepartmentTreeClient({
   branches,
   users 
 }: DepartmentTreeClientProps) {
+  const t = useTranslations('organization');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -236,7 +239,7 @@ export function DepartmentTreeClient({
             }}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Create Department
+            {t('departments.createNew')}
           </Button>
           <Button
             variant="outline"
@@ -246,7 +249,7 @@ export function DepartmentTreeClient({
               setExpandedIds(allIds);
             }}
           >
-            Expand All
+            {t('departments.expandAll')}
           </Button>
           <Button
             variant="outline"
@@ -255,21 +258,21 @@ export function DepartmentTreeClient({
               setExpandedIds(new Set());
             }}
           >
-            Collapse All
+            {t('departments.collapseAll')}
           </Button>
         </div>
 
         <div className="text-sm text-muted-foreground">
-          {departments.length} departments
+          {departments.length} {t('departments.title')}
         </div>
       </div>
 
       {/* Tree View */}
       <Card>
         <CardHeader>
-          <CardTitle>Organization Hierarchy</CardTitle>
+          <CardTitle>{t('departments.treeTitle')}</CardTitle>
           <CardDescription>
-            View and manage your department structure
+            {t('departments.treeDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -280,8 +283,8 @@ export function DepartmentTreeClient({
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <Building2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No departments yet</p>
-              <p className="text-sm">Create your first department to get started</p>
+              <p>{t('departments.emptyState.title')}</p>
+              <p className="text-sm">{t('departments.emptyState.description')}</p>
             </div>
           )}
         </CardContent>

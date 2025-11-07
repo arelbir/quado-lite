@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { createCompany, updateCompany } from "@/server/actions/organization-actions";
 import { Loader2 } from "lucide-react";
 import type { Company } from "@/lib/types";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -68,6 +69,8 @@ export function CompanyDialog({
   company,
   onSuccess,
 }: CompanyDialogProps) {
+  const t = useTranslations('organization');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEdit = !!company;
 
@@ -118,15 +121,15 @@ export function CompanyDialog({
         : await createCompany(data);
 
       if (result.success) {
-        toast.success(result.message || (isEdit ? "Company updated successfully" : "Company created successfully"));
+        toast.success(result.message || (isEdit ? t('companies.messages.updated') : t('companies.messages.created')));
         onOpenChange(false);
         form.reset();
         onSuccess?.();
       } else {
-        toast.error(result.error || "An error occurred");
+        toast.error(result.error || tCommon('messages.error'));
       }
     } catch (error) {
-      toast.error("Failed to save company");
+      toast.error(t('companies.messages.saveError'));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -138,12 +141,12 @@ export function CompanyDialog({
       <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Company" : "Create Company"}
+            {isEdit ? t('companies.editCompany') : t('companies.createNew')}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Update the company information below."
-              : "Add a new company to your organization."}
+              ? t('companies.description.update')
+              : t('companies.description.create')}
           </DialogDescription>
         </DialogHeader>
 
@@ -155,9 +158,9 @@ export function CompanyDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company Name *</FormLabel>
+                    <FormLabel>{t('companies.fields.name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ABC Technology Inc." {...field} />
+                      <Input placeholder={t('companies.placeholders.name')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -169,9 +172,9 @@ export function CompanyDialog({
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Code *</FormLabel>
+                    <FormLabel>{t('companies.fields.code')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ABC" {...field} />
+                      <Input placeholder={t('companies.placeholders.code')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -184,9 +187,9 @@ export function CompanyDialog({
               name="legalName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Legal Name</FormLabel>
+                  <FormLabel>{t('companies.fields.legalName')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="ABC Technology Incorporated" {...field} />
+                    <Input placeholder={t('companies.placeholders.legalName')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -199,9 +202,9 @@ export function CompanyDialog({
                 name="taxNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tax Number</FormLabel>
+                    <FormLabel>{t('companies.fields.taxNumber')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="1234567890" {...field} />
+                      <Input placeholder={t('companies.placeholders.taxNumber')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -213,9 +216,9 @@ export function CompanyDialog({
                 name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country</FormLabel>
+                    <FormLabel>{t('companies.fields.country')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Turkey" {...field} />
+                      <Input placeholder={t('companies.placeholders.country')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -229,9 +232,9 @@ export function CompanyDialog({
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>{t('companies.fields.city')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ankara" {...field} />
+                      <Input placeholder={t('companies.placeholders.city')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -243,9 +246,9 @@ export function CompanyDialog({
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>{t('companies.fields.phone')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="+90 312 123 4567" {...field} />
+                      <Input placeholder={t('companies.placeholders.phone')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -258,10 +261,10 @@ export function CompanyDialog({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>{t('companies.fields.address')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Street address, building number..."
+                      placeholder={t('companies.placeholders.address')}
                       {...field}
                     />
                   </FormControl>
@@ -276,9 +279,9 @@ export function CompanyDialog({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('companies.fields.email')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="info@company.com" type="email" {...field} />
+                      <Input placeholder={t('companies.placeholders.email')} type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -290,9 +293,9 @@ export function CompanyDialog({
                 name="website"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Website</FormLabel>
+                    <FormLabel>{t('companies.fields.website')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://www.company.com" {...field} />
+                      <Input placeholder={t('companies.placeholders.website')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -305,10 +308,10 @@ export function CompanyDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('companies.fields.description')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Company description..."
+                      placeholder={t('companies.placeholders.description')}
                       {...field}
                     />
                   </FormControl>
@@ -324,11 +327,11 @@ export function CompanyDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {tCommon('actions.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? "Update" : "Create"}
+                {isEdit ? tCommon('actions.update') : tCommon('actions.create')}
               </Button>
             </DialogFooter>
           </form>

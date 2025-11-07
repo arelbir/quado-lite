@@ -1,0 +1,62 @@
+{
+  "title": "HR Sync Yapılandırması",
+  "overview": "HR senkronizasyon ayarlarını yönetin",
+  
+  "config": {
+    "createNew": "HR Sync Yapılandırması Oluştur",
+    "editConfig": "HR Sync Yapılandırmasını Düzenle",
+    "updateConfig": "Yapılandırmayı Güncelle",
+    "createConfig": "Yapılandırma Oluştur",
+    "description": {
+      "create": "Yeni bir HR senkronizasyon yapılandırması oluşturun",
+      "update": "Yapılandırma ayarlarını güncelleyin"
+    },
+    "fields": {
+      "name": "Yapılandırma Adı",
+      "description": "Açıklama",
+      "sourceType": "Kaynak Türü",
+      "syncMode": "Senkronizasyon Modu",
+      "autoSync": "Otomatik Senkronizasyon",
+      "syncSchedule": "Senkronizasyon Programı"
+    },
+    "placeholders": {
+      "name": "örn. LDAP Active Directory",
+      "description": "Bu senkronizasyon yapılandırmasını tanımlayın...",
+      "sourceType": "Kaynak seçin",
+      "syncMode": "Mod seçin"
+    },
+    "messages": {
+      "created": "Yapılandırma başarıyla oluşturuldu",
+      "updated": "Yapılandırma başarıyla güncellendi",
+      "createError": "Yapılandırma oluşturulamadı",
+      "updateError": "Yapılandırma güncellenemedi"
+    }
+  },
+  
+  "dashboard": {
+    "title": "Senkronizasyon Yapılandırmaları",
+    "description": "HR senkronizasyon entegrasyonlarınızı yönetin",
+    "createConfig": "Yapılandırma Oluştur",
+    "noConfigs": "Senkronizasyon yapılandırması yok",
+    "triggerSync": "Senkronizasyon Başlat",
+    "triggeringSync": "Senkronizasyon başlatılıyor...",
+    "syncCompleted": "Senkronizasyon başarıyla tamamlandı",
+    "syncFailed": "Senkronizasyon başarısız: {error}",
+    "triggerFailed": "Senkronizasyon başlatılamadı",
+    "unknownSourceType": "Bilinmeyen kaynak türü",
+    "stats": {
+      "totalSyncs": "Toplam Senkronizasyon",
+      "successful": "Başarılı",
+      "failed": "Başarısız"
+    },
+    "quickActions": {
+      "title": "Hızlı İşlemler",
+      "createConfig": "Yapılandırma Oluştur",
+      "createConfigDesc": "Yeni senkronizasyon kaynağı ekle",
+      "syncAll": "Tümünü Senkronize Et",
+      "syncAllDesc": "Tüm aktif senkronizasyonları çalıştır",
+      "viewErrors": "Hataları Görüntüle",
+      "viewErrorsDesc": "Başarısız senkronizasyonları kontrol et"
+    }
+  }
+}

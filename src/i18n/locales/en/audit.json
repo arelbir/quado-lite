@@ -142,5 +142,21 @@
     "enterDescription": "Enter description",
     "selectDateRange": "Select date range",
     "searchTitle": "Search title..."
+  },
+
+  "questionsForm": {
+    "answerAtLeastOne": "Please answer at least one question",
+    "saveFailed": "Save failed",
+    "saveError": "An error occurred",
+    "saveSuccess": "{count} answers saved successfully!",
+    "otherBank": "Other",
+    "answered": "answered",
+    "nonCompliant": "non-compliant",
+    "autoSaving": "Auto-saving...",
+    "saved": "saved",
+    "unsavedChanges": "Unsaved changes",
+    "saveDraft": "Save Draft",
+    "saving": "Saving...",
+    "saveAll": "Save All"
   }
 }

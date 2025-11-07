@@ -143,20 +143,27 @@
   },
   
   "placeholders": {
+    "enterTitle": "Enter problem title",
+    "enterDescription": "Enter problem description",
     "selectFinding": "Select finding",
-    "enterProblem": "Enter problem title",
     "selectResponsible": "Select responsible person",
     "selectManager": "Select manager",
-    "searchProblem": "Search problem...",
-    "searchDof": "Search CAPA...",
-    "enterWhat": "What happened?",
-    "enterWhere": "Where did it happen?",
-    "enterWhen": "When did it happen?",
     "enterWho": "Who identified it?",
     "enterHow": "How was it identified?",
     "enterWhy": "Why is it important?",
     "enterMeasure": "Enter temporary measure",
     "enterAnalysis": "Enter your analysis",
     "enterRootCause": "Enter root cause"
+  },
+  
+  "quickDof": {
+    "open": "Open DOF",
+    "title": "Quick DOF",
+    "description": "Start 7-step Corrective and Preventive Action",
+    "responsible": "DOF Responsible",
+    "selectUserPlaceholder": "Select responsible",
+    "responsibleNote": "Responsible will complete all DOF steps",
+    "start": "Start DOF",
+    "createSuccess": "DOF created"
   }
 }

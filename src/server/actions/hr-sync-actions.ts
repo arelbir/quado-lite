@@ -11,6 +11,7 @@ import {
   createPermissionError,
 } from "@/lib/helpers/error-helpers";
 import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { addHRSyncJob, getQueueStatus, cancelSyncJob } from "@/lib/queue/hr-sync-queue";
 
 interface ActionResponse {
   success: boolean;
@@ -234,15 +235,87 @@ export async function triggerManualSync(
         })
         .returning();
 
-      // TODO: Trigger actual sync job (background job, queue, etc.)
-      // For now, just create the log
+      if (!syncLog) {
+        throw new Error("Failed to create sync log");
+      }
+
+      // Add sync job to background queue
+      const job = await addHRSyncJob({
+        syncLogId: syncLog.id,
+        configId: config.id,
+        triggeredBy: user.id,
+        syncType: config.sourceType,
+      });
+
+      console.log(`📋 HR sync job queued: ${job.id}`);
 
       revalidatePath("/admin/hr-sync");
 
       return {
         success: true,
         message: "Sync triggered successfully. Processing in background...",
-        data: syncLog,
+        data: { syncLog, jobId: job.id },
+      };
+    }
+  );
+}
+
+/**
+ * GET HR SYNC QUEUE STATUS
+ */
+export async function getHRSyncQueueStatus(): Promise<ActionResponse> {
+  return withAuth(
+    async (user) => {
+      // ✅ UNIFIED PERMISSION CHECK
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "hr-sync",
+        action: "view",
+      });
+
+      if (!perm.allowed) {
+        return createPermissionError(perm.reason || "Permission denied");
+      }
+
+      const queueStatus = await getQueueStatus();
+
+      return {
+        success: true,
+        data: queueStatus,
+      };
+    }
+  );
+}
+
+/**
+ * CANCEL HR SYNC JOB
+ */
+export async function cancelHRSyncJob(jobId: string): Promise<ActionResponse> {
+  return withAuth(
+    async (user) => {
+      // ✅ UNIFIED PERMISSION CHECK
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "hr-sync",
+        action: "cancel",
+      });
+
+      if (!perm.allowed) {
+        return createPermissionError(perm.reason || "Permission denied");
+      }
+
+      const cancelled = await cancelSyncJob(jobId);
+
+      if (!cancelled) {
+        return createValidationError("Job not found or cannot be cancelled");
+      }
+
+      revalidatePath("/admin/hr-sync");
+
+      return {
+        success: true,
+        message: "Sync job cancelled successfully",
+        data: { jobId, cancelled: true },
       };
     }
   );

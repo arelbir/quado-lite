@@ -7,6 +7,7 @@ import { PlusIcon } from "@radix-ui/react-icons"
 import { type Row } from "@tanstack/react-table"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { useTranslations } from 'next-intl'
 
 import { getErrorMessage } from "@/lib/handle-error"
 import { Button } from "@/components/ui/button"
@@ -46,6 +47,7 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
+  const t = useTranslations('myTasks');
   const [open, setOpen] = React.useState(false)
   const [isCreatePending, startCreateTransition] = React.useTransition()
 
@@ -66,11 +68,11 @@ export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
           anotherTaskId,
         }),
         {
-          loading: "Creating task...",
+          loading: t('status.creating'),
           success: () => {
             form.reset()
             setOpen(false)
-            return "Task created"
+            return t('messages.taskCreated')
           },
           error: (error) => {
             setOpen(false)
@@ -86,14 +88,14 @@ export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-          New task
+          {t('actions.createTask')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create task</DialogTitle>
+          <DialogTitle>{t('actions.createTask')}</DialogTitle>
           <DialogDescription>
-            Fill in the details below to create a new task.
+            {t('placeholders.enterDescription')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -106,10 +108,10 @@ export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t('fields.title')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Do a kickflip"
+                      placeholder={t('placeholders.enterTitle')}
                       className="resize-none"
                       {...field}
                     />
@@ -123,14 +125,14 @@ export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
               name="label"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Label</FormLabel>
+                  <FormLabel>{t('fields.category')}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger className="capitalize">
-                        <SelectValue placeholder="Select a label" />
+                        <SelectValue placeholder={t('fields.category')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -156,14 +158,14 @@ export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel>{t('fields.status')}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger className="capitalize">
-                        <SelectValue placeholder="Select a status" />
+                        <SelectValue placeholder={t('fields.status')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -189,14 +191,14 @@ export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
               name="priority"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Priority</FormLabel>
+                  <FormLabel>{t('fields.priority')}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger className="capitalize">
-                        <SelectValue placeholder="Select a priority" />
+                        <SelectValue placeholder={t('fields.priority')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -220,10 +222,10 @@ export function CreateTaskDialog({ prevTasks }: CreateTaskDialogProps) {
             <DialogFooter className="gap-2 pt-2 sm:space-x-0">
               <DialogClose asChild>
                 <Button type="button" variant="outline">
-                  Cancel
+                  {t('actions.cancel')}
                 </Button>
               </DialogClose>
-              <Button disabled={isCreatePending}>Submit</Button>
+              <Button disabled={isCreatePending}>{t('actions.save')}</Button>
             </DialogFooter>
           </form>
         </Form>

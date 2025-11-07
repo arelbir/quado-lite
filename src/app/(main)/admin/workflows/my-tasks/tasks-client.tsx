@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
 import { transitionWorkflow } from "@/server/actions/workflow-actions";
 import { toast } from "sonner";
+import { useTranslations } from 'next-intl';
 
 interface WorkflowTask {
   id: string;
@@ -21,6 +22,7 @@ interface WorkflowTask {
 }
 
 export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
+  const t = useTranslations('myTasks');
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleApprove = async (task: WorkflowTask) => {
@@ -29,17 +31,17 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
       const result = await transitionWorkflow({
         workflowInstanceId: task.workflowInstanceId,
         action: "approve",
-        comment: "Approved from My Tasks",
+        comment: t('workflows.approvedFromMyTasks'),
       });
 
       if (result.success) {
-        toast.success("Task approved successfully");
+        toast.success(t('workflows.taskApproved'));
         window.location.reload();
       } else {
-        toast.error(result.error || "Failed to approve");
+        toast.error(result.error || t('workflows.failedToApprove'));
       }
     } catch (error) {
-      toast.error("Failed to approve");
+      toast.error(t('workflows.failedToApprove'));
     }
     setLoading(null);
   };
@@ -50,17 +52,17 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
       const result = await transitionWorkflow({
         workflowInstanceId: task.workflowInstanceId,
         action: "reject",
-        comment: "Rejected from My Tasks",
+        comment: t('workflows.rejectedFromMyTasks'),
       });
 
       if (result.success) {
-        toast.success("Task rejected successfully");
+        toast.success(t('workflows.taskRejected'));
         window.location.reload();
       } else {
-        toast.error(result.error || "Failed to reject");
+        toast.error(result.error || t('workflows.failedToReject'));
       }
     } catch (error) {
-      toast.error("Failed to reject");
+      toast.error(t('workflows.failedToReject'));
     }
     setLoading(null);
   };
@@ -70,7 +72,7 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
           <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No pending workflow tasks</p>
+          <p>{t('workflows.noPendingTasks')}</p>
         </CardContent>
       </Card>
     );
@@ -88,7 +90,7 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('workflows.totalTasks')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{tasks.length}</div>
@@ -96,7 +98,7 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('workflows.pending')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{pendingTasks.length}</div>
@@ -104,7 +106,7 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('workflows.overdue')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{overdueCount}</div>
@@ -116,7 +118,7 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
       <div className="space-y-4">
         {tasks.map((task) => {
           const isOverdue = task.deadline && new Date(task.deadline) < new Date();
-          const entityType = task.instance?.entityType || "Unknown";
+          const entityType = task.instance?.entityType || t('workflows.unknown');
           const entityId = task.instance?.entityId || "N/A";
 
           return (
@@ -129,12 +131,12 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
                       {isOverdue && (
                         <Badge variant="destructive" className="text-xs">
                           <AlertCircle className="h-3 w-3 mr-1" />
-                          Overdue
+                          {t('workflows.overdue')}
                         </Badge>
                       )}
                     </CardTitle>
                     <CardDescription className="mt-1">
-                      Workflow: {task.instance?.definition?.name || "Unknown"}
+                      {t('workflows.workflow')}: {task.instance?.definition?.name || t('workflows.unknown')}
                     </CardDescription>
                   </div>
                   <Badge variant={task.status === "pending" ? "default" : "secondary"}>
@@ -145,11 +147,11 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
               <CardContent>
                 <div className="space-y-4">
                   <div className="text-sm text-muted-foreground">
-                    <div>Assignment: {task.assignmentType}</div>
-                    {task.assignedRole && <div>Role: {task.assignedRole}</div>}
+                    <div>{t('workflows.assignment')}: {task.assignmentType}</div>
+                    {task.assignedRole && <div>{t('workflows.role')}: {task.assignedRole}</div>}
                     {task.deadline && (
                       <div>
-                        Deadline: {new Date(task.deadline).toLocaleDateString()} at{" "}
+                        {t('workflows.deadline')}: {new Date(task.deadline).toLocaleDateString()} at{" "}
                         {new Date(task.deadline).toLocaleTimeString()}
                       </div>
                     )}
@@ -163,7 +165,7 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
                         disabled={loading === task.id}
                       >
                         <CheckCircle className="h-4 w-4 mr-1" />
-                        Approve
+                        {t('workflows.approve')}
                       </Button>
                       <Button
                         size="sm"
@@ -172,7 +174,7 @@ export function WorkflowTasksClient({ tasks }: { tasks: WorkflowTask[] }) {
                         disabled={loading === task.id}
                       >
                         <XCircle className="h-4 w-4 mr-1" />
-                        Reject
+                        {t('workflows.reject')}
                       </Button>
                     </div>
                   )}

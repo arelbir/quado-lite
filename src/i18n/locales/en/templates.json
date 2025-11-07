@@ -27,12 +27,15 @@
     "quality": "Quality",
     "environment": "Environment",
     "ohs": "OHS",
+    "ohsFull": "Occupational Health and Safety",
     "infoSecurity": "Information Security",
     "foodSafety": "Food Safety",
     "other": "Other"
   },
   "messages": {
     "selectBanksOptional": "Select question banks to be used in template (optional)",
+    "selectCategoryDescription": "Select which area this template is for",
+    "durationDescription": "Estimated duration for audit with this template",
     "enterTemplateInfo": "Specify template name and category",
     "templateCreated": "Template created successfully!",
     "templateUpdated": "Template updated successfully!",
@@ -40,5 +43,9 @@
     "allQuestionsInBanks": "All questions in banks",
     "banksInTemplate": "Question banks used in this template",
     "noBanksAddedYet": "No question banks added to this template yet"
+  },
+  "validation": {
+    "min3Chars": "At least 3 characters required",
+    "categoryRequired": "Please select a category"
   }
 }

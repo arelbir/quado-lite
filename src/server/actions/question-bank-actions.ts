@@ -51,7 +51,7 @@ export async function createQuestionBank(data: {
  * Tüm soru havuzlarını listele
  */
 export async function getQuestionBanks(): Promise<any> {
-  const result = await withAuth(async (user: User) => {
+  const result = await withAuth<any[]>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -95,7 +95,7 @@ export async function getQuestionBanks(): Promise<any> {
  * Tek bir soru havuzunu detaylı getir
  */
 export async function getQuestionBankById(bankId: string): Promise<any> {
-  const result = await withAuth(async (user: User) => {
+  const result = await withAuth<any>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -214,8 +214,8 @@ export async function deleteQuestionBank(bankId: string): Promise<ActionResponse
 /**
  * Aktif soru havuzlarını getir (şablon oluştururken kullanılır)
  */
-export async function getActiveQuestionBanks() {
-  const result = await withAuth(async (user: User) => {
+export async function getActiveQuestionBanks(): Promise<any[]> {
+  const result = await withAuth<any[]>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,

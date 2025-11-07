@@ -22,12 +22,13 @@ import { toast } from "sonner"
 import {  Link } from "@/components/ui/link"
 import { useAction } from "next-safe-action/hooks"
 import { isExecuting } from "next-safe-action/status"
+import { useTranslations } from 'next-intl'
 
 
 
 
 export const ResetPasswordForm = () => {
-
+    const t = useTranslations('auth');
     // const callbackUrl = searchParams.get("callbackUrl");
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
@@ -42,12 +43,12 @@ export const ResetPasswordForm = () => {
                 form.reset();
                 setSuccess(res?.success);
                 res.link && toast.success(<Link href={res.link}>
-                    Reset password now
+                    {t('messages.resetPasswordNow')}
                 </Link>, {duration: 0})
             }
         },
         onError: () => {
-            setError("Something went wrong")
+            setError(t('messages.somethingWentWrong'))
         }
     });
 
@@ -76,11 +77,11 @@ export const ResetPasswordForm = () => {
                         name="email"
                         render={({ field }) => (
                             <FormItem className="grid gap-2">
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>{t('fields.email')}</FormLabel>
                                 <FormControl>
                                     <Input
                                         disabled={isPending}
-                                        placeholder="email"
+                                        placeholder={t('placeholders.email')}
                                         autoComplete="email"
                                         {...field}
                                     />
@@ -94,8 +95,7 @@ export const ResetPasswordForm = () => {
                     <FormSuccess message={success} />
                     <LoadingButton loading={isPending}
                         className="w-full">
-
-                        Send reset email
+                        {t('actions.sendResetEmail')}
                     </LoadingButton>
                 </form>
             </Form>

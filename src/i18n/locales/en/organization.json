@@ -3,12 +3,22 @@
   "description": "Manage companies, branches, departments and positions",
   
   "companies": {
-    "title": "Companies",
-    "description": "Manage your companies",
+    "companyTitle": "Companies",
+    "overview": "Manage your companies",
     "createNew": "Create New Company",
     "editCompany": "Edit Company",
     "deleteCompany": "Delete Company",
     "deleteConfirm": "Are you sure you want to delete this company?",
+    "companyDescription": {
+      "create": "Add a new company to your organization.",
+      "update": "Update the company information below."
+    },
+    "messages": {
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully",
+      "saveError": "Failed to save company"
+    },
     "fields": {
       "name": "Company Name",
       "code": "Company Code",
@@ -33,10 +43,10 @@
       "address": "Enter address",
       "phone": "Enter phone number",
       "email": "Enter email address",
-      "website": "Enter website URL",
+      "website": "Enter website address",
       "description": "Enter description"
     },
-    "messages": {
+    "companyMessages": {
       "created": "Company created successfully",
       "updated": "Company updated successfully",
       "deleted": "Company deleted successfully",
@@ -48,11 +58,15 @@
 
   "branches": {
     "title": "Branches",
-    "description": "Manage branch offices and locations across your organization",
+    "overview": "Manage branch offices and locations across your organization",
     "createNew": "Create New Branch",
     "editBranch": "Edit Branch",
     "deleteBranch": "Delete Branch",
     "deleteConfirm": "Are you sure you want to delete this branch?",
+    "description": {
+      "create": "Add a new branch office to your organization.",
+      "update": "Update the branch information below."
+    },
     "fields": {
       "name": "Branch Name",
       "code": "Branch Code",
@@ -68,12 +82,21 @@
       "departments": "Departments",
       "isActive": "Active"
     },
+    "messages": {
+      "created": "Branch created successfully",
+      "updated": "Branch updated successfully",
+      "deleted": "Branch deleted successfully",
+      "idRequired": "Branch ID is required for update",
+      "saveError": "Failed to save branch"
+    },
     "types": {
       "Headquarters": "Headquarters",
       "Regional Office": "Regional Office",
       "Branch Office": "Branch Office",
       "Sales Office": "Sales Office",
-      "Service Center": "Service Center"
+      "Service Center": "Service Center",
+      "Factory": "Factory",
+      "Warehouse": "Warehouse"
     },
     "placeholders": {
       "name": "Enter branch name",
@@ -87,24 +110,28 @@
       "email": "Enter email address",
       "description": "Enter description",
       "manager": "Select branch manager"
-    },
-    "messages": {
-      "created": "Branch created successfully",
-      "updated": "Branch updated successfully",
-      "deleted": "Branch deleted successfully",
-      "createError": "Failed to create branch",
-      "updateError": "Failed to update branch",
-      "deleteError": "Failed to delete branch"
     }
   },
 
   "departments": {
     "title": "Departments",
-    "description": "Manage your organization's department hierarchy",
+    "overview": "Manage organizational department hierarchy",
     "createNew": "Create New Department",
     "editDepartment": "Edit Department",
     "deleteDepartment": "Delete Department",
     "deleteConfirm": "Are you sure you want to delete this department?",
+    "expandAll": "Expand All",
+    "collapseAll": "Collapse All",
+    "treeTitle": "Organization Hierarchy",
+    "treeDescription": "View and manage your department structure",
+    "emptyState": {
+      "title": "No departments yet",
+      "description": "Create your first department to get started"
+    },
+    "description": {
+      "create": "Add a new department to your organization.",
+      "update": "Update the department information below."
+    },
     "fields": {
       "name": "Department Name",
       "code": "Department Code",
@@ -127,25 +154,27 @@
       "description": "Enter description",
       "costCenter": "Enter cost center code",
       "budget": "Enter budget"
-    },
-    "messages": {
-      "created": "Department created successfully",
-      "updated": "Department updated successfully",
-      "deleted": "Department deleted successfully",
-      "createError": "Failed to create department",
-      "updateError": "Failed to update department",
-      "deleteError": "Failed to delete department",
-      "hasSubDepartments": "Cannot delete department with sub-departments"
     }
   },
 
   "positions": {
     "title": "Positions",
-    "description": "Manage job positions and career levels",
+    "overview": "Manage career positions and roles",
     "createNew": "Create New Position",
     "editPosition": "Edit Position",
     "deletePosition": "Delete Position",
     "deleteConfirm": "Are you sure you want to delete this position?",
+    "description": {
+      "create": "Add a new position to your organization.",
+      "update": "Update the position information below."
+    },
+    "messages": {
+      "created": "Position created successfully",
+      "updated": "Position updated successfully",
+      "deleted": "Position deleted successfully",
+      "idRequired": "Position ID is required for update",
+      "saveError": "Failed to save position"
+    },
     "fields": {
       "name": "Position Name",
       "code": "Position Code",
@@ -153,7 +182,8 @@
       "category": "Category",
       "description": "Description",
       "salaryGrade": "Salary Grade",
-      "isActive": "Active"
+      "isActive": "Active",
+      "basicInformation": "Basic Information"
     },
     "levels": {
       "1": "Level 1 - Intern",
@@ -182,15 +212,15 @@
       "category": "Select category",
       "description": "Enter description",
       "salaryGrade": "Enter salary grade"
-    },
-    "messages": {
-      "created": "Position created successfully",
-      "updated": "Position updated successfully",
-      "deleted": "Position deleted successfully",
-      "createError": "Failed to create position",
-      "updateError": "Failed to update position",
-      "deleteError": "Failed to delete position"
     }
+  },
+
+  "orgChart": {
+    "export": "Export",
+    "fitView": "Fit View",
+    "exportChart": "Export chart",
+    "subDepartments": "sub-department",
+    "subDepartments_plural": "sub-departments"
   },
 
   "common": {

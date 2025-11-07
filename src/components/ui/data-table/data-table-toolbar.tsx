@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { DateRangePicker } from "@/components/ui/date-range-picker"
+import { useTranslations } from 'next-intl'
 
 interface DataTableToolbarProps<TData>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -26,6 +27,7 @@ export function DataTableToolbar<TData>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
+  const tCommon = useTranslations('common');
   const isFiltered = table.getState().columnFilters.length > 0
 
   // Memoize computation of searchableColumns, filterableColumns, and dateColumns
@@ -97,7 +99,7 @@ export function DataTableToolbar<TData>({
                       .getColumn(String(column.value))
                       ?.setFilterValue(range)
                   }
-                  placeholder={column.placeholder || "Tarih aralığı seçin"}
+                  placeholder={column.placeholder || tCommon('placeholders.selectDateRange')}
                 />
               )
           )}
@@ -108,7 +110,7 @@ export function DataTableToolbar<TData>({
             className="h-8 px-2 lg:px-3"
             onClick={() => table.resetColumnFilters()}
           >
-            Reset
+            {tCommon('actions.reset')}
             <Cross2Icon className="ml-2 size-4" aria-hidden="true" />
           </Button>
         )}

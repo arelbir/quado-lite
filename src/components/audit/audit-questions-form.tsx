@@ -26,6 +26,7 @@ interface AuditQuestionsFormProps {
 }
 
 export function AuditQuestionsForm({ auditId, questions }: AuditQuestionsFormProps) {
+  const t = useTranslations('audit');
   const router = useRouter();
   const [formState, setFormState] = useState<FormState>({});
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -130,22 +131,22 @@ export function AuditQuestionsForm({ auditId, questions }: AuditQuestionsFormPro
           }));
 
         if (answers.length === 0) {
-          toast.error("Lütfen en az bir soruyu cevaplayın");
+          toast.error(t('questionsForm.answerAtLeastOne'));
           return;
         }
 
         const result = await saveAllAuditAnswers({ auditId, answers });
 
         if (result.success) {
-          toast.success(`${answers.length} cevap başarıyla kaydedildi!`);
+          toast.success(t('questionsForm.saveSuccess', { count: answers.length }));
           setLastSaved(new Date());
           setHasUnsavedChanges(false);
           router.refresh();
         } else {
-          toast.error(result.error || "Kaydetme başarısız");
+          toast.error(result.error || t('questionsForm.saveFailed'));
         }
       } catch (error) {
-        toast.error("Bir hata oluştu");
+        toast.error(t('questionsForm.saveError'));
       }
     });
   };
@@ -155,7 +156,7 @@ export function AuditQuestionsForm({ auditId, questions }: AuditQuestionsFormPro
 
   // Group questions by bank
   const groupedQuestions = questions.reduce((acc, aq) => {
-    const bankName = aq.question?.bank?.name || "Diğer";
+    const bankName = aq.question?.bank?.name || t('questionsForm.otherBank');
     if (!acc[bankName]) {
       acc[bankName] = [];
     }
@@ -197,28 +198,28 @@ export function AuditQuestionsForm({ auditId, questions }: AuditQuestionsFormPro
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <span className="font-medium">{answeredCount} / {questions.length}</span>
-                <span className="text-muted-foreground">cevaplandı</span>
+                <span className="text-muted-foreground">{t('questionsForm.answered')}</span>
               </div>
               {nonCompliantCount > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="text-destructive font-medium">{nonCompliantCount}</span>
-                  <span className="text-muted-foreground">uygunsuz</span>
+                  <span className="text-muted-foreground">{t('questionsForm.nonCompliant')}</span>
                 </div>
               )}
               {isAutoSaving && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Loader2 className="h-3 w-3 animate-spin" />
-                  <span className="text-xs">Otomatik kaydediliyor...</span>
+                  <span className="text-xs">{t('questionsForm.autoSaving')}</span>
                 </div>
               )}
               {lastSaved && !hasUnsavedChanges && (
                 <span className="text-xs text-muted-foreground">
-                  💾 {formatDistanceToNow(lastSaved, { addSuffix: true, locale: tr })} kaydedildi
+                  💾 {formatDistanceToNow(lastSaved, { addSuffix: true, locale: tr })} {t('questionsForm.saved')}
                 </span>
               )}
               {hasUnsavedChanges && !isAutoSaving && (
                 <span className="text-xs text-warning">
-                  ⚠️ Kaydedilmemiş değişiklikler
+                  ⚠️ {t('questionsForm.unsavedChanges')}
                 </span>
               )}
             </div>
@@ -230,7 +231,7 @@ export function AuditQuestionsForm({ auditId, questions }: AuditQuestionsFormPro
                 onClick={handleAutoSave}
                 disabled={!hasUnsavedChanges || isAutoSaving}
               >
-                Taslak Kaydet
+                {t('questionsForm.saveDraft')}
               </Button>
               <Button
                 onClick={handleSaveAll}
@@ -240,12 +241,12 @@ export function AuditQuestionsForm({ auditId, questions }: AuditQuestionsFormPro
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Kaydediliyor...
+                    {t('questionsForm.saving')}
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    Tümünü Kaydet
+                    {t('questionsForm.saveAll')}
                   </>
                 )}
               </Button>

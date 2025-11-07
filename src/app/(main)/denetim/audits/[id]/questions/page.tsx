@@ -34,8 +34,15 @@ export default async function AuditQuestionsPage({ params }: PageProps) {
     notFound();
   }
 
-  const questions = await getAuditQuestions(id);
-  const completion = await checkAuditCompletion(id);
+  const questions: any[] = await getAuditQuestions(id);
+  const completionResult = await checkAuditCompletion(id);
+  const completion: {
+    total: number;
+    answered: number;
+    unanswered: number;
+    nonCompliant: number;
+    completionPercentage: number;
+  } = completionResult;
 
   return (
     <div className="space-y-6">

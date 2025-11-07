@@ -4,8 +4,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Icons } from '@/components/icons';
 import { useWorkflowStore } from '../Hooks/useWorkflowStore';
 import { useFlowValidation } from '../Hooks/useFlowValidation';
+import { useTranslations } from 'next-intl';
 
 export function ValidationPanel() {
+  const t = useTranslations('workflow');
   const { nodes, edges } = useWorkflowStore();
   const { errors, isValid } = useFlowValidation(nodes, edges);
 
@@ -14,7 +16,7 @@ export function ValidationPanel() {
       <Alert className="bg-green-50 border-green-200">
         <Icons.CheckCircle2 className="size-4 text-green-600" />
         <AlertDescription className="text-green-800">
-          ✓ No issues found. Workflow is valid!
+          {t('validation.noIssuesFound')}
         </AlertDescription>
       </Alert>
     );

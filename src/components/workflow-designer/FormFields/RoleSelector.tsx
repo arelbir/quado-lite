@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { getWorkflowRoles, getWorkflowUsers, getWorkflowDepartments } from '@/server/actions/workflow-data-actions';
+import { useTranslations } from 'next-intl';
 
 // Static dynamic assignment templates (no need for server action)
 const DYNAMIC_ASSIGNMENT_TEMPLATES = [
@@ -72,12 +73,17 @@ interface RoleSelectorProps {
 export function RoleSelector({
   value,
   onChange,
-  label = 'Assigned Role',
-  placeholder = 'Select assignment...',
+  label,
+  placeholder,
   showDynamic = true,
   showUsers = true,
   showDepartments = true,
 }: RoleSelectorProps) {
+  const t = useTranslations('workflow');
+  
+  // Use translated defaults if not provided
+  const finalLabel = label || t('fields.assignedRole');
+  const finalPlaceholder = placeholder || t('placeholders.selectAssignment');
   const [open, setOpen] = useState(false);
   const [roles, setRoles] = useState<Array<{ value: string; label: string; description?: string }>>([]);
   const [users, setUsers] = useState<Array<{ value: string; label: string; email?: string }>>([]);
@@ -123,7 +129,7 @@ export function RoleSelector({
 
   // Get display value
   const getDisplayValue = () => {
-    if (!value) return placeholder;
+    if (!value) return finalPlaceholder;
 
     // Check roles
     const role = roles.find(r => r.value === value);
@@ -156,7 +162,7 @@ export function RoleSelector({
 
   return (
     <div className="space-y-2">
-      <Label>{label} *</Label>
+      <Label>{finalLabel} *</Label>
       
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -173,16 +179,16 @@ export function RoleSelector({
         
         <PopoverContent className="w-[400px] p-0" align="start">
           <Command>
-            <CommandInput placeholder="Search roles, users, departments..." />
+            <CommandInput placeholder={t('roleSelector.searchPlaceholder')} />
             <CommandList>
               <CommandEmpty>
-                {loading ? 'Loading...' : 'No results found.'}
+                {loading ? t('roleSelector.loading') : t('roleSelector.noResults')}
               </CommandEmpty>
 
               {/* System Roles */}
               {roles.length > 0 && (
                 <>
-                  <CommandGroup heading="📋 System Roles">
+                  <CommandGroup heading={t('roleSelector.systemRoles')}>
                     {roles.map((role) => (
                       <CommandItem
                         key={role.value}
@@ -215,7 +221,7 @@ export function RoleSelector({
               {/* Specific Users */}
               {showUsers && users.length > 0 && (
                 <>
-                  <CommandGroup heading="👤 Specific Users">
+                  <CommandGroup heading={t('roleSelector.specificUsers')}>
                     {users.slice(0, 10).map((user) => (
                       <CommandItem
                         key={user.value}
@@ -253,7 +259,7 @@ export function RoleSelector({
               {/* Department Managers */}
               {showDepartments && departments.length > 0 && (
                 <>
-                  <CommandGroup heading="🏢 Department Managers">
+                  <CommandGroup heading={t('roleSelector.departmentManagers')}>
                     {departments.map((dept) => (
                       <CommandItem
                         key={dept.value}
@@ -278,7 +284,7 @@ export function RoleSelector({
 
               {/* Dynamic Templates */}
               {showDynamic && dynamicTemplates.length > 0 && (
-                <CommandGroup heading="⚡ Dynamic Assignment">
+                <CommandGroup heading={t('roleSelector.dynamicAssignment')}>
                   {dynamicTemplates.map((template: typeof DYNAMIC_ASSIGNMENT_TEMPLATES[0]) => (
                     <CommandItem
                       key={template.value}

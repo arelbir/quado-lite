@@ -27,11 +27,13 @@ import {
   type FieldMapping,
   type SyncResult
 } from "@/drizzle/schema/hr-sync";
-import { user, departments, positions } from "@/drizzle/schema";
+import { departments, positions, user } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
-// Note: Install with: pnpm add ldapjs @types/ldapjs
-// import ldap from 'ldapjs';
+import { Client, type Entry, type SearchResult } from 'ldapts';
+
+// Type for LDAP user data
+type LDAPUser = Record<string, any>;
 
 /**
  * LDAP SYNC SERVICE CLASS
@@ -41,6 +43,7 @@ export class LDAPSyncService {
   private ldapConfig: LDAPConfig;
   private fieldMapping: FieldMapping;
   private syncLogId?: string;
+  private client?: Client;
 
   constructor(config: HRSyncConfig) {
     this.config = config;
@@ -73,7 +76,10 @@ export class LDAPSyncService {
       await this.updateSyncLog('Completed', result);
       
       // 5. Disconnect
-      client.unbind();
+      if (this.client) {
+        await this.client.unbind();
+        this.client = undefined;
+      }
       
       console.log(`✅ LDAP sync completed successfully`);
       return result;
@@ -91,6 +97,17 @@ export class LDAPSyncService {
           error: error instanceof Error ? error.message : 'Unknown error'
         }]
       });
+      
+      // Cleanup connection on error
+      if (this.client) {
+        try {
+          await this.client.unbind();
+          this.client = undefined;
+        } catch (cleanupError) {
+          console.warn('⚠️ Failed to cleanup LDAP connection:', cleanupError);
+        }
+      }
+      
       throw error;
     }
   }
@@ -98,75 +115,55 @@ export class LDAPSyncService {
   /**
    * CONNECT TO LDAP SERVER
    */
-  private async connect(): Promise<any> {
+  private async connect(): Promise<Client> {
     console.log(`🔌 Connecting to LDAP server: ${this.ldapConfig.host}:${this.ldapConfig.port}`);
     
-    // TODO: Implement actual LDAP connection
-    // const client = ldap.createClient({
-    //   url: `ldap://${this.ldapConfig.host}:${this.ldapConfig.port}`,
-    //   tlsOptions: this.ldapConfig.tlsEnabled ? {} : undefined
-    // });
-    
-    // return new Promise((resolve, reject) => {
-    //   client.bind(this.ldapConfig.bindDN, this.ldapConfig.bindPassword, (err) => {
-    //     if (err) reject(err);
-    //     else resolve(client);
-    //   });
-    // });
+    try {
+      // Create LDAP client
+      this.client = new Client({
+        url: `${this.ldapConfig.tlsEnabled ? 'ldaps' : 'ldap'}://${this.ldapConfig.host}:${this.ldapConfig.port}`,
+        timeout: 10000, // 10 seconds timeout
+        connectTimeout: 10000,
+      });
 
-    // MOCK: Return mock client for now
-    return {
-      unbind: () => console.log('🔌 Disconnected from LDAP'),
-      search: (baseDN: string, options: any, callback: any) => {
-        // Mock implementation
-        callback(null, {
-          on: (event: string, handler: any) => {
-            if (event === 'end') {
-              setTimeout(() => handler({ status: 0 }), 100);
-            }
-          }
-        });
-      }
-    };
+      // Bind to LDAP server
+      await this.client.bind(this.ldapConfig.bindDN, this.ldapConfig.bindPassword);
+      
+      console.log('✅ Successfully connected to LDAP server');
+      return this.client;
+    } catch (error) {
+      console.error('❌ Failed to connect to LDAP server:', error);
+      throw new Error(`LDAP connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   /**
    * SEARCH USERS IN LDAP
    */
-  private async searchUsers(client: any): Promise<any[]> {
+  private async searchUsers(client: Client): Promise<LDAPUser[]> {
     console.log(`🔍 Searching users in: ${this.ldapConfig.baseDN}`);
     
-    const opts = {
+    const searchOptions = {
+      scope: 'sub' as const,
       filter: this.ldapConfig.searchFilter,
-      scope: 'sub',
       attributes: Object.keys(this.fieldMapping)
     };
 
-    // TODO: Implement actual LDAP search
-    // return new Promise((resolve, reject) => {
-    //   const entries: any[] = [];
-    //   
-    //   client.search(this.ldapConfig.baseDN, opts, (err: any, res: any) => {
-    //     if (err) return reject(err);
-    //     
-    //     res.on('searchEntry', (entry: any) => {
-    //       entries.push(entry.object);
-    //     });
-    //     
-    //     res.on('error', reject);
-    //     
-    //     res.on('end', () => resolve(entries));
-    //   });
-    // });
-
-    // MOCK: Return mock users
-    return this.getMockLDAPUsers();
+    try {
+      const result: SearchResult = await client.search(this.ldapConfig.baseDN, searchOptions);
+      const users = result.searchEntries.map((entry: Entry) => entry.pojo as LDAPUser);
+      console.log(`✅ Found ${users.length} users in LDAP`);
+      return users;
+    } catch (error) {
+      console.error('❌ Failed to search LDAP users:', error);
+      throw new Error(`LDAP search failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   /**
    * PROCESS USERS (Create/Update/Skip)
    */
-  private async processUsers(ldapUsers: any[]): Promise<SyncResult> {
+  private async processUsers(ldapUsers: LDAPUser[]): Promise<SyncResult> {
     const result: SyncResult = {
       success: true,
       totalRecords: ldapUsers.length,
@@ -179,11 +176,11 @@ export class LDAPSyncService {
     for (const ldapUser of ldapUsers) {
       try {
         // 1. Map LDAP fields to internal fields
-        const mappedData = this.mapFields(ldapUser);
+        const mappedData = await this.mapFields(ldapUser);
         
         // 2. Check if user exists (by external ID or email)
         const existingUser = await this.findExistingUser(
-          ldapUser[this.getExternalIdField()],
+          ldapUser[this.getExternalIdField()] as string,
           mappedData.email
         );
 
@@ -217,15 +214,15 @@ export class LDAPSyncService {
         if (userId) {
           await this.upsertExternalMapping(
             userId,
-            ldapUser[this.getExternalIdField()],
-            ldapUser.mail
+            ldapUser[this.getExternalIdField()] as string,
+            (mappedData.email || ldapUser.mail) as string
           );
         }
 
         // 4. Log record
         await this.logUserRecord(
           userId,
-          ldapUser[this.getExternalIdField()],
+          ldapUser[this.getExternalIdField()] as string,
           action,
           ldapUser,
           mappedData,
@@ -242,7 +239,7 @@ export class LDAPSyncService {
         // Log failed record
         await this.logUserRecord(
           undefined,
-          ldapUser[this.getExternalIdField()],
+          ldapUser[this.getExternalIdField()] as string,
           'Error',
           ldapUser,
           null,
@@ -259,7 +256,7 @@ export class LDAPSyncService {
   /**
    * MAP LDAP FIELDS TO INTERNAL FIELDS
    */
-  private mapFields(ldapUser: any): any {
+  private async mapFields(ldapUser: LDAPUser): Promise<any> {
     const mapped: any = {};
     
     for (const [ldapField, internalField] of Object.entries(this.fieldMapping)) {
@@ -269,10 +266,10 @@ export class LDAPSyncService {
         // Handle special mappings
         if (internalField === 'departmentId') {
           // Map department name to ID (requires lookup)
-          mapped[internalField] = null; // TODO: Implement department lookup
+          mapped[internalField] = await this.lookupDepartmentId(value as string);
         } else if (internalField === 'positionId') {
           // Map position name to ID (requires lookup)
-          mapped[internalField] = null; // TODO: Implement position lookup
+          mapped[internalField] = await this.lookupPositionId(value as string);
         } else {
           mapped[internalField] = value;
         }
@@ -280,6 +277,40 @@ export class LDAPSyncService {
     }
 
     return mapped;
+  }
+
+  /**
+   * LOOKUP DEPARTMENT ID BY NAME
+   */
+  private async lookupDepartmentId(departmentName: string): Promise<string | null> {
+    try {
+      const department = await db.query.departments.findFirst({
+        where: eq(departments.name, departmentName),
+        columns: { id: true }
+      });
+      
+      return department?.id || null;
+    } catch (error) {
+      console.warn(`⚠️ Failed to lookup department "${departmentName}":`, error);
+      return null;
+    }
+  }
+
+  /**
+   * LOOKUP POSITION ID BY NAME
+   */
+  private async lookupPositionId(positionName: string): Promise<string | null> {
+    try {
+      const position = await db.query.positions.findFirst({
+        where: eq(positions.name, positionName),
+        columns: { id: true }
+      });
+      
+      return position?.id || null;
+    } catch (error) {
+      console.warn(`⚠️ Failed to lookup position "${positionName}":`, error);
+      return null;
+    }
   }
 
   /**

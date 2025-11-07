@@ -28,10 +28,10 @@ export function NotificationList({ onUnreadCountChange }: NotificationListProps)
 
   const loadNotifications = async () => {
     try {
-      const data = await getUserNotifications(20);
+      const data: Notification[] = await getUserNotifications(20);
       setNotifications(data);
       
-      const unreadCount = data.filter((n) => !n.isRead).length;
+      const unreadCount = data.filter((n: Notification) => !n.isRead).length;
       onUnreadCountChange?.(unreadCount);
     } catch (error) {
       console.error("Error loading notifications:", error);

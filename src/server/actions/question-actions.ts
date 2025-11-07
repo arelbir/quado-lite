@@ -134,8 +134,8 @@ export async function deleteQuestion(questionId: string): Promise<ActionResponse
 /**
  * Tek bir soruyu getir (düzenleme için)
  */
-export async function getQuestionById(questionId: string) {
-  const result = await withAuth(async (user: User) => {
+export async function getQuestionById(questionId: string): Promise<any> {
+  const result = await withAuth<any>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,

@@ -1,0 +1,195 @@
+{
+  "title": "İş Akışları",
+  "singular": "İş Akışı",
+  "description": "İş akışı yönetimi ve izleme",
+  
+  "timeline": {
+    "title": "İş Akışı Zaman Çizelgesi",
+    "description": "Bu iş akışı için aktivite geçmişi",
+    "noEntries": "Henüz zaman çizelgesi girişi yok",
+    "entryCount": "{count, plural, =1 {1 aktivite girişi} other {# aktivite girişi}}",
+    
+    "actions": {
+      "submit": "Gönderildi",
+      "approve": "Onaylandı",
+      "reject": "Reddedildi",
+      "complete": "Tamamlandı",
+      "escalate": "Yükseltildi",
+      "veto": "Veto Edildi",
+      "assign": "Atandı",
+      "reassign": "Yeniden Atandı",
+      "unknown": "Bilinmiyor"
+    }
+  },
+  
+  "status": {
+    "draft": "Taslak",
+    "active": "Aktif",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi",
+    "suspended": "Askıya Alındı"
+  },
+  
+  "step": {
+    "start": "Başlangıç",
+    "process": "İşlem",
+    "decision": "Karar",
+    "approval": "Onay",
+    "end": "Bitiş",
+    "newStep": "Yeni Adım"
+  },
+  
+  "actions": {
+    "create": "Yeni İş Akışı Oluştur",
+    "edit": "İş Akışını Düzenle",
+    "delete": "İş Akışını Sil",
+    "view": "İş Akışını Görüntüle",
+    "start": "Başlat",
+    "pause": "Duraklat",
+    "resume": "Devam Et",
+    "cancel": "İptal Et",
+    "complete": "Tamamla"
+  },
+  
+  "fields": {
+    "name": "İş Akışı Adı",
+    "description": "Açıklama",
+    "status": "Durum",
+    "priority": "Öncelik",
+    "assignedTo": "Atanan Kişi",
+    "assignedRole": "Atanan Rol",
+    "createdBy": "Oluşturan",
+    "createdAt": "Oluşturulma Tarihi",
+    "updatedAt": "Güncellenme Tarihi",
+    "startedAt": "Başlangıç Tarihi",
+    "completedAt": "Tamamlanma Tarihi",
+    "condition": "Koşul"
+  },
+  
+  "placeholders": {
+    "enterName": "İş akışı adını giriniz",
+    "enterDescription": "Açıklama giriniz",
+    "selectStatus": "Durum seçiniz",
+    "selectPriority": "Öncelik seçiniz",
+    "selectAssignee": "Atanan kişiyi seçiniz",
+    "enterCondition": "Koşul giriniz...",
+    "selectAssignment": "Atama seçiniz..."
+  },
+  
+  "messages": {
+    "createSuccess": "İş akışı oluşturuldu",
+    "updateSuccess": "İş akışı güncellendi",
+    "deleteSuccess": "İş akışı silindi",
+    "startSuccess": "İş akışı başlatıldı",
+    "pauseSuccess": "İş akışı duraklatıldı",
+    "resumeSuccess": "İş akışı devam ettirildi",
+    "cancelSuccess": "İş akışı iptal edildi",
+    "completeSuccess": "İş akışı tamamlandı",
+    "createError": "İş akışı oluşturulamadı",
+    "updateError": "İş akışı güncellenemedi",
+    "deleteError": "İş akışı silinemedi",
+    "startError": "İş akışı başlatılamadı",
+    "pauseError": "İş akışı duraklatılamadı",
+    "resumeError": "İş akışı devam ettirilemedi",
+    "cancelError": "İş akışı iptal edilemedi",
+    "completeError": "İş akışı tamamlanamadı"
+  },
+
+  "templates": {
+    "title": "Koşul Şablonları",
+    "description": "Önceden oluşturulmuş koşulları eklemek için tıklayın",
+    "chooseFromTemplate": "Şablondan Seç"
+  },
+
+  "roleSelector": {
+    "searchPlaceholder": "Rolleri, kullanıcıları, departmanları arayın...",
+    "loading": "Yükleniyor...",
+    "noResults": "Sonuç bulunamadı.",
+    "systemRoles": "📋 Sistem Rolleri",
+    "specificUsers": "👤 Belirli Kullanıcılar",
+    "departmentManagers": "🏢 Departman Yöneticileri",
+    "dynamicAssignment": "⚡ Dinamik Atama"
+  },
+
+  "formulaBuilder": {
+    "visualBuilder": "Görsel Oluşturucu",
+    "title": "Görsel Formül Oluşturucu",
+    "description": "Kod yazmadan koşulları görsel olarak oluşturun",
+    "and": "VE",
+    "or": "VEYA",
+    "bothMustBeTrue": "Her ikisi de doğru olmalı",
+    "eitherCanBeTrue": "Herhangi biri doğru olabilir",
+    "selectField": "Alan seç",
+    "value": "Değer",
+    "addCondition": "Koşul Ekle",
+    "generatedFormula": "Oluşturulan Formül:",
+    "addConditionsAbove": "Yukarıya koşullar ekleyin...",
+    "applyFormula": "Formülü Uygula"
+  },
+
+  "approvalNode": {
+    "approvers": "Onaylayanlar",
+    "more": "daha fazla",
+    "type": "Tip"
+  },
+
+  "customFields": {
+    "referenceTitle": "Özel Alan Referansı",
+    "fieldsCount": "{count} alan",
+    "availableFor": "{module} varlıkları için kullanılabilir",
+    "title": "Özel Alanlar",
+    "description": "{module} varlıkları için",
+    "moduleNotSelected": "Modül seçilmedi",
+    "setModuleToSeeFields": "Özel alanları görmek için iş akışı modülünü ayarlayın",
+    "loading": "Özel alanlar yükleniyor...",
+    "noFieldsDefined": "Özel alan tanımlanmadı",
+    "createFieldsInAdmin": "Özel alanları Admin → Özel Alanlar bölümünde oluşturun",
+    "usagePath": "📌 Kullanım Yolu",
+    "options": "📋 Seçenekler",
+    "examples": "💡 Örnekler"
+  },
+
+  "properties": {
+    "nodeProperties": "Düğüm Özellikleri",
+    "configureNode": "Seçili düğümü yapılandır",
+    "selectNodeToEdit": "Düğüm özelliklerini düzenlemek için bir düğüm seçin",
+    "deleteConfirm": "\"{label}\" düğümünü silmek istediğinizden emin misiniz?",
+    "stepName": "Adım Adı",
+    "enterStepName": "Adım adını girin",
+    "description": "Açıklama",
+    "describeStep": "Bu adımı tanımlayın...",
+    "decisionLogic": "Karar Mantığı",
+    "condition": "Koşul",
+    "conditionPlaceholder": "Örn: status === 'approved' OR score > 80",
+    "yesTrue": "Evet / Doğru",
+    "noFalse": "Hayır / Yanlış",
+    "rightHandle": "Sağ tutamaç",
+    "bottomHandle": "Alt tutamaç",
+    "approvalSettings": "Onay Ayarları",
+    "approvalType": "Onay Tipi",
+    "selectType": "Tip seç",
+    "anyApprover": "Herhangi Bir Onaylayan",
+    "allApprovers": "Tüm Onaylayanlar",
+    "approvalTypeDescription": "ANY: Tek onay gerekli | ALL: Herkes onaylamalı",
+    "approvers": "Onaylayanlar",
+    "addApprover": "Onaylayan ekle",
+    "assignment": "Atama",
+    "assignedTo": "Atanan",
+    "selectRoleUserDepartment": "Rol, kullanıcı veya departman seçin...",
+    "deadline": "Süre (saat)",
+    "deadlineDescription": "Bu adımı tamamlamak için zaman sınırı",
+    "notifications": "Bildirimler",
+    "onAssignment": "Atamada",
+    "notifyWhenAssigned": "Adım atandığında bildir",
+    "beforeDeadline": "Süreden Önce (saat)",
+    "deleteNode": "Düğümü Sil"
+  },
+
+  "toolbar": {
+    "addNode": "Düğüm Ekle"
+  },
+
+  "validation": {
+    "noIssuesFound": "✓ Sorun bulunamadı. İş akışı geçerli!"
+  }
+}

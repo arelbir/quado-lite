@@ -9,6 +9,17 @@ import { getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
+interface Template {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  questionBankIds: string | string[] | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date | null;
+}
+
 export default async function TemplatesPage() {
   const cookieStore = cookies();
   const localeCookie = cookieStore.get('NEXT_LOCALE');
@@ -51,7 +62,7 @@ async function TemplatesGrid() {
     : defaultLocale;
   
   const t = await getTranslations({ locale, namespace: 'templates' });
-  const templates = await getAuditTemplates();
+  const templates: Template[] = await getAuditTemplates();
 
   if (templates.length === 0) {
     return (

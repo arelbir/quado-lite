@@ -14,19 +14,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ShieldCheck, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
+import type { roles } from "@/drizzle/schema/role-system";
 
-export interface Role {
-  id: string;
-  name: string;
-  description: string | null;
-  permissions: { id: string }[];
-  isSystem?: boolean;
-}
+type Role = typeof roles.$inferSelect;
+
+// Extended type with permissions relation
+type RoleWithPermissions = Role & {
+  permissions?: { id: string }[];
+};
 
 export const createColumns = (
   onEdit: (role: Role) => void,
   onDelete: (role: Role) => void
-): ColumnDef<Role>[] => [
+): ColumnDef<RoleWithPermissions>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (

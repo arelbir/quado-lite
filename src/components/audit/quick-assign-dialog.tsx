@@ -32,6 +32,8 @@ interface QuickAssignDialogProps {
 }
 
 export function QuickAssignDialog({ findingId, users, currentAssigneeId }: QuickAssignDialogProps) {
+  const t = useTranslations('finding');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string>(currentAssigneeId || "");
@@ -40,7 +42,7 @@ export function QuickAssignDialog({ findingId, users, currentAssigneeId }: Quick
 
   const handleSubmit = () => {
     if (!selectedUserId) {
-      toast.error("Lütfen bir kullanıcı seçin");
+      toast.error(t('quickAssign.selectUserError'));
       return;
     }
 
@@ -48,7 +50,7 @@ export function QuickAssignDialog({ findingId, users, currentAssigneeId }: Quick
       const result = await assignFinding(findingId, selectedUserId);
 
       if (result.success) {
-        toast.success("Bulgu atandı");
+        toast.success(t('quickAssign.assignSuccess'));
         setOpen(false);
         router.refresh();
       } else {
@@ -62,22 +64,22 @@ export function QuickAssignDialog({ findingId, users, currentAssigneeId }: Quick
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="w-full md:w-auto">
           <UserPlus className="h-4 w-4 mr-2" />
-          Sorumlu Ata
+          {t('quickAssign.assignResponsible')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Sorumlu Ata</DialogTitle>
+          <DialogTitle>{t('quickAssign.title')}</DialogTitle>
           <DialogDescription>
-            Bulguyu bir süreç sahibine atayın ve risk seviyesini belirleyin
+            {t('quickAssign.description')}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="assignee">Sorumlu</Label>
+            <Label htmlFor="assignee">{t('quickAssign.responsible')}</Label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger>
-                <SelectValue placeholder="Kullanıcı seçin" />
+                <SelectValue placeholder={t('quickAssign.selectUserPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
@@ -89,26 +91,26 @@ export function QuickAssignDialog({ findingId, users, currentAssigneeId }: Quick
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="risk">Risk Seviyesi</Label>
+            <Label htmlFor="risk">{t('quickAssign.riskLevel')}</Label>
             <Select value={selectedRisk} onValueChange={setSelectedRisk}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Kritik">Kritik</SelectItem>
-                <SelectItem value="Yüksek">Yüksek</SelectItem>
-                <SelectItem value="Orta">Orta</SelectItem>
-                <SelectItem value="Düşük">Düşük</SelectItem>
+                <SelectItem value="Kritik">{t('quickAssign.riskCritical')}</SelectItem>
+                <SelectItem value="Yüksek">{t('quickAssign.riskHigh')}</SelectItem>
+                <SelectItem value="Orta">{t('quickAssign.riskMedium')}</SelectItem>
+                <SelectItem value="Düşük">{t('quickAssign.riskLow')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            İptal
+            {tCommon('cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={isPending}>
-            Ata
+            {t('quickAssign.assign')}
           </Button>
         </DialogFooter>
       </DialogContent>

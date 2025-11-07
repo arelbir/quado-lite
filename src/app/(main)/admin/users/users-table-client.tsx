@@ -10,6 +10,7 @@ import type { DataTableFilterField } from "@/types/data-table";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UserDialog } from "@/components/admin/user-dialog";
+import { useTranslations } from 'next-intl';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -63,6 +64,8 @@ interface UsersTableClientProps {
 export function UsersTableClient({ users, companies, branches, departments, positions, managers, pageCount }: UsersTableClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('users');
+  const tCommon = useTranslations('common');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bulkRoleDialogOpen, setBulkRoleDialogOpen] = useState(false);
@@ -101,7 +104,7 @@ export function UsersTableClient({ users, companies, branches, departments, posi
 
   const handleEditSuccess = () => {
     router.refresh();
-    toast.success("User updated successfully");
+    toast.success(t('messages.updated'));
   };
 
   const confirmDelete = async () => {
@@ -111,15 +114,15 @@ export function UsersTableClient({ users, companies, branches, departments, posi
       const result = await deleteUser(deletingUser.id);
       
       if (result.success) {
-        toast.success(result.message || "User deleted successfully");
+        toast.success(result.message || t('messages.deleted'));
         setDeleteDialogOpen(false);
         setDeletingUser(null);
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to delete user");
+        toast.error(result.error || t('messages.deleteError'));
       }
     } catch (error) {
-      toast.error("Failed to delete user");
+      toast.error(t('messages.deleteError'));
       console.error(error);
     }
   };

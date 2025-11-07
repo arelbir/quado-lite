@@ -46,6 +46,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createDepartment, updateDepartment } from "@/server/actions/department-actions";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -93,6 +94,8 @@ export function DepartmentDialog({
   users,
   onSuccess,
 }: DepartmentDialogProps) {
+  const t = useTranslations('organization');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEdit = !!department;
 
@@ -156,15 +159,15 @@ export function DepartmentDialog({
         : await createDepartment(submitData);
 
       if (result.success) {
-        toast.success(isEdit ? "Department updated successfully" : "Department created successfully");
+        toast.success(isEdit ? t('departments.messages.updated') : t('departments.messages.created'));
         onOpenChange(false);
         form.reset();
         onSuccess?.();
       } else {
-        toast.error(result.error || "An error occurred");
+        toast.error(result.error || tCommon('messages.error'));
       }
     } catch (error) {
-      toast.error("Failed to save department");
+      toast.error(t('departments.messages.saveError'));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -176,12 +179,12 @@ export function DepartmentDialog({
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Department" : "Create Department"}
+            {isEdit ? t('departments.editDepartment') : t('departments.createNew')}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Update the department information below."
-              : "Add a new department to your organization."}
+              ? t('departments.description.update')
+              : t('departments.description.create')}
           </DialogDescription>
         </DialogHeader>
 
@@ -193,9 +196,9 @@ export function DepartmentDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name *</FormLabel>
+                    <FormLabel>{t('departments.fields.name')} *</FormLabel>
                     <FormControl>
-                      <Input placeholder="IT Department" {...field} />
+                      <Input placeholder={t('departments.placeholders.name')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -207,9 +210,9 @@ export function DepartmentDialog({
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Code *</FormLabel>
+                    <FormLabel>{t('departments.fields.code')} *</FormLabel>
                     <FormControl>
-                      <Input placeholder="IT" {...field} />
+                      <Input placeholder={t('departments.placeholders.code')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -337,11 +340,11 @@ export function DepartmentDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {tCommon('actions.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? "Update" : "Create"}
+                {isEdit ? tCommon('actions.update') : tCommon('actions.create')}
               </Button>
             </DialogFooter>
           </form>

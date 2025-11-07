@@ -4,8 +4,10 @@ import { memo } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Card } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
+import { useTranslations } from 'next-intl';
 
 export const DecisionNode = memo(({ data, selected }: NodeProps) => {
+  const t = useTranslations('workflow');
   return (
     <Card className={`min-w-[200px] p-3 border-2 ${selected ? 'border-primary shadow-lg' : 'border-yellow-200 dark:border-yellow-800'} bg-yellow-50 dark:bg-yellow-950`}>
       <Handle
@@ -17,7 +19,7 @@ export const DecisionNode = memo(({ data, selected }: NodeProps) => {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Icons.GitBranch className="size-4 text-yellow-600 dark:text-yellow-400" />
-          <span className="font-semibold text-sm text-yellow-900 dark:text-yellow-100">{data.label || 'Decision'}</span>
+          <span className="font-semibold text-sm text-yellow-900 dark:text-yellow-100">{data.label || t('step.decision')}</span>
         </div>
         
         {data.condition && (

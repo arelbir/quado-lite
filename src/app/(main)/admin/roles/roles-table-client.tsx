@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createColumns, type Role } from "./columns";
+import { createColumns } from "./columns";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
@@ -14,6 +14,15 @@ import { RolesPermissionMatrix } from "@/components/admin/roles-permission-matri
 import { deleteRole } from "@/server/actions/role-actions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Grid3x3 } from "lucide-react";
+import type { roles, permissions } from "@/drizzle/schema/role-system";
+
+type Role = typeof roles.$inferSelect;
+type Permission = typeof permissions.$inferSelect;
+
+// Extended type with permissions relation
+type RoleWithPermissions = Role & {
+  permissions?: { id: string }[];
+};
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,17 +34,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface Permission {
-  id: string;
-  name: string;
-  description: string | null;
-  module: string | null;
-  resource: string;
-  action: string;
-}
-
 interface RolesTableClientProps {
-  roles: Role[];
+  roles: RoleWithPermissions[];
   permissions: Permission[];
 }
 

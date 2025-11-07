@@ -152,20 +152,26 @@
   },
   
   "placeholders": {
-    "searchDof": "DÖF ara...",
+    "enterTitle": "Problem başlığını giriniz",
+    "enterDescription": "Problem açıklamasını giriniz",
     "selectFinding": "Bulgu seçiniz",
-    "enterProblem": "Problem başlığını giriniz",
     "selectResponsible": "Sorumlu seçiniz",
     "selectManager": "Yönetici seçiniz",
-    "searchProblem": "Problem ara...",
-    "enterWhat": "Ne oldu?",
-    "enterWhere": "Nerede oldu?",
-    "enterWhen": "Ne zaman oldu?",
-    "enterWho": "Kim tespit etti?",
     "enterHow": "Nasıl tespit edildi?",
     "enterWhy": "Neden önemli?",
     "enterMeasure": "Geçici önlemi giriniz",
     "enterAnalysis": "Analizinizi giriniz",
     "enterRootCause": "Kök nedeni giriniz"
+  },
+  
+  "quickDof": {
+    "open": "DÖF Aç",
+    "title": "Hızlı DÖF Aç",
+    "description": "7 adımlı Düzeltici Önleyici Faaliyet başlatın",
+    "responsible": "DÖF Sorumlusu",
+    "selectUserPlaceholder": "Sorumlu seçin",
+    "responsibleNote": "Sorumlu tüm DÖF adımlarını tamamlayacak",
+    "start": "DÖF Başlat",
+    "createSuccess": "DÖF oluşturuldu"
   }
 }

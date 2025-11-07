@@ -29,6 +29,14 @@
   "messages": {
     "requiredQuestion": "Auditor must answer this question",
     "updateQuestionInfo": "Update question information",
-    "addToBankDescription": "add question to bank"
+    "addToBankDescription": "add question to bank",
+    "questionCreated": "Question created successfully!",
+    "questionTypeDescription": "Determines the question answer format",
+    "helpTextDescription": "Helper description to show to auditor",
+    "min2OptionsRequired": "At least 2 options are required"
+  },
+  "validation": {
+    "min10Chars": "At least 10 characters required",
+    "min2Options": "At least 2 options required"
   }
 }

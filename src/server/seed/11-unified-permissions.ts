@@ -1116,6 +1116,28 @@ export async function seedUnifiedPermissions() {
           SUPER_ADMIN: null,
         },
       },
+      {
+        name: "View HR Sync Status",
+        code: "hr-sync.view",
+        resource: "hr-sync",
+        action: "view",
+        category: "HR Integration",
+        description: "View HR sync configurations and logs",
+        roles: {
+          SUPER_ADMIN: null,
+        },
+      },
+      {
+        name: "Cancel HR Sync Job",
+        code: "hr-sync.cancel",
+        resource: "hr-sync",
+        action: "cancel",
+        category: "HR Integration",
+        description: "Cancel running HR sync jobs",
+        roles: {
+          SUPER_ADMIN: null,
+        },
+      },
 
       // ================== REPORT PERMISSIONS ==================
       {

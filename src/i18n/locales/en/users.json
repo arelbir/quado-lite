@@ -1,0 +1,80 @@
+{
+  "title": "User Management",
+  "overview": "Manage user accounts and roles",
+  
+  "createNew": "Create New User",
+  "editUser": "Edit User",
+  "deleteUser": "Delete User",
+  "deleteConfirm": "Are you sure you want to delete this user?",
+  "description": {
+    "create": "Add a new user to the system",
+    "update": "Update user information and organizational assignments"
+  },
+  
+  "bulkAssignment": {
+    "title": "Bulk Role Assignment",
+    "description": "Assign a role to {count} selected user(s)",
+    "selectedUsers": "Selected Users",
+    "selectRole": "Select Role",
+    "rolePlaceholder": "Choose a role...",
+    "assignButton": "Assign to {count} User(s)",
+    "selectRoleError": "Please select a role",
+    "assignmentError": "An error occurred during bulk assignment",
+    "successCount": "Role assigned to {count} user(s)",
+    "failedCount": "Failed to assign role to {count} user(s)"
+  },
+  
+  "fields": {
+    "name": "Name",
+    "email": "Email",
+    "department": "Department",
+    "position": "Position",
+    "status": "Status",
+    "role": "Role",
+    "manager": "Manager"
+  },
+  
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "suspended": "Suspended"
+  },
+  
+  "messages": {
+    "created": "User created successfully",
+    "updated": "User updated successfully",
+    "deleted": "User deleted successfully",
+    "createError": "Failed to create user",
+    "updateError": "Failed to update user",
+    "deleteError": "Failed to delete user",
+    "passwordRequired": "Password is required for new users"
+  },
+  
+  "placeholders": {
+    "searchUser": "Search by name or email",
+    "selectDepartment": "Select department",
+    "selectPosition": "Select position",
+    "selectRole": "Select role"
+  },
+  
+  "roleManagement": {
+    "title": "Role Assignments",
+    "description": "Manage roles for {userName}",
+    "addRole": "Add Role",
+    "selectRolePlaceholder": "Select a role...",
+    "system": "System",
+    "assignRole": "Assign Role",
+    "assignFirstRole": "Assign First Role",
+    "noRolesAssigned": "No roles assigned yet",
+    "removeRoleTitle": "Remove Role",
+    "removeRoleDescription": "Are you sure you want to remove this role from {userName}? This action will revoke all permissions associated with this role.",
+    "removeRole": "Remove Role",
+    "selectRoleError": "Please select a role",
+    "assignedSuccess": "Role assigned successfully",
+    "assignFailed": "Failed to assign role",
+    "assignError": "An error occurred while assigning role",
+    "removedSuccess": "Role removed successfully",
+    "removeFailed": "Failed to remove role",
+    "removeError": "An error occurred while removing role"
+  }
+}

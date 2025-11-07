@@ -13,11 +13,13 @@ import { Icons } from '@/components/icons';
 import { Separator } from '@/components/ui/separator';
 import { RoleSelector } from '../FormFields/RoleSelector';
 import { ConditionEditor } from '../FormFields/ConditionEditor';
+import { useTranslations } from 'next-intl';
 
 // Debounce delay for text inputs (ms)
 const DEBOUNCE_DELAY = 300;
 
 export function PropertiesPanel() {
+  const t = useTranslations('workflow');
   const { selectedNode, updateNodeData, deleteNode } = useWorkflowStore();
   
   // Local state to prevent input reset on every keystroke
@@ -99,7 +101,7 @@ export function PropertiesPanel() {
         <div className="flex flex-col items-center justify-center h-full text-center">
           <Icons.MousePointerClick className="size-12 text-muted-foreground mb-4" />
           <p className="text-sm text-muted-foreground">
-            Select a node to edit its properties
+            {t('properties.selectNodeToEdit')}
           </p>
         </div>
       </Card>
@@ -107,7 +109,7 @@ export function PropertiesPanel() {
   }
 
   const handleDelete = () => {
-    if (confirm(`Delete "${selectedNode.data.label}" node?`)) {
+    if (confirm(t('properties.deleteConfirm', { label: selectedNode.data.label }))) {
       deleteNode(selectedNode.id);
     }
   };
@@ -117,9 +119,9 @@ export function PropertiesPanel() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h3 className="text-lg font-semibold">Node Properties</h3>
+          <h3 className="text-lg font-semibold">{t('properties.nodeProperties')}</h3>
           <p className="text-xs text-muted-foreground">
-            Configure selected node
+            {t('properties.configureNode')}
           </p>
         </div>
 
@@ -128,22 +130,22 @@ export function PropertiesPanel() {
         {/* Basic Info */}
         <div className="space-y-4">
           <div>
-            <Label htmlFor="label">Step Name *</Label>
+            <Label htmlFor="label">{t('properties.stepName')}</Label>
             <Input
               id="label"
               value={localData.label || ''}
               onChange={(e) => handleTextChange('label', e.target.value)}
-              placeholder="Enter step name"
+              placeholder={t('properties.enterStepName')}
             />
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('properties.description')}</Label>
             <Textarea
               id="description"
               value={localData.description || ''}
               onChange={(e) => handleTextChange('description', e.target.value)}
-              placeholder="Describe this step..."
+              placeholder={t('properties.describeStep')}
               rows={3}
             />
           </div>
@@ -155,13 +157,13 @@ export function PropertiesPanel() {
         {selectedNode.type === 'decision' && (
           <>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Decision Logic</h4>
+              <h4 className="text-sm font-semibold">{t('properties.decisionLogic')}</h4>
               
               <ConditionEditor
                 value={localData.condition || ''}
                 onChange={(value) => handleTextChange('condition', value)}
-                label="Condition"
-                placeholder="e.g., status === 'approved' OR score > 80"
+                label={t('properties.condition')}
+                placeholder={t('properties.conditionPlaceholder')}
                 customFieldKeys={[]}
               />
 
@@ -169,16 +171,16 @@ export function PropertiesPanel() {
                 <div className="p-2 bg-green-50 border border-green-200 rounded">
                   <div className="flex items-center gap-1 text-xs font-medium text-green-700">
                     <div className="size-2 rounded-full bg-green-500" />
-                    Yes / True
+                    {t('properties.yesTrue')}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Right handle</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('properties.rightHandle')}</p>
                 </div>
                 <div className="p-2 bg-red-50 border border-red-200 rounded">
                   <div className="flex items-center gap-1 text-xs font-medium text-red-700">
                     <div className="size-2 rounded-full bg-red-500" />
-                    No / False
+                    {t('properties.noFalse')}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Bottom handle</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('properties.bottomHandle')}</p>
                 </div>
               </div>
             </div>
@@ -191,29 +193,29 @@ export function PropertiesPanel() {
         {selectedNode.type === 'approval' && (
           <>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Approval Settings</h4>
+              <h4 className="text-sm font-semibold">{t('properties.approvalSettings')}</h4>
               
               <div>
-                <Label htmlFor="approvalType">Approval Type *</Label>
+                <Label htmlFor="approvalType">{t('properties.approvalType')}</Label>
                 <Select
                   value={localData.approvalType || 'ANY'}
                   onValueChange={(value) => handleImmediateChange('approvalType', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder={t('properties.selectType')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ANY">Any Approver</SelectItem>
-                    <SelectItem value="ALL">All Approvers</SelectItem>
+                    <SelectItem value="ANY">{t('properties.anyApprover')}</SelectItem>
+                    <SelectItem value="ALL">{t('properties.allApprovers')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-1">
-                  ANY: One approval needed | ALL: Everyone must approve
+                  {t('properties.approvalTypeDescription')}
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="approvers">Approvers *</Label>
+                <Label htmlFor="approvers">{t('properties.approvers')}</Label>
                 <Select
                   value={localData.approvers?.[0] || ''}
                   onValueChange={(value) => {
@@ -224,7 +226,7 @@ export function PropertiesPanel() {
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Add approver" />
+                    <SelectValue placeholder={t('properties.addApprover')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
@@ -281,20 +283,20 @@ export function PropertiesPanel() {
         {selectedNode.type === 'process' && (
           <>
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Assignment</h4>
+              <h4 className="text-sm font-semibold">{t('properties.assignment')}</h4>
               
               <RoleSelector
                 value={localData.assignedRole || ''}
                 onChange={(value) => handleImmediateChange('assignedRole', value)}
-                label="Assigned To"
-                placeholder="Select role, user, or department..."
+                label={t('properties.assignedTo')}
+                placeholder={t('properties.selectRoleUserDepartment')}
                 showDynamic={true}
                 showUsers={true}
                 showDepartments={true}
               />
 
               <div>
-                <Label htmlFor="deadline">Deadline (hours) *</Label>
+                <Label htmlFor="deadline">{t('properties.deadline')}</Label>
                 <Input
                   id="deadline"
                   type="number"
@@ -303,7 +305,7 @@ export function PropertiesPanel() {
                   onChange={(e) => handleImmediateChange('deadlineHours', Number(e.target.value))}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Time limit for completing this step
+                  {t('properties.deadlineDescription')}
                 </p>
               </div>
             </div>
@@ -312,13 +314,13 @@ export function PropertiesPanel() {
 
             {/* Notifications */}
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Notifications</h4>
+              <h4 className="text-sm font-semibold">{t('properties.notifications')}</h4>
               
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <Label htmlFor="notify-assign">On Assignment</Label>
+                  <Label htmlFor="notify-assign">{t('properties.onAssignment')}</Label>
                   <p className="text-xs text-muted-foreground">
-                    Notify when step is assigned
+                    {t('properties.notifyWhenAssigned')}
                   </p>
                 </div>
                 <Switch
@@ -334,7 +336,7 @@ export function PropertiesPanel() {
               </div>
 
               <div>
-                <Label htmlFor="notify-before">Before Deadline (hours)</Label>
+                <Label htmlFor="notify-before">{t('properties.beforeDeadline')}</Label>
                 <Input
                   id="notify-before"
                   type="number"
@@ -385,7 +387,7 @@ export function PropertiesPanel() {
             onClick={handleDelete}
           >
             <Icons.Trash className="size-4 mr-2" />
-            Delete Node
+            {t('properties.deleteNode')}
           </Button>
         </div>
       </div>

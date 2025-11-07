@@ -37,6 +37,7 @@ interface FindingCardProps {
 }
 
 export function FindingCard({ finding, auditId, users }: FindingCardProps) {
+  const t = useTranslations('finding');
   const isCompleted = finding.status === "Completed";
   const parsedFinding = parseFindingDetails(finding.details);
 
@@ -80,7 +81,7 @@ export function FindingCard({ finding, auditId, users }: FindingCardProps) {
           {/* Details - Tek satır kompakt */}
           {parsedFinding.isAutomatic ? (
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="text-xs">Auto</Badge>
+              <Badge variant="secondary" className="text-xs">{t('card.auto')}</Badge>
               
               {parsedFinding.question && (
                 <TooltipProvider>
@@ -92,7 +93,7 @@ export function FindingCard({ finding, auditId, users }: FindingCardProps) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
-                      <p className="font-semibold text-xs mb-1">Soru</p>
+                      <p className="font-semibold text-xs mb-1">{t('card.question')}</p>
                       <p>{parsedFinding.question}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -109,7 +110,7 @@ export function FindingCard({ finding, auditId, users }: FindingCardProps) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
-                      <p className="font-semibold text-xs mb-1">Cevap</p>
+                      <p className="font-semibold text-xs mb-1">{t('card.answer')}</p>
                       <p>{parsedFinding.answer}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -126,7 +127,7 @@ export function FindingCard({ finding, auditId, users }: FindingCardProps) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
-                      <p className="font-semibold text-xs mb-1">Not</p>
+                      <p className="font-semibold text-xs mb-1">{t('card.notes')}</p>
                       <p>{parsedFinding.notes}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -155,7 +156,7 @@ export function FindingCard({ finding, auditId, users }: FindingCardProps) {
           <Button asChild size="sm" variant="outline" className="w-full md:w-auto">
             <Link href={`/denetim/findings/${finding.id}`}>
               <ExternalLink className="h-4 w-4 mr-2" />
-              Detaylar
+              {t('card.details')}
             </Link>
           </Button>
 

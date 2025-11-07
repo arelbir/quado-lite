@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useTranslations } from 'next-intl';
 
 interface Template {
   name: string;
@@ -113,6 +114,7 @@ interface ConditionTemplatesProps {
 }
 
 export function ConditionTemplates({ onSelect }: ConditionTemplatesProps) {
+  const t = useTranslations('workflow');
   const categories = Array.from(new Set(TEMPLATES.map(t => t.category)));
 
   return (
@@ -120,14 +122,14 @@ export function ConditionTemplates({ onSelect }: ConditionTemplatesProps) {
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="w-full">
           <Icons.FileText className="size-4 mr-2" />
-          Choose from Template
+          {t('templates.chooseFromTemplate')}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0" align="start">
         <div className="p-3 border-b">
-          <h4 className="font-medium text-sm">Condition Templates</h4>
+          <h4 className="font-medium text-sm">{t('templates.title')}</h4>
           <p className="text-xs text-muted-foreground mt-1">
-            Click to insert pre-built conditions
+            {t('templates.description')}
           </p>
         </div>
         <div className="max-h-96 overflow-y-auto p-2">

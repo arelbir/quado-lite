@@ -1,0 +1,62 @@
+{
+  "title": "HR Sync Configuration",
+  "overview": "Manage HR synchronization settings",
+  
+  "config": {
+    "createNew": "Create HR Sync Config",
+    "editConfig": "Edit HR Sync Config",
+    "updateConfig": "Update Config",
+    "createConfig": "Create Config",
+    "description": {
+      "create": "Create a new HR synchronization configuration",
+      "update": "Update the configuration settings"
+    },
+    "fields": {
+      "name": "Config Name",
+      "description": "Description",
+      "sourceType": "Source Type",
+      "syncMode": "Sync Mode",
+      "autoSync": "Auto Sync",
+      "syncSchedule": "Sync Schedule"
+    },
+    "placeholders": {
+      "name": "e.g. LDAP Active Directory",
+      "description": "Describe this sync configuration...",
+      "sourceType": "Select source",
+      "syncMode": "Select mode"
+    },
+    "messages": {
+      "created": "Config created successfully",
+      "updated": "Config updated successfully",
+      "createError": "Failed to create config",
+      "updateError": "Failed to update config"
+    }
+  },
+  
+  "dashboard": {
+    "title": "Sync Configurations",
+    "description": "Manage your HR sync integrations",
+    "createConfig": "Create Config",
+    "noConfigs": "No sync configurations",
+    "triggerSync": "Trigger Sync",
+    "triggeringSync": "Triggering sync...",
+    "syncCompleted": "Sync completed successfully",
+    "syncFailed": "Sync failed: {error}",
+    "triggerFailed": "Failed to trigger sync",
+    "unknownSourceType": "Unknown source type",
+    "stats": {
+      "totalSyncs": "Total Syncs",
+      "successful": "Successful",
+      "failed": "Failed"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "createConfig": "Create Config",
+      "createConfigDesc": "Add new sync source",
+      "syncAll": "Sync All",
+      "syncAllDesc": "Run all active syncs",
+      "viewErrors": "View Errors",
+      "viewErrorsDesc": "Check failed syncs"
+    }
+  }
+}

@@ -31,25 +31,14 @@ import { toast } from "sonner";
 import { Loader2, HelpCircle } from "lucide-react";
 import { useTranslations } from 'next-intl';
 
-/**
- * Validation Schema
- */
-const formSchema = z.object({
-  name: z.string().min(3, "En az 3 karakter gerekli"),
-  description: z.string().optional(),
-  category: z.enum(["Kalite", "Çevre", "İSG", "Bilgi Güvenliği", "Gıda Güvenliği", "Diğer"], {
-    required_error: "Kategori seçiniz",
-  }),
-  questionBankIds: z.array(z.string()).optional(),
-  estimatedDurationMinutes: z.string().optional(),
-});
+type FormValues = {
+  name: string;
+  description?: string;
+  category: "Kalite" | "Çevre" | "İSG" | "Bilgi Güvenliği" | "Gıda Güvenliği" | "Diğer";
+  questionBankIds?: string[];
+  estimatedDurationMinutes?: string;
+};
 
-type FormValues = z.infer<typeof formSchema>;
-
-/**
- * Audit Template Create Form
- * Pattern: DRY - Question Bank ile aynı yapı
- */
 interface QuestionBank {
   id: string;
   name: string;
@@ -63,6 +52,16 @@ export function CreateTemplateForm() {
   const [isPending, startTransition] = useTransition();
   const [questionBanks, setQuestionBanks] = useState<QuestionBank[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const formSchema = z.object({
+    name: z.string().min(3, t('validation.min3Chars')),
+    description: z.string().optional(),
+    category: z.enum(["Kalite", "Çevre", "İSG", "Bilgi Güvenliği", "Gıda Güvenliği", "Diğer"], {
+      required_error: t('validation.categoryRequired'),
+    }),
+    questionBankIds: z.array(z.string()).optional(),
+    estimatedDurationMinutes: z.string().optional(),
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -143,16 +142,16 @@ export function CreateTemplateForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Kalite">Kalite</SelectItem>
-                  <SelectItem value="Çevre">Çevre</SelectItem>
-                  <SelectItem value="İSG">İSG (İş Sağlığı ve Güvenliği)</SelectItem>
-                  <SelectItem value="Bilgi Güvenliği">Bilgi Güvenliği</SelectItem>
-                  <SelectItem value="Gıda Güvenliği">Gıda Güvenliği</SelectItem>
-                  <SelectItem value="Diğer">Diğer</SelectItem>
+                  <SelectItem value="Kalite">{t('categories.quality')}</SelectItem>
+                  <SelectItem value="Çevre">{t('categories.environment')}</SelectItem>
+                  <SelectItem value="İSG">{t('categories.ohs')} ({t('categories.ohsFull')})</SelectItem>
+                  <SelectItem value="Bilgi Güvenliği">{t('categories.infoSecurity')}</SelectItem>
+                  <SelectItem value="Gıda Güvenliği">{t('categories.foodSafety')}</SelectItem>
+                  <SelectItem value="Diğer">{t('categories.other')}</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
-                Şablonun hangi alan için olduğunu seçin
+                {t('messages.selectCategoryDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -194,7 +193,7 @@ export function CreateTemplateForm() {
                 />
               </FormControl>
               <FormDescription>
-                Bu şablonla yapılacak denetimin tahmini süresi
+                {t('messages.durationDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -269,7 +268,7 @@ export function CreateTemplateForm() {
         <div className="flex items-center gap-4">
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Oluştur
+            {tCommon('actions.create')}
           </Button>
           <Button 
             type="button" 
@@ -277,7 +276,7 @@ export function CreateTemplateForm() {
             onClick={() => router.back()}
             disabled={isPending}
           >
-            İptal
+            {tCommon('actions.cancel')}
           </Button>
         </div>
       </form>

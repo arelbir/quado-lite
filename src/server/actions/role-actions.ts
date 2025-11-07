@@ -322,3 +322,75 @@ export async function getAllRoles(): Promise<ActionResponse> {
     };
   });
 }
+
+/**
+ * UPDATE ROLE PERMISSIONS
+ * Update the permissions assigned to a role
+ */
+export async function updateRolePermissions(
+  roleId: string,
+  permissionIds: string[]
+) {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "role",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    // Validate role exists
+    const role = await db.query.roles.findFirst({
+      where: eq(roles.id, roleId),
+    });
+
+    if (!role) {
+      return createNotFoundError("Role");
+    }
+
+    // Prevent updating system roles
+    if (role.isSystem) {
+      return createValidationError("Cannot modify system role permissions");
+    }
+
+    try {
+      // Start transaction
+      await db.transaction(async (tx) => {
+        // Remove all existing permissions for this role
+        await tx
+          .delete(rolePermissions)
+          .where(eq(rolePermissions.roleId, roleId));
+
+        // Add new permissions
+        if (permissionIds.length > 0) {
+          await tx.insert(rolePermissions).values(
+            permissionIds.map(permissionId => ({
+              roleId,
+              permissionId,
+            }))
+          );
+        }
+      });
+
+      revalidatePath("/admin/roles");
+      revalidatePath("/admin/permissions");
+
+      return {
+        success: true,
+        message: `Updated ${permissionIds.length} permissions for role ${role.name}`,
+        data: undefined,
+      };
+
+    } catch (error) {
+      console.error(`Failed to update permissions for role ${roleId}:`, error);
+      return {
+        success: false,
+        error: "Failed to update role permissions",
+      };
+    }
+  });
+}

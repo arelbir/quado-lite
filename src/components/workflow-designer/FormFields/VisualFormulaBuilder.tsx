@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { useTranslations } from 'next-intl';
 
 interface Condition {
   id: string;
@@ -57,6 +58,8 @@ const COMMON_VALUES = {
 };
 
 export function VisualFormulaBuilder({ onApply }: VisualFormulaBuilderProps) {
+  const t = useTranslations('workflow');
+  const tCommon = useTranslations('common');
   const [open, setOpen] = useState(false);
   const [conditions, setConditions] = useState<Condition[]>([
     { id: '1', field: '', operator: '===', value: '', connector: 'AND' },
@@ -104,14 +107,14 @@ export function VisualFormulaBuilder({ onApply }: VisualFormulaBuilderProps) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="w-full">
           <Icons.Settings className="size-4 mr-2" />
-          Visual Builder
+          {t('formulaBuilder.visualBuilder')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Visual Formula Builder</DialogTitle>
+          <DialogTitle>{t('formulaBuilder.title')}</DialogTitle>
           <DialogDescription>
-            Build conditions visually without writing code
+            {t('formulaBuilder.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -134,12 +137,12 @@ export function VisualFormulaBuilder({ onApply }: VisualFormulaBuilderProps) {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="AND">AND</SelectItem>
-                        <SelectItem value="OR">OR</SelectItem>
+                        <SelectItem value="AND">{t('formulaBuilder.and')}</SelectItem>
+                        <SelectItem value="OR">{t('formulaBuilder.or')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Badge variant="outline" className="text-xs">
-                      {conditions[index - 1]?.connector === 'AND' ? 'Both must be true' : 'Either can be true'}
+                      {conditions[index - 1]?.connector === 'AND' ? t('formulaBuilder.bothMustBeTrue') : t('formulaBuilder.eitherCanBeTrue')}
                     </Badge>
                   </div>
                 )}
@@ -152,7 +155,7 @@ export function VisualFormulaBuilder({ onApply }: VisualFormulaBuilderProps) {
                       onValueChange={(value) => updateCondition(condition.id, { field: value })}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select field" />
+                        <SelectValue placeholder={t('formulaBuilder.selectField')} />
                       </SelectTrigger>
                       <SelectContent>
                         {FIELDS.map((field) => (
@@ -191,7 +194,7 @@ export function VisualFormulaBuilder({ onApply }: VisualFormulaBuilderProps) {
                         onValueChange={(value) => updateCondition(condition.id, { value })}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Value" />
+                          <SelectValue placeholder={t('formulaBuilder.value')} />
                         </SelectTrigger>
                         <SelectContent>
                           {COMMON_VALUES[condition.field as keyof typeof COMMON_VALUES].map((val) => (
@@ -203,7 +206,7 @@ export function VisualFormulaBuilder({ onApply }: VisualFormulaBuilderProps) {
                       </Select>
                     ) : (
                       <Input
-                        placeholder="Value"
+                        placeholder={t('formulaBuilder.value')}
                         value={condition.value}
                         onChange={(e) => updateCondition(condition.id, { value: e.target.value })}
                       />
@@ -228,25 +231,25 @@ export function VisualFormulaBuilder({ onApply }: VisualFormulaBuilderProps) {
 
           <Button variant="outline" onClick={addCondition} className="w-full">
             <Icons.Plus className="size-4 mr-2" />
-            Add Condition
+            {t('formulaBuilder.addCondition')}
           </Button>
 
           {/* Preview */}
           <Card className="p-4 bg-muted/50">
-            <div className="text-sm font-medium mb-2">Generated Formula:</div>
+            <div className="text-sm font-medium mb-2">{t('formulaBuilder.generatedFormula')}</div>
             <code className="block bg-background p-2 rounded text-xs font-mono">
-              {buildFormula() || 'Add conditions above...'}
+              {buildFormula() || t('formulaBuilder.addConditionsAbove')}
             </code>
           </Card>
 
           {/* Actions */}
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button onClick={handleApply} disabled={!buildFormula()}>
               <Icons.CheckCircle2 className="size-4 mr-2" />
-              Apply Formula
+              {t('formulaBuilder.applyFormula')}
             </Button>
           </div>
         </div>

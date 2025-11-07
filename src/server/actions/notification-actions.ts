@@ -11,7 +11,7 @@ import { checkPermission } from "@/lib/permissions/unified-permission-checker";
  * Kullanıcının bildirimlerini getir
  */
 export async function getUserNotifications(limit = 50): Promise<any> {
-  const result = await withAuth(async (user: User) => {
+  const result = await withAuth<any[]>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -43,7 +43,7 @@ export async function getUserNotifications(limit = 50): Promise<any> {
  * Okunmamış bildirim sayısını getir
  */
 export async function getUnreadCount(): Promise<number> {
-  const result = await withAuth(async (user: User) => {
+  const result = await withAuth<any>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -79,7 +79,7 @@ export async function getUnreadCount(): Promise<number> {
 export async function markNotificationAsRead(
   notificationId: string
 ): Promise<ActionResponse> {
-  return withAuth(async (user: User) => {
+  return withAuth<void>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -108,7 +108,7 @@ export async function markNotificationAsRead(
  * Tüm bildirimleri okundu olarak işaretle
  */
 export async function markAllAsRead(): Promise<ActionResponse> {
-  return withAuth(async (user: User) => {
+  return withAuth<void>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -137,7 +137,7 @@ export async function markAllAsRead(): Promise<ActionResponse> {
  * Kullanıcı bildirim tercihlerini getir
  */
 export async function getNotificationPreferences(): Promise<any> {
-  const result = await withAuth(async (user: User) => {
+  const result = await withAuth<any>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -185,7 +185,7 @@ export async function updateNotificationPreferences(data: {
   planNotifications?: boolean;
   auditNotifications?: boolean;
 }): Promise<ActionResponse> {
-  return withAuth(async (user: User) => {
+  return withAuth<void>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,

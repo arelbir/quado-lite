@@ -11,8 +11,8 @@ import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 /**
  * Denetim sorularını getir
  */
-export async function getAuditQuestions(auditId: string) {
-  const result = await withAuth(async (user: User) => {
+export async function getAuditQuestions(auditId: string): Promise<any[]> {
+  const result = await withAuth<any[]>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,
@@ -285,8 +285,20 @@ export async function saveAllAuditAnswers(data: {
 /**
  * Denetim tamamlama durumunu kontrol et
  */
-export async function checkAuditCompletion(auditId: string) {
-  const result = await withAuth(async (user: User) => {
+export async function checkAuditCompletion(auditId: string): Promise<{
+  total: number;
+  answered: number;
+  unanswered: number;
+  nonCompliant: number;
+  completionPercentage: number;
+}> {
+  const result = await withAuth<{
+    total: number;
+    answered: number;
+    unanswered: number;
+    nonCompliant: number;
+    completionPercentage: number;
+  }>(async (user: User) => {
     // ✅ UNIFIED PERMISSION CHECK
     const perm = await checkPermission({
       user: user as any,

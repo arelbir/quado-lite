@@ -1,0 +1,80 @@
+{
+  "title": "Kullanıcı Yönetimi",
+  "overview": "Kullanıcı hesaplarını ve rollerini yönetin",
+  
+  "createNew": "Yeni Kullanıcı Oluştur",
+  "editUser": "Kullanıcıyı Düzenle",
+  "deleteUser": "Kullanıcıyı Sil",
+  "deleteConfirm": "Bu kullanıcıyı silmek istediğinizden emin misiniz?",
+  "description": {
+    "create": "Sisteme yeni bir kullanıcı ekleyin",
+    "update": "Kullanıcı bilgilerini ve organizasyon atamalarını güncelleyin"
+  },
+  
+  "bulkAssignment": {
+    "title": "Toplu Rol Atama",
+    "description": "Seçilen {count} kullanıcıya rol atayın",
+    "selectedUsers": "Seçilen Kullanıcılar",
+    "selectRole": "Rol Seçin",
+    "rolePlaceholder": "Rol seçin...",
+    "assignButton": "{count} Kullanıcıya Ata",
+    "selectRoleError": "Lütfen bir rol seçin",
+    "assignmentError": "Toplu atama sırasında bir hata oluştu",
+    "successCount": "Role {count} kullanıcı atandı",
+    "failedCount": "{count} kullanıcıya rol atanamadı"
+  },
+  
+  "fields": {
+    "name": "Ad Soyad",
+    "email": "E-posta",
+    "department": "Departman",
+    "position": "Pozisyon",
+    "status": "Durum",
+    "role": "Rol",
+    "manager": "Yönetici"
+  },
+  
+  "status": {
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "suspended": "Askıya Alındı"
+  },
+  
+  "messages": {
+    "created": "Kullanıcı başarıyla oluşturuldu",
+    "updated": "Kullanıcı başarıyla güncellendi",
+    "deleted": "Kullanıcı başarıyla silindi",
+    "createError": "Kullanıcı oluşturulurken hata oluştu",
+    "updateError": "Kullanıcı güncellenirken hata oluştu",
+    "deleteError": "Kullanıcı silinirken hata oluştu",
+    "passwordRequired": "Yeni kullanıcılar için şifre gereklidir"
+  },
+  
+  "placeholders": {
+    "searchUser": "Kullanıcı adı veya e-posta ile arayın",
+    "selectDepartment": "Departman seçin",
+    "selectPosition": "Pozisyon seçin",
+    "selectRole": "Rol seçin"
+  },
+  
+  "roleManagement": {
+    "title": "Rol Atamaları",
+    "description": "{userName} için rolleri yönetin",
+    "addRole": "Rol Ekle",
+    "selectRolePlaceholder": "Rol seçin...",
+    "system": "Sistem",
+    "assignRole": "Rol Ata",
+    "assignFirstRole": "İlk Rolü Ata",
+    "noRolesAssigned": "Henüz rol atanmamış",
+    "removeRoleTitle": "Rolü Kaldır",
+    "removeRoleDescription": "{userName} kullanıcısından bu rolü kaldırmak istediğinizden emin misiniz? Bu işlem bu rolle ilişkili tüm izinleri geri alacak.",
+    "removeRole": "Rolü Kaldır",
+    "selectRoleError": "Lütfen bir rol seçin",
+    "assignedSuccess": "Rol başarıyla atandı",
+    "assignFailed": "Rol atanamadı",
+    "assignError": "Rol atanırken bir hata oluştu",
+    "removedSuccess": "Rol başarıyla kaldırıldı",
+    "removeFailed": "Rol kaldırılamadı",
+    "removeError": "Rol kaldırılırken bir hata oluştu"
+  }
+}

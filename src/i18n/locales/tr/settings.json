@@ -1,0 +1,26 @@
+{
+  "title": "Ayarlar",
+  "profile": {
+    "title": "Profil",
+    "description": "Sitede diğerlerinin sizi göreceği şekilde"
+  },
+  "fields": {
+    "username": "Kullanıcı Adı",
+    "image": "Profil Resmi"
+  },
+  "placeholders": {
+    "username": "kullaniciadi",
+    "imageUrl": "resim url"
+  },
+  "descriptions": {
+    "username": "Bu herkese açık görünen adınız. Gerçek adınız veya bir takma ad olabilir. Bunu sadece 30 günde bir değiştirebilirsiniz.",
+    "image": "Bu görüntü profilinizde görünecektir."
+  },
+  "actions": {
+    "updateProfile": "Profili Güncelle"
+  },
+  "messages": {
+    "noChangesMade": "Değişiklik yapılmadı",
+    "errorOccurred": "Bir hata oluştu"
+  }
+}

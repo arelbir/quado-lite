@@ -1,0 +1,26 @@
+{
+  "title": "Settings",
+  "profile": {
+    "title": "Profile",
+    "description": "This is how others will see you on the site"
+  },
+  "fields": {
+    "username": "Username",
+    "image": "Profile Image"
+  },
+  "placeholders": {
+    "username": "username",
+    "imageUrl": "image url"
+  },
+  "descriptions": {
+    "username": "This is your public display name. It can be your real name or a pseudonym. You can only change this once every 30 days.",
+    "image": "This image will be displayed on your profile."
+  },
+  "actions": {
+    "updateProfile": "Update profile"
+  },
+  "messages": {
+    "noChangesMade": "No changes made",
+    "errorOccurred": "An error occurred"
+  }
+}

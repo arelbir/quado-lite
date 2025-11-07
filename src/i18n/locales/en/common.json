@@ -26,7 +26,9 @@
     "view": "View",
     "add": "Add",
     "remove": "Remove",
-    "update": "Update"
+    "update": "Update",
+    "select": "Select",
+    "reset": "Reset"
   },
   "manager": "Manager",
   "createdAt": "Created",
@@ -36,6 +38,7 @@
     "loading": "Loading...",
     "saving": "Saving...",
     "generating": "Generating...",
+    "creating": "Creating...",
     "success": "Success!",
     "error": "Error!",
     "noData": "No data found",
@@ -43,6 +46,8 @@
     "completed": "Completed",
     "pending": "Pending",
     "failed": "Failed",
+    "active": "Active",
+    "inactive": "Inactive",
     "audit": {
       "Active": "Active",
       "InProgress": "In Progress",
@@ -63,6 +68,23 @@
     "selectOption": "Select...",
     "noResults": "No results found",
     "allRightsReserved": "All rights reserved"
+  },
+  "labels": {
+    "importance": "Importance",
+    "optional": "Optional",
+    "relatedQuestion": "Related Question",
+    "noQuestionSelected": "No question selected",
+    "level": "Level",
+    "noLevelAssigned": "No level assigned",
+    "details": "Details"
+  },
+  "messages": {
+    "error": "An error occurred",
+    "notFound": "Not Found"
+  },
+  "placeholders": {
+    "selectQuestion": "Select question (optional)",
+    "selectDateRange": "Select date range"
   },
   "total": "Total",
   "table": {
