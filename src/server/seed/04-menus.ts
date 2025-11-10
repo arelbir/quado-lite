@@ -45,9 +45,9 @@ const getMenus = (adminId: string) => [
     type: 'dir',
     children: [
       {
-        path: "/denetim",
-        label: "auditDashboard",
-        icon: "LayoutDashboard",
+        path: "/denetim/audits",
+        label: "allAudits",
+        icon: "ClipboardCheck",
         status: "active",
         createBy: adminId,
         type: 'menu',
@@ -56,14 +56,6 @@ const getMenus = (adminId: string) => [
         path: "/denetim/my-audits",
         label: "myAudits",
         icon: "FileCheck",
-        status: "active",
-        createBy: adminId,
-        type: 'menu',
-      },
-      {
-        path: "/denetim/all",
-        label: "allAudits",
-        icon: "ListChecks",
         status: "active",
         createBy: adminId,
         type: 'menu',
