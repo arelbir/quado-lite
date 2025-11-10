@@ -3,12 +3,22 @@
   "description": "Şirket, şube, departman ve pozisyon yönetimi",
   
   "companies": {
-    "title": "Şirketler",
-    "description": "Şirketlerinizi yönetin",
+    "companyTitle": "Şirketler",
+    "overview": "Şirketlerinizi yönetin",
     "createNew": "Yeni Şirket Oluştur",
     "editCompany": "Şirketi Düzenle",
     "deleteCompany": "Şirketi Sil",
     "deleteConfirm": "Bu şirketi silmek istediğinizden emin misiniz?",
+    "companyDescription": {
+      "create": "Organizasyonunuza yeni bir şirket ekleyin.",
+      "update": "Şirket bilgilerini güncelleyin."
+    },
+    "messages": {
+      "created": "Şirket başarıyla oluşturuldu",
+      "updated": "Şirket başarıyla güncellendi",
+      "deleted": "Şirket başarıyla silindi",
+      "saveError": "Şirket kaydedilemedi"
+    },
     "fields": {
       "name": "Şirket Adı",
       "code": "Şirket Kodu",
@@ -36,7 +46,7 @@
       "website": "Website adresini giriniz",
       "description": "Açıklama giriniz"
     },
-    "messages": {
+    "companyMessages": {
       "created": "Şirket başarıyla oluşturuldu",
       "updated": "Şirket başarıyla güncellendi",
       "deleted": "Şirket başarıyla silindi",
@@ -48,11 +58,15 @@
 
   "branches": {
     "title": "Şubeler",
-    "description": "Şube ofislerini ve lokasyonlarını yönetin",
+    "overview": "Şube ofislerini ve lokasyonlarını yönetin",
     "createNew": "Yeni Şube Oluştur",
     "editBranch": "Şubeyi Düzenle",
     "deleteBranch": "Şubeyi Sil",
     "deleteConfirm": "Bu şubeyi silmek istediğinizden emin misiniz?",
+    "description": {
+      "create": "Organizasyonunuza yeni bir şube ofisi ekleyin.",
+      "update": "Şube bilgilerini güncelleyin."
+    },
     "fields": {
       "name": "Şube Adı",
       "code": "Şube Kodu",
@@ -68,12 +82,21 @@
       "departments": "Departmanlar",
       "isActive": "Aktif"
     },
+    "messages": {
+      "created": "Şube başarıyla oluşturuldu",
+      "updated": "Şube başarıyla güncellendi",
+      "deleted": "Şube başarıyla silindi",
+      "idRequired": "Güncelleme için şube ID gerekli",
+      "saveError": "Şube kaydedilemedi"
+    },
     "types": {
       "Headquarters": "Genel Merkez",
       "Regional Office": "Bölge Ofisi",
       "Branch Office": "Şube Ofisi",
       "Sales Office": "Satış Ofisi",
-      "Service Center": "Servis Merkezi"
+      "Service Center": "Servis Merkezi",
+      "Factory": "Fabrika",
+      "Warehouse": "Depo"
     },
     "placeholders": {
       "name": "Şube adını giriniz",
@@ -87,24 +110,28 @@
       "email": "E-posta adresini giriniz",
       "description": "Açıklama giriniz",
       "manager": "Şube müdürü seçiniz"
-    },
-    "messages": {
-      "created": "Şube başarıyla oluşturuldu",
-      "updated": "Şube başarıyla güncellendi",
-      "deleted": "Şube başarıyla silindi",
-      "createError": "Şube oluşturulurken hata oluştu",
-      "updateError": "Şube güncellenirken hata oluştu",
-      "deleteError": "Şube silinirken hata oluştu"
     }
   },
 
   "departments": {
     "title": "Departmanlar",
-    "description": "Organizasyon departman hiyerarşisini yönetin",
+    "overview": "Organizasyon departman hiyerarşisini yönetin",
     "createNew": "Yeni Departman Oluştur",
     "editDepartment": "Departmanı Düzenle",
     "deleteDepartment": "Departmanı Sil",
     "deleteConfirm": "Bu departmanı silmek istediğinizden emin misiniz?",
+    "expandAll": "Tümünü Genişlet",
+    "collapseAll": "Tümünü Daralt",
+    "treeTitle": "Organizasyon Hiyerarşisi",
+    "treeDescription": "Departman yapınızı görüntüleyin ve yönetin",
+    "emptyState": {
+      "title": "Henüz departman yok",
+      "description": "Başlamak için ilk departmanınızı oluşturun"
+    },
+    "description": {
+      "create": "Organizasyonunuza yeni bir departman ekleyin.",
+      "update": "Departman bilgilerini güncelleyin."
+    },
     "fields": {
       "name": "Departman Adı",
       "code": "Departman Kodu",
@@ -127,25 +154,27 @@
       "description": "Açıklama giriniz",
       "costCenter": "Maliyet merkezi kodunu giriniz",
       "budget": "Bütçe giriniz"
-    },
-    "messages": {
-      "created": "Departman başarıyla oluşturuldu",
-      "updated": "Departman başarıyla güncellendi",
-      "deleted": "Departman başarıyla silindi",
-      "createError": "Departman oluşturulurken hata oluştu",
-      "updateError": "Departman güncellenirken hata oluştu",
-      "deleteError": "Departman silinirken hata oluştu",
-      "hasSubDepartments": "Alt departmanı olan departman silinemez"
     }
   },
 
   "positions": {
     "title": "Pozisyonlar",
-    "description": "İş pozisyonlarını ve kariyer seviyelerini yönetin",
+    "overview": "Kariyer pozisyonlarını ve rollerini yönetin",
     "createNew": "Yeni Pozisyon Oluştur",
     "editPosition": "Pozisyonu Düzenle",
     "deletePosition": "Pozisyonu Sil",
     "deleteConfirm": "Bu pozisyonu silmek istediğinizden emin misiniz?",
+    "description": {
+      "create": "Organizasyonunuza yeni bir pozisyon ekleyin.",
+      "update": "Pozisyon bilgilerini güncelleyin."
+    },
+    "messages": {
+      "created": "Pozisyon başarıyla oluşturuldu",
+      "updated": "Pozisyon başarıyla güncellendi",
+      "deleted": "Pozisyon başarıyla silindi",
+      "idRequired": "Güncelleme için pozisyon ID gerekli",
+      "saveError": "Pozisyon kaydedilemedi"
+    },
     "fields": {
       "name": "Pozisyon Adı",
       "code": "Pozisyon Kodu",
@@ -153,7 +182,8 @@
       "category": "Kategori",
       "description": "Açıklama",
       "salaryGrade": "Maaş Derecesi",
-      "isActive": "Aktif"
+      "isActive": "Aktif",
+      "basicInformation": "Temel Bilgiler"
     },
     "levels": {
       "1": "Seviye 1 - Stajyer",
@@ -182,15 +212,15 @@
       "category": "Kategori seçiniz",
       "description": "Açıklama giriniz",
       "salaryGrade": "Maaş derecesini giriniz"
-    },
-    "messages": {
-      "created": "Pozisyon başarıyla oluşturuldu",
-      "updated": "Pozisyon başarıyla güncellendi",
-      "deleted": "Pozisyon başarıyla silindi",
-      "createError": "Pozisyon oluşturulurken hata oluştu",
-      "updateError": "Pozisyon güncellenirken hata oluştu",
-      "deleteError": "Pozisyon silinirken hata oluştu"
     }
+  },
+
+  "orgChart": {
+    "export": "Dışa Aktar",
+    "fitView": "Görünümü Sığdır",
+    "exportChart": "Grafiği dışa aktar",
+    "subDepartments": "alt departman",
+    "subDepartments_plural": "alt departman"
   },
 
   "common": {

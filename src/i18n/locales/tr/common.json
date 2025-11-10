@@ -26,7 +26,9 @@
     "view": "Görüntüle",
     "add": "Ekle",
     "remove": "Kaldır",
-    "update": "Güncelle"
+    "update": "Güncelle",
+    "select": "Seç",
+    "reset": "Sıfırla"
   },
   "manager": "Yönetici",
   "createdAt": "Oluşturulma",
@@ -36,6 +38,7 @@
     "loading": "Yükleniyor...",
     "saving": "Kaydediliyor...",
     "generating": "Oluşturuluyor...",
+    "creating": "Oluşturuluyor...",
     "success": "Başarılı!",
     "error": "Hata!",
     "noData": "Veri bulunamadı",
@@ -43,6 +46,8 @@
     "completed": "Tamamlandı",
     "pending": "Beklemede",
     "failed": "Başarısız",
+    "active": "Aktif",
+    "inactive": "Pasif",
     "audit": {
       "Active": "Aktif",
       "InProgress": "Devam Ediyor",
@@ -63,6 +68,23 @@
     "selectOption": "Seçiniz...",
     "noResults": "Sonuç bulunamadı",
     "allRightsReserved": "Tüm hakları saklıdır"
+  },
+  "labels": {
+    "importance": "Önem",
+    "optional": "İsteğe Bağlı",
+    "relatedQuestion": "İlişkili Soru",
+    "noQuestionSelected": "Soru seçilmedi",
+    "level": "Seviye",
+    "noLevelAssigned": "Seviye atanmamış",
+    "details": "Detaylar"
+  },
+  "messages": {
+    "error": "Bir hata oluştu",
+    "notFound": "Bulunamadı"
+  },
+  "placeholders": {
+    "selectQuestion": "Soru seçin (isteğe bağlı)",
+    "selectDateRange": "Tarih aralığı seçin"
   },
   "total": "Toplam",
   "table": {

@@ -46,6 +46,9 @@ export const actions = pgTable("actions", {
   rejectionReason: text("rejection_reason"),
   evidenceUrls: text("evidence_urls").array(), // YENİ: Kanıt dosyaları
   
+  // Bitiş Tarihi (Due Date)
+  dueDate: timestamp("due_date"),
+  
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   completedAt: timestamp("completed_at"),

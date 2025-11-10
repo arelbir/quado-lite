@@ -21,8 +21,10 @@ import { eq, and } from "drizzle-orm";
 import { 
   withAuth, 
   createNotFoundError,
-  createValidationError 
+  createValidationError,
+  createPermissionError 
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import { revalidatePath } from "next/cache";
 import type { ActionResponse } from "@/lib/types";
 
@@ -45,6 +47,21 @@ export async function createUser(
   }
 ): Promise<ActionResponse<{ id: string }>> {
   return withAuth(async (currentUser) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "user",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return {
+        success: false,
+        data: undefined,
+        error: perm.reason || "Permission denied",
+      };
+    }
+
     // Check if email already exists
     const existingUser = await db.query.user.findFirst({
       where: eq(user.email, data.email),
@@ -80,7 +97,7 @@ export async function createUser(
       data: { id: newUser!.id },
       message: "User created successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function updateUser(
@@ -98,6 +115,21 @@ export async function updateUser(
   }>
 ): Promise<ActionResponse> {
   return withAuth(async (currentUser) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "user",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return {
+        success: false,
+        data: undefined,
+        error: perm.reason || "Permission denied",
+      };
+    }
+
     // Check if user exists
     const existingUser = await db.query.user.findFirst({
       where: eq(user.id, userId),
@@ -122,11 +154,26 @@ export async function updateUser(
       data: undefined,
       message: "User updated successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function deleteUser(userId: string): Promise<ActionResponse> {
   return withAuth(async (currentUser) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "user",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return {
+        success: false,
+        data: undefined,
+        error: perm.reason || "Permission denied",
+      };
+    }
+
     // Check if user exists
     const existingUser = await db.query.user.findFirst({
       where: eq(user.id, userId),
@@ -158,7 +205,7 @@ export async function deleteUser(userId: string): Promise<ActionResponse> {
       data: undefined,
       message: "User deleted successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function getUserById(userId: string): Promise<ActionResponse<any>> {
@@ -174,7 +221,7 @@ export async function getUserById(userId: string): Promise<ActionResponse<any>> 
       data: userData,
       message: "User retrieved successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 // ============================================
@@ -196,6 +243,21 @@ export async function assignRoleToUser(
   }
 ): Promise<ActionResponse<{ userId: string; userName: string; roleName: string }>> {
   return withAuth(async (currentUser) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "user",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return {
+        success: false,
+        error: perm.reason || "Permission denied",
+        message: perm.reason || "Permission denied",
+      } as any;
+    }
+
     // Check if user exists
     const userExists = await db.query.user.findFirst({
       where: eq(user.id, userId),
@@ -269,7 +331,7 @@ export async function assignRoleToUser(
       },
       message: `Role "${roleExists.name}" assigned successfully`,
     };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -281,6 +343,21 @@ export async function removeRoleFromUser(
   roleId: string
 ): Promise<ActionResponse> {
   return withAuth(async (currentUser) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "user",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return {
+        success: false,
+        error: perm.reason || "Permission denied",
+        message: perm.reason || "Permission denied",
+      };
+    }
+
     // Get role name first
     const roleRecord = await db.query.roles.findFirst({
       where: eq(roles.id, roleId),
@@ -321,7 +398,7 @@ export async function removeRoleFromUser(
       data: undefined,
       message: `Role "${roleRecord.name}" removed successfully`,
     };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -346,4 +423,42 @@ export async function getUserRoles(userId: string): Promise<ActionResponse<any[]
       message: "User roles retrieved successfully",
     };
   }, { requireAdmin: true });
+}
+
+/**
+ * GET ACTIVE USERS
+ * Fetches all active users for selection dropdowns
+ */
+export async function getActiveUsers(): Promise<ActionResponse<any[]>> {
+  return withAuth(async (currentUser) => {
+    const users = await db.query.user.findMany({
+      where: eq(user.status, 'active'),
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+      },
+      with: {
+        department: {
+          columns: {
+            id: true,
+            name: true,
+          },
+        },
+        position: {
+          columns: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: (users, { asc }) => [asc(users.name)],
+    });
+
+    return {
+      success: true,
+      data: users,
+      message: "Active users retrieved successfully",
+    };
+  });
 }

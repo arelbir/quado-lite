@@ -1,0 +1,64 @@
+{
+  "title": "Rol Yönetimi",
+  "overview": "Kullanıcı rollerini ve izinlerini yönetin",
+  
+  "createNew": "Yeni Rol Oluştur",
+  "editRole": "Rolü Düzenle",
+  "deleteRole": "Rolü Sil",
+  "deleteConfirm": "Bu rolü silmek istediğinizden emin misiniz?",
+  "description": {
+    "create": "Belirli izinlere sahip yeni bir rol oluşturun",
+    "update": "Rol bilgilerini ve izinlerini güncelleyin"
+  },
+  
+  "fields": {
+    "name": "Rol Adı",
+    "description": "Açıklama",
+    "permissions": "İzinler"
+  },
+  
+  "messages": {
+    "created": "Rol başarıyla oluşturuldu",
+    "updated": "Rol başarıyla güncellendi",
+    "deleted": "Rol başarıyla silindi",
+    "createError": "Rol oluşturulurken hata oluştu",
+    "updateError": "Rol güncellenirken hata oluştu",
+    "deleteError": "Rol silinirken hata oluştu"
+  },
+  
+  "permissions": {
+    "selectAll": "Tümünü Seç",
+    "deselectAll": "Tümünü Kaldır",
+    "selectResource": "Kaynak için tüm izinleri seç",
+    "deselectResource": "Kaynak için tüm izinleri kaldır",
+    "noPermissions": "İzin bulunamadı",
+    "atLeastOne": "En az bir izin seçmelisiniz"
+  },
+
+"permissionMatrix": {
+  "title": "İzin Matrisi",
+  "description": "İzinleri checkbox'lara tıklayarak değiştirin",
+  "permissionsSelected": "izin seçildi",
+  "unsavedChanges": "Kaydedilmemiş değişiklikler",
+  "saving": "Kaydediliyor...",
+  "saveChanges": "Değişiklikleri Kaydet",
+  "systemRoleError": "Sistem rolü izinleri değiştirilemez",
+  "systemRoleWarning": "Sistem rolleri değiştirilemez",
+  "permissionsUpdated": "İzinler başarıyla güncellendi",
+  "updateFailed": "İzinler güncellenemedi",
+  "module": "Modül",
+  "actions": "İşlemler",
+  "selectAll": "Tümü",
+  "clearAll": "Hiçbiri"
+},
+
+"rolesPermissionMatrix": {
+  "title": "Roller İzin Matrisi",
+  "description": "Kaynak ve CRUD işlemlerine göre organize edilmiş rol izinleri",
+  "module": "Modül",
+  "system": "Sistem",
+  "hasPermission": "İzin Var",
+  "noPermission": "İzin Yok",
+  "operationNotAvailable": "İşlem Mevcut Değil"
+}
+}

@@ -26,6 +26,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { importFromCSV } from "@/lib/hr-sync/csv-import-service";
 import { currentUser } from "@/lib/auth";
+import { db } from "@/drizzle/db";
+import { hrSyncConfigs } from "@/drizzle/schema/hr-sync";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   try {
@@ -111,10 +114,47 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Generate template based on config field mapping
-    const template = `Employee ID,Full Name,Email,Department,Position
-EMP001,John Doe,john.doe@company.com,Quality,Quality Manager
-EMP002,Alice Smith,alice.smith@company.com,IT,Developer`;
+    // Get configId from query params
+    const { searchParams } = new URL(request.url);
+    const configId = searchParams.get('configId');
+
+    if (!configId) {
+      return NextResponse.json(
+        { success: false, error: "configId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Generate template based on config field mapping
+    const config = await db.query.hrSyncConfigs.findFirst({
+      where: eq(hrSyncConfigs.id, configId),
+    });
+
+    if (!config) {
+      return NextResponse.json(
+        { success: false, error: "Config not found" },
+        { status: 404 }
+      );
+    }
+
+    const fieldMapping = config.fieldMapping as any;
+    const headers = Object.keys(fieldMapping).join(',');
+    
+    // Generate sample data row
+    const sampleData = Object.values(fieldMapping).map((field: any) => {
+      switch (field) {
+        case 'name': return 'John Doe';
+        case 'email': return 'john.doe@company.com';
+        case 'employeeNumber': return 'EMP001';
+        case 'departmentId': return 'Quality';
+        case 'positionId': return 'Quality Manager';
+        case 'phone': return '+90 555 123 4567';
+        case 'isActive': return 'true';
+        default: return 'Sample Value';
+      }
+    }).join(',');
+
+    const template = `${headers}\n${sampleData}`;
 
     return new NextResponse(template, {
       headers: {

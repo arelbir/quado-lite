@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, User, Clock, AlertTriangle, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslations } from 'next-intl';
 
 interface TimelineEntry {
   id: string;
@@ -21,6 +22,7 @@ interface WorkflowTimelineProps {
 }
 
 export function WorkflowTimeline({ timeline }: WorkflowTimelineProps) {
+  const t = useTranslations('workflow');
   const getActionIcon = (action: string | null) => {
     switch (action) {
       case "approve":
@@ -40,27 +42,27 @@ export function WorkflowTimeline({ timeline }: WorkflowTimelineProps) {
 
   const getActionLabel = (action: string | null) => {
     const labels: Record<string, string> = {
-      submit: "Submitted",
-      approve: "Approved",
-      reject: "Rejected",
-      complete: "Completed",
-      escalate: "Escalated",
-      veto: "Vetoed",
-      assign: "Assigned",
-      reassign: "Reassigned",
+      submit: t('timeline.actions.submit'),
+      approve: t('timeline.actions.approve'),
+      reject: t('timeline.actions.reject'),
+      complete: t('timeline.actions.complete'),
+      escalate: t('timeline.actions.escalate'),
+      veto: t('timeline.actions.veto'),
+      assign: t('timeline.actions.assign'),
+      reassign: t('timeline.actions.reassign'),
     };
-    return action ? labels[action] || action : "Unknown";
+    return action ? labels[action] || action : t('timeline.actions.unknown');
   };
 
   if (!timeline || timeline.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Workflow Timeline</CardTitle>
-          <CardDescription>Activity history for this workflow</CardDescription>
+          <CardTitle>{t('timeline.title')}</CardTitle>
+          <CardDescription>{t('timeline.description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-4">No timeline entries yet</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{t('timeline.noEntries')}</p>
         </CardContent>
       </Card>
     );
@@ -73,8 +75,8 @@ export function WorkflowTimeline({ timeline }: WorkflowTimelineProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Workflow Timeline</CardTitle>
-        <CardDescription>{timeline.length} activity entries</CardDescription>
+        <CardTitle>{t('timeline.title')}</CardTitle>
+        <CardDescription>{t('timeline.entryCount', { count: timeline.length })}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="relative space-y-4">

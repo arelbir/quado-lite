@@ -42,27 +42,39 @@ export async function seedRoleMenus(adminId: string) {
       {
         roleCode: 'QUALITY_MANAGER',
         menuPaths: [
-          '/',
-          '/admin/workflows',
-          '/audit-system',
-          '/workflow-operations',
-          '/infrastructure',
+          '/',                    // Dashboard (1 menu)
+          '/audit-system',        // Audit System parent (1 menu)
+          '/denetim',             // Audit System children (9 menus)
+          '/workflow-operations', // Workflow Operations parent (1 menu)
+          '/administration',      // Administration parent (1 menu)
+          '/admin',               // Administration children (15 menus: /admin/users, /admin/roles, etc.)
+          '/system',              // System parent + children (1 menu: /settings)
         ],
       },
       {
         roleCode: 'PROCESS_OWNER',
         menuPaths: [
-          '/',
-          '/admin/workflows',
-          '/audit-system',
-          '/workflow-operations',
+          '/',                    // Dashboard
+          '/audit-system',        // Audit System parent
+          '/denetim',             // Audit System children
+          '/workflow-operations', // Workflow Operations parent
+          '/administration',      // Administration parent
+          '/admin',               // Administration children (for user/team management)
+        ],
+      },
+      {
+        roleCode: 'AUDITOR',
+        menuPaths: [
+          '/',                    // Dashboard
+          '/audit-system',        // Audit System parent
+          '/denetim',             // Audit System children (read-only focus)
         ],
       },
       {
         roleCode: 'ACTION_OWNER',
         menuPaths: [
-          '/',
-          '/admin/workflows/my-tasks',
+          '/',                            // Dashboard
+          '/admin/workflows/my-tasks',    // Only My Tasks
         ],
       },
     ];
@@ -83,8 +95,16 @@ export async function seedRoleMenus(adminId: string) {
       
       if (mapping.menuPaths[0] !== 'all') {
         // Filter menus by paths
+        // IMPORTANT: Use strict matching to avoid '/' matching everything
         menusForRole = allMenus.filter(menu => 
-          mapping.menuPaths.some(path => menu.path?.startsWith(path))
+          mapping.menuPaths.some(path => {
+            if (path === '/') {
+              // Exact match for root dashboard only
+              return menu.path === '/';
+            }
+            // For other paths, use startsWith but ensure not exact '/'
+            return menu.path?.startsWith(path) && menu.path !== '/';
+          })
         );
       }
 

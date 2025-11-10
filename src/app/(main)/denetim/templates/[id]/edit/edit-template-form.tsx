@@ -32,17 +32,13 @@ import { toast } from "sonner";
 import { Loader2, HelpCircle } from "lucide-react";
 import { useTranslations } from 'next-intl';
 
-const formSchema = z.object({
-  name: z.string().min(3, "En az 3 karakter gerekli"),
-  description: z.string().optional(),
-  category: z.enum(["Kalite", "Çevre", "İSG", "Bilgi Güvenliği", "Gıda Güvenliği", "Diğer"], {
-    required_error: "Kategori seçiniz",
-  }),
-  questionBankIds: z.array(z.string()).optional(),
-  estimatedDurationMinutes: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = {
+  name: string;
+  description?: string;
+  category: "Kalite" | "Çevre" | "İSG" | "Bilgi Güvenliği" | "Gıda Güvenliği" | "Diğer";
+  questionBankIds?: string[];
+  estimatedDurationMinutes?: string;
+};
 
 interface QuestionBank {
   id: string;
@@ -55,10 +51,6 @@ interface EditTemplateFormProps {
   availableQuestionBanks: any;
 }
 
-/**
- * Edit Template Form
- * Pattern: DRY - Create form ile aynı yapı ama default values + update action
- */
 export function EditTemplateForm({ template: initialTemplate, availableQuestionBanks }: EditTemplateFormProps) {
   const t = useTranslations('templates');
   const tCommon = useTranslations('common');
@@ -66,6 +58,16 @@ export function EditTemplateForm({ template: initialTemplate, availableQuestionB
   const [isPending, startTransition] = useTransition();
   const questionBanks = availableQuestionBanks as QuestionBank[];
   const loading = false;
+
+  const formSchema = z.object({
+    name: z.string().min(3, t('validation.min3Chars')),
+    description: z.string().optional(),
+    category: z.enum(["Kalite", "Çevre", "İSG", "Bilgi Güvenliği", "Gıda Güvenliği", "Diğer"], {
+      required_error: t('validation.categoryRequired'),
+    }),
+    questionBankIds: z.array(z.string()).optional(),
+    estimatedDurationMinutes: z.string().optional(),
+  });
 
   // Parse existing question bank IDs
   const existingBankIds = initialTemplate.questionBankIds 
@@ -114,7 +116,7 @@ export function EditTemplateForm({ template: initialTemplate, availableQuestionB
               <FormLabel>{t('fields.templateName')} *</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Örn: ISO 9001 Standart Denetim Şablonu" 
+                  placeholder={t('placeholders.templateExample')} 
                   {...field} 
                   disabled={isPending}
                 />
@@ -141,16 +143,16 @@ export function EditTemplateForm({ template: initialTemplate, availableQuestionB
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Kalite">Kalite</SelectItem>
-                  <SelectItem value="Çevre">Çevre</SelectItem>
-                  <SelectItem value="İSG">İSG (İş Sağlığı ve Güvenliği)</SelectItem>
-                  <SelectItem value="Bilgi Güvenliği">Bilgi Güvenliği</SelectItem>
-                  <SelectItem value="Gıda Güvenliği">Gıda Güvenliği</SelectItem>
-                  <SelectItem value="Diğer">Diğer</SelectItem>
+                  <SelectItem value="Kalite">{t('categories.quality')}</SelectItem>
+                  <SelectItem value="Çevre">{t('categories.environment')}</SelectItem>
+                  <SelectItem value="İSG">{t('categories.ohs')} ({t('categories.ohsFull')})</SelectItem>
+                  <SelectItem value="Bilgi Güvenliği">{t('categories.infoSecurity')}</SelectItem>
+                  <SelectItem value="Gıda Güvenliği">{t('categories.foodSafety')}</SelectItem>
+                  <SelectItem value="Diğer">{t('categories.other')}</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
-                Şablonun hangi alan için olduğunu seçin
+                {t('messages.selectCategoryDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -162,10 +164,10 @@ export function EditTemplateForm({ template: initialTemplate, availableQuestionB
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Açıklama</FormLabel>
+              <FormLabel>{t('fields.description')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Şablon hakkında kısa bir açıklama..."
+                  placeholder={t('placeholders.descriptionExample')}
                   className="min-h-[120px]"
                   {...field}
                   disabled={isPending}
@@ -181,18 +183,18 @@ export function EditTemplateForm({ template: initialTemplate, availableQuestionB
           name="estimatedDurationMinutes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tahmini Süre (Dakika)</FormLabel>
+              <FormLabel>{t('fields.estimatedDuration')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
-                  placeholder="Örn: 60"
+                  placeholder={t('placeholders.durationExample')}
                   {...field}
                   disabled={isPending}
                   min="0"
                 />
               </FormControl>
               <FormDescription>
-                Bu şablonla yapılacak denetimin tahmini süresi
+                {t('messages.durationDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>

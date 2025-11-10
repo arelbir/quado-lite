@@ -21,7 +21,8 @@ import {
   createNotFoundError,
   createPermissionError,
 } from "@/lib/helpers/error-helpers";
-import type { ActionResponse } from "@/lib/types/common";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import type { ActionResponse, User } from "@/lib/types/common";
 import { getNextAssignee, type AssignmentStrategy } from "@/lib/workflow/auto-assignment";
 import { escalateAssignment as escalateAssignmentInternal } from "@/lib/workflow/deadline-monitor";
 
@@ -483,7 +484,18 @@ export async function startWorkflow(data: {
   entityId: string;
   entityMetadata?: any;
 }): Promise<ActionResponse<any>> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "start",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Validate workflow definition
     const validation = await validateWorkflowDefinition(data.workflowDefinitionId);
     if (!validation.isValid) return validation.error!;
@@ -534,7 +546,18 @@ export async function transitionWorkflow(data: {
   action: "submit" | "approve" | "reject" | "complete";
   comment?: string;
 }): Promise<ActionResponse> {
-  return withAuth(async (currentUser): Promise<ActionResponse> => {
+  return withAuth(async (currentUser: User): Promise<ActionResponse> => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "transition",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Fetch workflow instance
     const instance = await fetchWorkflowInstance(data.workflowInstanceId, {
       includeAssignments: true,
@@ -631,7 +654,7 @@ export async function vetoWorkflow(data: {
   workflowInstanceId: string;
   comment: string;
 }): Promise<ActionResponse> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
     const instance = await fetchWorkflowInstance(data.workflowInstanceId);
 
     if (!instance) {
@@ -642,10 +665,15 @@ export async function vetoWorkflow(data: {
       return createValidationError("Workflow definition not found");
     }
 
-    // Check veto authority
-    const hasVeto = await hasVetoAuthority(currentUser.id, instance.workflowDefinitionId);
-    if (!hasVeto) {
-      return createPermissionError("You don't have veto authority");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "veto",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     const { steps } = getWorkflowSteps(instance.definition);
@@ -688,7 +716,18 @@ export async function createDelegation(data: {
   endDate: Date;
   reason: string;
 }): Promise<ActionResponse> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "delegate",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Validate dates
     if (data.startDate >= data.endDate) {
       return createValidationError("End date must be after start date");
@@ -730,7 +769,18 @@ export async function createDelegation(data: {
  * GET MY WORKFLOW TASKS
  */
 export async function getMyWorkflowTasks(): Promise<ActionResponse<any>> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Get user's roles
     const userRoles = await getUserRoles(currentUser.id);
 
@@ -772,7 +822,7 @@ export async function manualEscalateWorkflow(data: {
   assignmentId: string;
   reason: string;
 }): Promise<ActionResponse<any>> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
     // Get assignment
     const assignment = await db.query.stepAssignments.findFirst({
       where: eq(stepAssignments.id, data.assignmentId),
@@ -782,8 +832,16 @@ export async function manualEscalateWorkflow(data: {
       return createNotFoundError("Assignment");
     }
 
-    // Check permission: must be manager or admin
-    // For simplicity, allow any authenticated user (can add role check)
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "escalate",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
     
     // Escalate using internal function
     const result = await escalateAssignmentInternal(data.assignmentId);
@@ -819,7 +877,18 @@ export async function cancelWorkflow(data: {
   workflowInstanceId: string;
   reason: string;
 }): Promise<ActionResponse> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "cancel",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const instance = await fetchWorkflowInstance(data.workflowInstanceId);
 
     if (!instance) {
@@ -868,7 +937,7 @@ export async function updateDelegation(data: {
   endDate?: Date;
   reason?: string;
 }): Promise<ActionResponse> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
     const delegation = await db.query.workflowDelegations.findFirst({
       where: eq(workflowDelegations.id, data.delegationId),
     });
@@ -877,13 +946,19 @@ export async function updateDelegation(data: {
       return createNotFoundError("Delegation");
     }
 
-    // Check permission: Creator or admin
-    const isAdmin = currentUser.userRoles?.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
-    
-    if (delegation.fromUserId !== currentUser.id && !isAdmin) {
-      return createPermissionError("Only delegation creator can update");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "delegate",
+      entity: {
+        id: delegation.id,
+        createdById: delegation.fromUserId,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -910,7 +985,7 @@ export async function updateDelegation(data: {
  * DEACTIVATE DELEGATION
  */
 export async function deactivateDelegation(delegationId: string): Promise<ActionResponse> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
     const delegation = await db.query.workflowDelegations.findFirst({
       where: eq(workflowDelegations.id, delegationId),
     });
@@ -919,13 +994,19 @@ export async function deactivateDelegation(delegationId: string): Promise<Action
       return createNotFoundError("Delegation");
     }
 
-    // Check permission: Creator or admin
-    const isAdmin = currentUser.userRoles?.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
-    
-    if (delegation.fromUserId !== currentUser.id && !isAdmin) {
-      return createPermissionError("Only delegation creator can deactivate");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "delegate",
+      entity: {
+        id: delegation.id,
+        createdById: delegation.fromUserId,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -950,7 +1031,18 @@ export async function deactivateDelegation(delegationId: string): Promise<Action
  * GET MY DELEGATIONS
  */
 export async function getMyDelegations(): Promise<ActionResponse<any>> {
-  return withAuth(async (currentUser) => {
+  return withAuth(async (currentUser: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const delegations = await db.query.workflowDelegations.findMany({
       where: eq(workflowDelegations.fromUserId, currentUser.id),
     });

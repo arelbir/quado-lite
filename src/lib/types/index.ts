@@ -22,6 +22,7 @@ export type {
   Branch,
   Department,
   Position,
+  Role,
   BranchWithRelations,
   DepartmentWithRelations,
   ActionResponse,

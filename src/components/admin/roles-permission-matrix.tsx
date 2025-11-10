@@ -4,26 +4,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Check, X, Shield, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from 'next-intl';
+import type { roles, permissions } from "@/drizzle/schema/role-system";
 
-interface Role {
-  id: string;
-  name: string;
-  description: string | null;
-  permissions: { id: string }[];
-  isSystem?: boolean;
-}
+type Role = typeof roles.$inferSelect;
+type Permission = typeof permissions.$inferSelect;
 
-interface Permission {
-  id: string;
-  name: string;
-  description: string | null;
-  module: string | null;
-  resource: string;
-  action: string;
-}
+// Extended types with relations
+type RoleWithPermissions = Role & {
+  permissions?: { id: string }[];
+};
 
 interface RolesPermissionMatrixProps {
-  roles: Role[];
+  roles: RoleWithPermissions[];
   permissions: Permission[];
 }
 
@@ -31,6 +24,8 @@ interface RolesPermissionMatrixProps {
 const CRUD_ACTIONS = ['Create', 'Read', 'Update', 'Delete'] as const;
 
 export function RolesPermissionMatrix({ roles, permissions }: RolesPermissionMatrixProps) {
+  const t = useTranslations('roles');
+  
   // Group permissions by resource (module)
   const groupedByResource = permissions.reduce((acc, permission) => {
     const resource = permission.resource || "Other";
@@ -44,19 +39,19 @@ export function RolesPermissionMatrix({ roles, permissions }: RolesPermissionMat
   // Get resources sorted
   const resources = Object.keys(groupedByResource).sort();
 
-  // Check if role has specific permission (resource + action)
-  const hasPermission = (role: Role, resource: string, action: string): boolean | null => {
-    const permission = permissions.find(
-      p => p.resource === resource && p.action.toLowerCase() === action.toLowerCase()
+  // Check if a role has a specific permission
+  const hasPermission = (role: RoleWithPermissions, resource: string, action: string): boolean | null => {
+    const permission = permissions.find(p => 
+      p.resource === resource && p.action.toLowerCase() === action.toLowerCase()
     );
     
     if (!permission) return null; // Permission doesn't exist
     
-    return role.permissions?.some(p => p.id === permission.id) || false;
+    return role.permissions?.some((p: { id: string }) => p.id === permission.id) || false;
   };
 
   // Calculate coverage percentage for a role
-  const calculateCoverage = (role: Role): number => {
+  const calculateCoverage = (role: RoleWithPermissions): number => {
     if (permissions.length === 0) return 0;
     return Math.round((role.permissions?.length || 0) / permissions.length * 100);
   };
@@ -66,10 +61,10 @@ export function RolesPermissionMatrix({ roles, permissions }: RolesPermissionMat
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5" />
-          CRUD Permission Matrix
+          <CardTitle>{t('rolesPermissionMatrix.title')}</CardTitle>
         </CardTitle>
         <CardDescription>
-          Role permissions organized by resource and CRUD operations
+          {t('rolesPermissionMatrix.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -79,7 +74,7 @@ export function RolesPermissionMatrix({ roles, permissions }: RolesPermissionMat
             <thead>
               <tr className="border-b-2">
                 <th className="text-left p-3 font-medium text-sm bg-muted">
-                  Module
+                  {t('rolesPermissionMatrix.module')}
                 </th>
                 {CRUD_ACTIONS.map((action) => (
                   <th key={action} className="text-center p-3 font-medium text-sm bg-muted">
@@ -91,7 +86,7 @@ export function RolesPermissionMatrix({ roles, permissions }: RolesPermissionMat
                     <div className="flex flex-col items-center gap-1">
                       <span className="truncate max-w-[100px]">{role.name}</span>
                       {role.isSystem && (
-                        <Badge variant="secondary" className="text-xs">System</Badge>
+                        <Badge variant="secondary" className="text-xs">{t('rolesPermissionMatrix.system')}</Badge>
                       )}
                       <span className="text-xs font-normal text-muted-foreground">
                         {calculateCoverage(role)}%
@@ -165,15 +160,15 @@ export function RolesPermissionMatrix({ roles, permissions }: RolesPermissionMat
         <div className="mt-6 pt-4 border-t flex items-center gap-6 text-sm flex-wrap">
           <div className="flex items-center gap-2">
             <div className="w-4 h-6 rounded-sm bg-green-500" />
-            <span className="text-muted-foreground">Has Permission</span>
+            <span className="text-muted-foreground">{t('rolesPermissionMatrix.hasPermission')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-6 rounded-sm bg-gray-200" />
-            <span className="text-muted-foreground">No Permission</span>
+            <span className="text-muted-foreground">{t('rolesPermissionMatrix.noPermission')}</span>
           </div>
           <div className="flex items-center gap-2">
             <Minus className="w-4 h-4 text-gray-300" />
-            <span className="text-muted-foreground">Operation Not Available</span>
+            <span className="text-muted-foreground">{t('rolesPermissionMatrix.operationNotAvailable')}</span>
           </div>
         </div>
       </CardContent>

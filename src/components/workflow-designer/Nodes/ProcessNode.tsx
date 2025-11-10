@@ -4,8 +4,10 @@ import { memo } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Card } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
+import { useTranslations } from 'next-intl';
 
 export const ProcessNode = memo(({ data, selected }: NodeProps) => {
+  const t = useTranslations('workflow');
   return (
     <Card className={`min-w-[200px] p-3 border-2 ${selected ? 'border-primary shadow-lg' : 'border-border'}`}>
       <Handle
@@ -17,7 +19,7 @@ export const ProcessNode = memo(({ data, selected }: NodeProps) => {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Icons.CheckCircle2 className="size-4 text-blue-500" />
-          <span className="font-semibold text-sm">{data.label || 'Process Step'}</span>
+          <span className="font-semibold text-sm">{data.label || t('step.process')}</span>
         </div>
         
         {data.assignedRole && (

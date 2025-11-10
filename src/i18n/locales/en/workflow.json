@@ -1,0 +1,195 @@
+{
+  "title": "Workflows",
+  "singular": "Workflow",
+  "description": "Workflow management and tracking",
+  
+  "timeline": {
+    "title": "Workflow Timeline",
+    "description": "Activity history for this workflow",
+    "noEntries": "No timeline entries yet",
+    "entryCount": "{count, plural, =1 {1 activity entry} other {# activity entries}}",
+    
+    "actions": {
+      "submit": "Submitted",
+      "approve": "Approved",
+      "reject": "Rejected",
+      "complete": "Completed",
+      "escalate": "Escalated",
+      "veto": "Vetoed",
+      "assign": "Assigned",
+      "reassign": "Reassigned",
+      "unknown": "Unknown"
+    }
+  },
+  
+  "status": {
+    "draft": "Draft",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "suspended": "Suspended"
+  },
+  
+  "step": {
+    "start": "Start",
+    "process": "Process",
+    "decision": "Decision",
+    "approval": "Approval",
+    "end": "End",
+    "newStep": "New Step"
+  },
+  
+  "actions": {
+    "create": "Create Workflow",
+    "edit": "Edit Workflow",
+    "delete": "Delete Workflow",
+    "view": "View Workflow",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "cancel": "Cancel",
+    "complete": "Complete"
+  },
+  
+  "fields": {
+    "name": "Workflow Name",
+    "description": "Description",
+    "status": "Status",
+    "priority": "Priority",
+    "assignedTo": "Assigned To",
+    "assignedRole": "Assigned Role",
+    "createdBy": "Created By",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "startedAt": "Started At",
+    "completedAt": "Completed At",
+    "condition": "Condition"
+  },
+  
+  "placeholders": {
+    "enterName": "Enter workflow name",
+    "enterDescription": "Enter description",
+    "selectStatus": "Select status",
+    "selectPriority": "Select priority",
+    "selectAssignee": "Select assignee",
+    "enterCondition": "Enter condition...",
+    "selectAssignment": "Select assignment..."
+  },
+  
+  "messages": {
+    "createSuccess": "Workflow created",
+    "updateSuccess": "Workflow updated",
+    "deleteSuccess": "Workflow deleted",
+    "startSuccess": "Workflow started",
+    "pauseSuccess": "Workflow paused",
+    "resumeSuccess": "Workflow resumed",
+    "cancelSuccess": "Workflow cancelled",
+    "completeSuccess": "Workflow completed",
+    "createError": "Failed to create workflow",
+    "updateError": "Failed to update workflow",
+    "deleteError": "Failed to delete workflow",
+    "startError": "Failed to start workflow",
+    "pauseError": "Failed to pause workflow",
+    "resumeError": "Failed to resume workflow",
+    "cancelError": "Failed to cancel workflow",
+    "completeError": "Failed to complete workflow"
+  },
+
+  "templates": {
+    "title": "Condition Templates",
+    "description": "Click to insert pre-built conditions",
+    "chooseFromTemplate": "Choose from Template"
+  },
+
+  "roleSelector": {
+    "searchPlaceholder": "Search roles, users, departments...",
+    "loading": "Loading...",
+    "noResults": "No results found.",
+    "systemRoles": "📋 System Roles",
+    "specificUsers": "👤 Specific Users",
+    "departmentManagers": "🏢 Department Managers",
+    "dynamicAssignment": "⚡ Dynamic Assignment"
+  },
+
+  "formulaBuilder": {
+    "visualBuilder": "Visual Builder",
+    "title": "Visual Formula Builder",
+    "description": "Build conditions visually without writing code",
+    "and": "AND",
+    "or": "OR",
+    "bothMustBeTrue": "Both must be true",
+    "eitherCanBeTrue": "Either can be true",
+    "selectField": "Select field",
+    "value": "Value",
+    "addCondition": "Add Condition",
+    "generatedFormula": "Generated Formula:",
+    "addConditionsAbove": "Add conditions above...",
+    "applyFormula": "Apply Formula"
+  },
+
+  "approvalNode": {
+    "approvers": "Approvers",
+    "more": "more",
+    "type": "Type"
+  },
+
+  "customFields": {
+    "referenceTitle": "Custom Fields Reference",
+    "fieldsCount": "{count} fields",
+    "availableFor": "Available for {module} entities",
+    "title": "Custom Fields",
+    "description": "For {module} entities",
+    "moduleNotSelected": "Module not selected",
+    "setModuleToSeeFields": "Set workflow module to see custom fields",
+    "loading": "Loading custom fields...",
+    "noFieldsDefined": "No custom fields defined",
+    "createFieldsInAdmin": "Create custom fields in Admin → Custom Fields",
+    "usagePath": "📌 Usage Path",
+    "options": "📋 Options",
+    "examples": "💡 Examples"
+  },
+
+  "properties": {
+    "nodeProperties": "Node Properties",
+    "configureNode": "Configure selected node",
+    "selectNodeToEdit": "Select a node to edit its properties",
+    "deleteConfirm": "Delete \"{label}\" node?",
+    "stepName": "Step Name",
+    "enterStepName": "Enter step name",
+    "description": "Description",
+    "describeStep": "Describe this step...",
+    "decisionLogic": "Decision Logic",
+    "condition": "Condition",
+    "conditionPlaceholder": "e.g., status === 'approved' OR score > 80",
+    "yesTrue": "Yes / True",
+    "noFalse": "No / False",
+    "rightHandle": "Right handle",
+    "bottomHandle": "Bottom handle",
+    "approvalSettings": "Approval Settings",
+    "approvalType": "Approval Type",
+    "selectType": "Select type",
+    "anyApprover": "Any Approver",
+    "allApprovers": "All Approvers",
+    "approvalTypeDescription": "ANY: One approval needed | ALL: Everyone must approve",
+    "approvers": "Approvers",
+    "addApprover": "Add approver",
+    "assignment": "Assignment",
+    "assignedTo": "Assigned To",
+    "selectRoleUserDepartment": "Select role, user, or department...",
+    "deadline": "Deadline (hours)",
+    "deadlineDescription": "Time limit for completing this step",
+    "notifications": "Notifications",
+    "onAssignment": "On Assignment",
+    "notifyWhenAssigned": "Notify when step is assigned",
+    "beforeDeadline": "Before Deadline (hours)",
+    "deleteNode": "Delete Node"
+  },
+
+  "toolbar": {
+    "addNode": "Add Node"
+  },
+
+  "validation": {
+    "noIssuesFound": "✓ No issues found. Workflow is valid!"
+  }
+}

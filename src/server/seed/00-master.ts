@@ -28,6 +28,7 @@ import { seedSampleData } from "./07-sample-data";
 import { seedAssignments } from "./08-assignments";
 import { seedWorkflows } from "./09-workflows";
 import { seedRoleMenus } from "./10-role-menus";
+import { seedUnifiedPermissions } from "./11-unified-permissions";
 import { seedWorkflows as seedVisualWorkflows } from "./11-workflows";
 
 async function masterSeed() {
@@ -76,7 +77,10 @@ async function masterSeed() {
     // 10. Role-Menu Mappings (AFTER roles & menus)
     await seedRoleMenus(adminId);
     
-    // 11. Visual Workflow Definitions (with adminId)
+    // 11. Unified Permissions (AFTER roles) ✨ NEW
+    await seedUnifiedPermissions();
+    
+    // 12. Visual Workflow Definitions (with adminId)
     console.log("\n🎨 SEEDING: Visual Workflows...");
     await seedVisualWorkflows();
 
@@ -98,6 +102,7 @@ async function masterSeed() {
     console.log("  ✅ 8 Workflow Definitions");
     console.log("  ✅ 4 Visual Workflows (Designer) ✨ NEW");
     console.log("  ✅ Role-Menu Mappings");
+    console.log("  ✅ Unified Permissions (68 permissions) ✨ 146 FUNCTIONS");
     console.log("\n🔑 LOGIN:");
     console.log("  📧 Any user: [firstname].[lastname]@abcteknoloji.com");
     console.log("  ℹ️  Turkish chars → ASCII (ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u)");

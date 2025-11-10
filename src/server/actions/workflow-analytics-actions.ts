@@ -3,7 +3,8 @@
 import { db } from "@/drizzle/db";
 import { workflowInstances, stepAssignments, workflowTimeline } from "@/drizzle/schema";
 import { eq, and, gte, sql, count } from "drizzle-orm";
-import { withAuth } from "@/lib/helpers";
+import { withAuth, createPermissionError } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import type { ActionResponse } from "@/lib/types";
 
 /**
@@ -17,7 +18,18 @@ import type { ActionResponse } from "@/lib/types";
  * Get overall workflow statistics
  */
 export async function getWorkflowStats(): Promise<ActionResponse<any>> {
-  return withAuth(async () => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Total instances by status
     const instanceStats = await db
       .select({
@@ -92,7 +104,18 @@ export async function getWorkflowStats(): Promise<ActionResponse<any>> {
  * Get workflow performance by entity type
  */
 export async function getWorkflowPerformanceByType(): Promise<ActionResponse<any>> {
-  return withAuth(async () => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const performance = await db
       .select({
         entityType: workflowInstances.entityType,
@@ -142,7 +165,18 @@ export async function getWorkflowPerformanceByType(): Promise<ActionResponse<any
  * Get workflow timeline activity (last 30 days)
  */
 export async function getWorkflowTimelineActivity(): Promise<ActionResponse<any>> {
-  return withAuth(async () => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -168,7 +202,18 @@ export async function getWorkflowTimelineActivity(): Promise<ActionResponse<any>
  * Get top performers (users with most completed tasks)
  */
 export async function getTopPerformers(limit = 10): Promise<ActionResponse<any>> {
-  return withAuth(async () => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const performers = await db
       .select({
         userId: stepAssignments.assignedUserId,
@@ -191,7 +236,18 @@ export async function getTopPerformers(limit = 10): Promise<ActionResponse<any>>
  * Get bottleneck analysis (steps taking longest)
  */
 export async function getBottleneckAnalysis(): Promise<ActionResponse<any>> {
-  return withAuth(async () => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Get completed assignments with duration
     const assignments = await db.query.stepAssignments.findMany({
       where: eq(stepAssignments.status, "completed"),
@@ -244,7 +300,18 @@ export async function getBottleneckAnalysis(): Promise<ActionResponse<any>> {
  * Get escalation statistics
  */
 export async function getEscalationStats(): Promise<ActionResponse<any>> {
-  return withAuth(async () => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const escalations = await db
       .select({
         count: count(),

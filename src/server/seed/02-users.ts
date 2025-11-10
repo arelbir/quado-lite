@@ -50,16 +50,20 @@ const POSITION_LEVELS = {
 };
 
 // Helper: Convert Turkish characters to ASCII for email
+// Same logic as normalizeEmailForLogin utility
 function toAscii(str: string): string {
   return str
     .toLowerCase()
     .replace(/ç/g, 'c')
     .replace(/ğ/g, 'g')
     .replace(/ı/g, 'i')
+    .replace(/İ/g, 'i')
+    .replace(/i̇/g, 'i')  // Combining dot above
     .replace(/ö/g, 'o')
     .replace(/ş/g, 's')
     .replace(/ü/g, 'u')
-    .replace(/İ/g, 'i');
+    .normalize('NFD')      // Normalize Unicode
+    .replace(/[\u0300-\u036f]/g, ''); // Remove diacritical marks
 }
 
 function generateUser(index: number, deptCode: string, companyId: string) {

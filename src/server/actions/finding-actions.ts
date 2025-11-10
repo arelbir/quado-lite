@@ -14,6 +14,7 @@ import {
   revalidateFindingPaths,
   revalidateAuditPaths,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import { startWorkflow } from "@/server/actions/workflow-actions";
 import { getFindingWorkflowId, buildFindingMetadata } from "@/lib/workflow/workflow-integration";
 import { checkAuditCompletionStatus } from "./audit-actions";
@@ -48,8 +49,15 @@ export async function createFinding(data: {
   assignedToId?: string;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError<{ id: string }>("Only auditors can create findings");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "finding",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [finding] = await db
@@ -97,8 +105,21 @@ export async function assignFinding(
       return createNotFoundError("Finding");
     }
 
-    if (!requireCreatorOrAdmin(user, finding.createdById!)) {
-      return createPermissionError("Permission denied");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "finding",
+      action: "update",
+      entity: {
+        id: finding.id,
+        assignedToId: finding.assignedToId,
+        createdById: finding.createdById,
+        status: finding.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -141,10 +162,21 @@ export async function submitFindingForClosure(
       return createNotFoundError("Finding");
     }
 
-    // Check permission: Process owner or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (finding.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError("Only process owner can submit for closure");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "finding",
+      action: "submit",
+      entity: {
+        id: finding.id,
+        assignedToId: finding.assignedToId,
+        createdById: finding.createdById,
+        status: finding.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     const [actionsCount] = await db
@@ -211,16 +243,29 @@ export async function closeFinding(
   findingId: string
 ): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only auditors can close findings");
-    }
-
     const finding = await db.query.findings.findFirst({
       where: eq(findings.id, findingId),
     });
 
     if (!finding) {
       return createNotFoundError("Finding");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "finding",
+      action: "approve",
+      entity: {
+        id: finding.id,
+        assignedToId: finding.assignedToId,
+        createdById: finding.createdById,
+        status: finding.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     if (finding.status !== "PendingAuditorClosure") {
@@ -252,8 +297,29 @@ export async function rejectFinding(
   reason?: string
 ): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only auditors can reject findings");
+    const finding = await db.query.findings.findFirst({
+      where: eq(findings.id, findingId),
+    });
+
+    if (!finding) {
+      return createNotFoundError("Finding");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "finding",
+      action: "reject",
+      entity: {
+        id: finding.id,
+        assignedToId: finding.assignedToId,
+        createdById: finding.createdById,
+        status: finding.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -327,8 +393,21 @@ export async function updateFinding(
       return createNotFoundError("Finding");
     }
 
-    if (!requireCreatorOrAdmin(user, finding.createdById!)) {
-      return createPermissionError("Permission denied");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "finding",
+      action: "update",
+      entity: {
+        id: finding.id,
+        assignedToId: finding.assignedToId,
+        createdById: finding.createdById,
+        status: finding.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     const updateData: any = {

@@ -3,9 +3,21 @@ import { db } from "@/drizzle/db";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Briefcase, Users, FileText, Hash } from "lucide-react";
+import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { defaultLocale, type Locale, locales } from '@/i18n/config';
 
 export default async function PositionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('NEXT_LOCALE');
+  const locale = (localeCookie?.value && locales.includes(localeCookie.value as Locale)) 
+    ? (localeCookie.value as Locale)
+    : defaultLocale;
+  
+  const t = await getTranslations({ locale, namespace: 'organization' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+  
   const position = await db.query.positions.findFirst({
     where: (positions, { eq }) => eq(positions.id, id),
   });
@@ -26,31 +38,19 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
 
   const levelColors: Record<string, string> = {
     "10": "bg-purple-100 text-purple-800",
-    "9": "bg-blue-100 text-blue-800",
-    "8": "bg-green-100 text-green-800",
+    "9": "bg-indigo-100 text-indigo-800",
+    "8": "bg-blue-100 text-blue-800",
     "7": "bg-cyan-100 text-cyan-800",
-    "6": "bg-orange-100 text-orange-800",
-    "5": "bg-yellow-100 text-yellow-800",
-    "4": "bg-gray-100 text-gray-800",
-    "3": "bg-gray-100 text-gray-800",
-    "2": "bg-gray-100 text-gray-800",
-    "1": "bg-gray-100 text-gray-800",
+    "6": "bg-teal-100 text-teal-800",
+    "5": "bg-green-100 text-green-800",
+    "4": "bg-lime-100 text-lime-800",
+    "3": "bg-yellow-100 text-yellow-800",
+    "2": "bg-orange-100 text-orange-800",
+    "1": "bg-red-100 text-red-800",
   };
 
   const getLevelLabel = (level: string) => {
-    const labels: Record<string, string> = {
-      "10": "C-Level",
-      "9": "VP/Director",
-      "8": "Senior Manager",
-      "7": "Manager",
-      "6": "Team Lead/Senior",
-      "5": "Mid-Level",
-      "4": "Junior",
-      "3": "Entry",
-      "2": "Intern",
-      "1": "Trainee",
-    };
-    return labels[level] || level;
+    return t(`positions.levels.${level}`);
   };
 
   return (
@@ -59,10 +59,10 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{position.name}</h1>
-          <p className="text-muted-foreground">Position Details</p>
+          <p className="text-muted-foreground">{t('positions.fields.name')} {tCommon('labels.details')}</p>
         </div>
         <Badge className={position.isActive ? "bg-green-100 text-green-800" : ""} variant={position.isActive ? "default" : "secondary"}>
-          {position.isActive ? "Active" : "Inactive"}
+          {position.isActive ? tCommon('status.active') : tCommon('status.inactive')}
         </Badge>
       </div>
 
@@ -72,35 +72,35 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Briefcase className="h-5 w-5" />
-              Basic Information
+              {t('positions.fields.basicInformation')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Position Name</label>
+              <label className="text-sm font-medium text-muted-foreground">{t('positions.fields.name')}</label>
               <p className="text-base font-medium">{position.name}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Code</label>
+              <label className="text-sm font-medium text-muted-foreground">{t('positions.fields.code')}</label>
               <p className="text-base font-medium">{position.code}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Level</label>
+              <label className="text-sm font-medium text-muted-foreground">{t('positions.fields.level')}</label>
               <div className="mt-1">
                 <Badge className={position.level ? (levelColors[position.level] || "bg-gray-100 text-gray-800") : "bg-gray-100 text-gray-800"}>
-                  {position.level ? `Level ${position.level} - ${getLevelLabel(position.level)}` : "No level assigned"}
+                  {position.level ? `${tCommon('labels.level')} ${position.level} - ${getLevelLabel(position.level)}` : tCommon('labels.noLevelAssigned')}
                 </Badge>
               </div>
             </div>
             {position.category && (
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Category</label>
+                <label className="text-sm font-medium text-muted-foreground">{t('positions.fields.category')}</label>
                 <Badge variant="outline" className="mt-1">{position.category}</Badge>
               </div>
             )}
             {position.salaryGrade && (
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Salary Grade</label>
+                <label className="text-sm font-medium text-muted-foreground">{t('positions.fields.salaryGrade')}</label>
                 <p className="text-base font-mono">{position.salaryGrade}</p>
               </div>
             )}
@@ -113,7 +113,7 @@ export default async function PositionDetailPage({ params }: { params: Promise<{
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Description
+                {t('positions.fields.description')}
               </CardTitle>
             </CardHeader>
             <CardContent>

@@ -11,13 +11,27 @@ import { db } from '@/drizzle/db';
 import { roles, user, departments } from '@/drizzle/schema';
 import { eq } from 'drizzle-orm';
 import type { ActionResponse } from '@/lib/types';
+import { withAuth, createPermissionError } from '@/lib/helpers';
+import { checkPermission } from '@/lib/permissions/unified-permission-checker';
 
 /**
  * Get all active roles for workflow assignment
  */
 export async function getWorkflowRoles(): Promise<ActionResponse<Array<{ value: string; label: string; description?: string }>>> {
-  try {
-    const rolesList = await db
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    try {
+      const rolesList = await db
       .select({
         code: roles.code,
         name: roles.name,
@@ -33,19 +47,32 @@ export async function getWorkflowRoles(): Promise<ActionResponse<Array<{ value: 
       description: role.description || undefined,
     }));
 
-    return { success: true, data: formattedRoles };
-  } catch (error) {
-    console.error('Error fetching workflow roles:', error);
-    return { success: false, error: 'Failed to fetch roles' };
-  }
+      return { success: true, data: formattedRoles };
+    } catch (error) {
+      console.error('Error fetching workflow roles:', error);
+      return { success: false, error: 'Failed to fetch roles' };
+    }
+  });
 }
 
 /**
  * Get all active users for specific assignment
  */
 export async function getWorkflowUsers(): Promise<ActionResponse<Array<{ value: string; label: string; email?: string }>>> {
-  try {
-    const usersList = await db
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    try {
+      const usersList = await db
       .select({
         id: user.id,
         name: user.name,
@@ -62,19 +89,32 @@ export async function getWorkflowUsers(): Promise<ActionResponse<Array<{ value: 
       email: u.email || undefined,
     }));
 
-    return { success: true, data: formattedUsers };
-  } catch (error) {
-    console.error('Error fetching workflow users:', error);
-    return { success: false, error: 'Failed to fetch users' };
-  }
+      return { success: true, data: formattedUsers };
+    } catch (error) {
+      console.error('Error fetching workflow users:', error);
+      return { success: false, error: 'Failed to fetch users' };
+    }
+  });
 }
 
 /**
  * Get all departments for manager assignment
  */
 export async function getWorkflowDepartments(): Promise<ActionResponse<Array<{ value: string; label: string }>>> {
-  try {
-    const departmentsList = await db
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    try {
+      const departmentsList = await db
       .select({
         id: departments.id,
         name: departments.name,
@@ -88,11 +128,12 @@ export async function getWorkflowDepartments(): Promise<ActionResponse<Array<{ v
       label: `${dept.name} Manager`,
     }));
 
-    return { success: true, data: formattedDepartments };
-  } catch (error) {
-    console.error('Error fetching workflow departments:', error);
-    return { success: false, error: 'Failed to fetch departments' };
-  }
+      return { success: true, data: formattedDepartments };
+    } catch (error) {
+      console.error('Error fetching workflow departments:', error);
+      return { success: false, error: 'Failed to fetch departments' };
+    }
+  });
 }
 
 // Note: Dynamic assignment templates moved to RoleSelector.tsx

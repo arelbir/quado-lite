@@ -1,0 +1,57 @@
+{
+  "newAction": "Yeni Aksiyon",
+  "createActionFor": "Bulgu için aksiyon oluştur",
+  "actionDetails": "Aksiyon Detayları",
+  
+  "findingContext": "İlgili Bulgu",
+  "findingDetails": "Bulgu Detayları",
+  
+  "detailsLabel": "Aksiyon Açıklaması",
+  "detailsPlaceholder": "Düzeltici veya önleyici aksiyonu tanımlayın...",
+  "detailsDescription": "Bulguyu gidermek için alınacak aksiyonu net bir şekilde açıklayın",
+  
+  "assignedToLabel": "Aksiyon Sorumlusu",
+  "assignedToDescription": "Aksiyonu tamamlamaktan sorumlu kişi",
+  "assignedToPlaceholder": "Sorumlu kişiyi seçin",
+  
+  "managerLabel": "Onaylayacak Yönetici",
+  "managerDescription": "Aksiyonu onaylayacak yönetici (opsiyonel)",
+  "managerPlaceholder": "Yönetici seçin (opsiyonel)",
+  
+  "workflowInfo": "İş Akışı Bilgisi",
+  "workflowDescription": "Aksiyon oluşturulduktan sonra otomatik olarak iş akışı başlayacak. Sorumlu kişiye bildirim gönderilecek.",
+  
+  "workflowSteps": {
+    "assigned": "Aksiyonunuz Atanacak",
+    "assignedDesc": "Sorumluya bildirim gidecek",
+    "inProgress": "Aksiyon Tamamlanacak",
+    "inProgressDesc": "Sorumlu kişi tamamlayacak",
+    "approval": "Yönetici Onayı",
+    "approvalDesc": "Yönetici değerlendirecek",
+    "completed": "Tamamlandı",
+    "completedDesc": "İş akışı sonlandı"
+  },
+  
+  "createButton": "Aksiyon Oluştur",
+  "cancelButton": "İptal",
+  "backButton": "Geri",
+  
+  "dueDateLabel": "Bitiş Tarihi",
+  "dueDateDescription": "Aksiyonun tamamlanması gereken tarih (opsiyonel)",
+  "dueDatePlaceholder": "Tarih seçin",
+  
+  "validation": {
+    "detailsRequired": "Aksiyon açıklaması gereklidir",
+    "detailsMinLength": "En az 10 karakter girmelisiniz",
+    "assignedToRequired": "Aksiyon sorumlusu seçmelisiniz",
+    "invalidUserId": "Geçersiz kullanıcı ID'si",
+    "dueDateInvalid": "Geçersiz tarih"
+  },
+  
+  "toast": {
+    "createSuccess": "Aksiyon başarıyla oluşturuldu",
+    "createError": "Aksiyon oluşturulamadı",
+    "createErrorGeneric": "Bir hata oluştu",
+    "loading": "Aksiyon oluşturuluyor..."
+  }
+}

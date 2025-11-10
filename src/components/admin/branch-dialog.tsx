@@ -46,6 +46,7 @@ import { toast } from "sonner";
 import { createBranch, updateBranch } from "@/server/actions/organization-actions";
 import { Loader2 } from "lucide-react";
 import type { Branch, Company } from "@/lib/types";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -78,6 +79,8 @@ export function BranchDialog({
   companies,
   onSuccess,
 }: BranchDialogProps) {
+  const t = useTranslations('organization');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEdit = !!branch;
 
@@ -124,7 +127,7 @@ export function BranchDialog({
 
     try {
       if (isEdit && !branch?.id) {
-        toast.error("Branch ID is required for update");
+        toast.error(t('branches.messages.idRequired'));
         return;
       }
 
@@ -133,15 +136,15 @@ export function BranchDialog({
         : await createBranch(data);
 
       if (result.success) {
-        toast.success(result.message || (isEdit ? "Branch updated successfully" : "Branch created successfully"));
+        toast.success(result.message || (isEdit ? t('branches.messages.updated') : t('branches.messages.created')));
         onOpenChange(false);
         form.reset();
         onSuccess?.();
       } else {
-        toast.error(result.error || "An error occurred");
+        toast.error(result.error || tCommon('messages.error'));
       }
     } catch (error) {
-      toast.error("Failed to save branch");
+      toast.error(t('branches.messages.saveError'));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -153,12 +156,12 @@ export function BranchDialog({
       <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Branch" : "Create Branch"}
+            {isEdit ? t('branches.editBranch') : t('branches.createNew')}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Update the branch information below."
-              : "Add a new branch office to your organization."}
+              ? t('branches.description.update')
+              : t('branches.description.create')}
           </DialogDescription>
         </DialogHeader>
 
@@ -170,9 +173,9 @@ export function BranchDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Branch Name *</FormLabel>
+                    <FormLabel>{t('branches.fields.name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ankara Branch" {...field} />
+                      <Input placeholder={t('branches.placeholders.name')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -184,9 +187,9 @@ export function BranchDialog({
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Code *</FormLabel>
+                    <FormLabel>{t('branches.fields.code')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ANK" {...field} />
+                      <Input placeholder={t('branches.placeholders.code')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -200,14 +203,14 @@ export function BranchDialog({
                 name="companyId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company *</FormLabel>
+                    <FormLabel>{t('branches.fields.company')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select company" />
+                          <SelectValue placeholder={t('branches.placeholders.company')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -228,24 +231,24 @@ export function BranchDialog({
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type *</FormLabel>
+                    <FormLabel>{t('branches.fields.type')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder={t('branches.placeholders.type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Headquarters">Headquarters</SelectItem>
-                        <SelectItem value="Regional Office">Regional Office</SelectItem>
-                        <SelectItem value="Branch Office">Branch Office</SelectItem>
-                        <SelectItem value="Sales Office">Sales Office</SelectItem>
-                        <SelectItem value="Service Center">Service Center</SelectItem>
-                        <SelectItem value="Factory">Factory</SelectItem>
-                        <SelectItem value="Warehouse">Warehouse</SelectItem>
+                        <SelectItem value="Headquarters">{t('branches.types.Headquarters')}</SelectItem>
+                        <SelectItem value="Regional Office">{t('branches.types.Regional Office')}</SelectItem>
+                        <SelectItem value="Branch Office">{t('branches.types.Branch Office')}</SelectItem>
+                        <SelectItem value="Sales Office">{t('branches.types.Sales Office')}</SelectItem>
+                        <SelectItem value="Service Center">{t('branches.types.Service Center')}</SelectItem>
+                        <SelectItem value="Factory">{t('branches.types.Factory')}</SelectItem>
+                        <SelectItem value="Warehouse">{t('branches.types.Warehouse')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -260,9 +263,9 @@ export function BranchDialog({
                 name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country</FormLabel>
+                    <FormLabel>{t('branches.fields.country')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Turkey" {...field} />
+                      <Input placeholder={t('branches.placeholders.country')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -274,9 +277,9 @@ export function BranchDialog({
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>{t('branches.fields.city')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ankara" {...field} />
+                      <Input placeholder={t('branches.placeholders.city')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -289,10 +292,10 @@ export function BranchDialog({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>{t('branches.fields.address')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Street address, building number..."
+                      placeholder={t('branches.placeholders.address')}
                       {...field}
                     />
                   </FormControl>
@@ -307,9 +310,9 @@ export function BranchDialog({
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>{t('branches.fields.phone')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="+90 312 123 4567" {...field} />
+                      <Input placeholder={t('branches.placeholders.phone')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -321,9 +324,9 @@ export function BranchDialog({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('branches.fields.email')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ankara@company.com" type="email" {...field} />
+                      <Input placeholder={t('branches.placeholders.email')} type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -336,10 +339,10 @@ export function BranchDialog({
               name="managerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Branch Manager</FormLabel>
+                  <FormLabel>{t('branches.fields.manager')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Manager ID (from users)"
+                      placeholder={t('branches.placeholders.manager')}
                       {...field}
                     />
                   </FormControl>
@@ -353,10 +356,10 @@ export function BranchDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('branches.fields.description')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Branch description..."
+                      placeholder={t('branches.placeholders.description')}
                       {...field}
                     />
                   </FormControl>
@@ -372,11 +375,11 @@ export function BranchDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {tCommon('actions.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? "Update" : "Create"}
+                {isEdit ? tCommon('actions.update') : tCommon('actions.create')}
               </Button>
             </DialogFooter>
           </form>

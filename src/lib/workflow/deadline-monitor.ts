@@ -12,7 +12,7 @@
  */
 
 import { db } from "@/drizzle/db";
-import { stepAssignments, workflowInstances, user } from "@/drizzle/schema";
+import { stepAssignments, workflowInstances, user, workflowTimeline, notifications } from "@/drizzle/schema";
 import { eq, and, lte, isNull, sql } from "drizzle-orm";
 
 /**
@@ -209,7 +209,22 @@ export async function escalateAssignment(assignmentId: string): Promise<Escalati
       })
       .where(eq(stepAssignments.id, assignmentId));
 
-    // TODO: Create timeline entry
+    // Create timeline entry for escalation
+    await db.insert(workflowTimeline).values({
+      workflowInstanceId: assignment.workflowInstanceId,
+      stepId: assignment.stepId,
+      action: "escalate",
+      comment: `Task escalated due to deadline breach. Reassigned to escalation target.`,
+      performedBy: assignment.assignedUserId, // System action, use original assignee
+      metadata: {
+        originalAssigneeId: assignment.assignedUserId,
+        escalatedToId: escalationTarget,
+        deadline: assignment.deadline,
+        escalatedAt: new Date().toISOString(),
+      },
+      createdAt: new Date(),
+    });
+
     // TODO: Send notification to escalation target
 
     return {
@@ -311,7 +326,60 @@ export function formatDeadline(deadline: Date): string {
  * Send once when < 24h remaining
  */
 export async function shouldSendApproachingNotification(assignmentId: string): Promise<boolean> {
-  // TODO: Track notification history to avoid duplicate notifications
-  // For now, just return true
+  // Track notification history to avoid duplicate notifications
+  const existingNotification = await db.query.notifications.findFirst({
+    where: and(
+      eq(notifications.category, "workflow_deadline_approaching"),
+      eq(notifications.relatedEntityId, assignmentId)
+    ),
+    orderBy: (notifications, { desc }) => [desc(notifications.createdAt)],
+  });
+
+  // If notification sent in last 24 hours, don't send again
+  if (existingNotification) {
+    const hoursSinceLastNotification = 
+      (Date.now() - existingNotification.createdAt.getTime()) / (1000 * 60 * 60);
+    
+    if (hoursSinceLastNotification < 24) {
+      return false;
+    }
+  }
+
   return true;
+}
+
+/**
+ * Send deadline approaching notification
+ */
+export async function sendDeadlineApproachingNotification(
+  assignmentId: string,
+  userId: string,
+  deadlineDate: Date
+): Promise<boolean> {
+  try {
+    // Check if we should send notification
+    const shouldSend = await shouldSendApproachingNotification(assignmentId);
+    if (!shouldSend) {
+      return false;
+    }
+
+    // Create notification record
+    await db.insert(notifications).values({
+      userId,
+      category: "workflow_deadline_approaching",
+      title: "Deadline Approaching",
+      message: `Your task deadline is approaching: ${deadlineDate.toLocaleDateString()}`,
+      // relatedEntityType can be null for workflow assignments
+      relatedEntityType: null,
+      relatedEntityId: null,
+      isRead: false,
+      createdAt: new Date(),
+    });
+
+    console.log(`📧 Deadline approaching notification sent to user ${userId} for assignment ${assignmentId}`);
+    return true;
+  } catch (error) {
+    console.error(`Failed to send deadline notification for assignment ${assignmentId}:`, error);
+    return false;
+  }
 }

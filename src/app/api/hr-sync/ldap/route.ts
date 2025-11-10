@@ -24,6 +24,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { syncFromLDAP } from "@/lib/hr-sync/ldap-sync-service";
 import { currentUser } from "@/lib/auth";
+import { db } from "@/drizzle/db";
+import { hrSyncLogs } from "@/drizzle/schema/hr-sync";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   try {
@@ -101,10 +104,28 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Implement get sync logs
+    // Get configId from query params
+    const { searchParams } = new URL(request.url);
+    const configId = searchParams.get('configId');
+
+    if (!configId) {
+      return NextResponse.json(
+        { success: false, error: "configId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Get sync logs for this config
+    const logs = await db.query.hrSyncLogs.findMany({
+      where: eq(hrSyncLogs.configId, configId),
+      orderBy: (hrSyncLogs, { desc }) => [desc(hrSyncLogs.createdAt)],
+      limit: 50, // Last 50 logs
+    });
+
     return NextResponse.json({
       success: true,
-      message: "Not implemented yet"
+      data: logs,
+      count: logs.length
     });
 
   } catch (error) {

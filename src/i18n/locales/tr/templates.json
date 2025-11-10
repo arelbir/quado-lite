@@ -27,12 +27,15 @@
     "quality": "Kalite",
     "environment": "Çevre",
     "ohs": "İSG",
+    "ohsFull": "İş Sağlığı ve Güvenliği",
     "infoSecurity": "Bilgi Güvenliği",
     "foodSafety": "Gıda Güvenliği",
     "other": "Diğer"
   },
   "messages": {
     "selectBanksOptional": "Şablonda kullanılacak soru havuzlarını seçin (opsiyonel)",
+    "selectCategoryDescription": "Şablonun hangi alan için olduğunu seçin",
+    "durationDescription": "Bu şablonla yapılacak denetimin tahmini süresi",
     "enterTemplateInfo": "Şablon adı ve kategorisini belirleyin",
     "templateCreated": "Şablon başarıyla oluşturuldu!",
     "templateUpdated": "Şablon başarıyla güncellendi!",
@@ -40,5 +43,9 @@
     "allQuestionsInBanks": "Tüm havuzlardaki sorular",
     "banksInTemplate": "Bu şablonda kullanılan soru havuzları",
     "noBanksAddedYet": "Bu şablona henüz soru havuzu eklenmemiş"
+  },
+  "validation": {
+    "min3Chars": "En az 3 karakter gerekli",
+    "categoryRequired": "Kategori seçiniz"
   }
 }

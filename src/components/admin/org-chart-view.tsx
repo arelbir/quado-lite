@@ -32,6 +32,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Building2, Users, Maximize2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from 'next-intl';
 
 interface Department {
   id: string;
@@ -58,6 +59,8 @@ interface OrgChartViewProps {
 
 // Custom node component
 function DepartmentNode({ data }: { data: any }) {
+  const t = useTranslations('organization');
+  
   return (
     <Card className="min-w-[200px] shadow-lg border-2 hover:shadow-xl transition-shadow">
       <CardContent className="p-4">
@@ -76,7 +79,7 @@ function DepartmentNode({ data }: { data: any }) {
             )}
             {data.childCount > 0 && (
               <div className="text-xs text-muted-foreground mt-1">
-                {data.childCount} sub-departments
+                {data.childCount} {t('orgChart.subDepartments', { count: data.childCount })}
               </div>
             )}
           </div>
@@ -91,6 +94,9 @@ const nodeTypes = {
 };
 
 export function OrgChartView({ departments, companies }: OrgChartViewProps) {
+  const t = useTranslations('organization');
+  const tCommon = useTranslations('common');
+  
   // Build nodes and edges
   const { initialNodes, initialEdges } = useMemo(() => {
     const nodes: Node[] = [];
@@ -178,7 +184,7 @@ export function OrgChartView({ departments, companies }: OrgChartViewProps) {
   // Export chart as image
   const onExport = useCallback(() => {
     // TODO: Implement export to PNG/SVG
-    console.log("Export chart");
+    console.log(t('orgChart.exportChart'));
   }, []);
 
   // Fit view
@@ -193,15 +199,15 @@ export function OrgChartView({ departments, companies }: OrgChartViewProps) {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onExport}>
             <Download className="w-4 h-4 mr-2" />
-            Export
+            {t('orgChart.export')}
           </Button>
           <Button variant="outline" size="sm" onClick={onFitView}>
             <Maximize2 className="w-4 h-4 mr-2" />
-            Fit View
+            {t('orgChart.fitView')}
           </Button>
         </div>
         <div className="text-sm text-muted-foreground">
-          {departments.length} departments
+          {departments.length} {t('departments.title', { count: departments.length })}
         </div>
       </div>
 

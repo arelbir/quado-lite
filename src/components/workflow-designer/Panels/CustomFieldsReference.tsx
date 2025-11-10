@@ -21,12 +21,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { useTranslations } from 'next-intl';
 
 interface CustomFieldsReferenceProps {
   module?: EntityType | '';
 }
 
 export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
+  const t = useTranslations('workflow');
   const [fields, setFields] = useState<CustomFieldDefinition[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -115,8 +117,8 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
         <CardContent className="p-6">
           <div className="text-center text-sm text-muted-foreground">
             <Icons.AlertCircle className="size-12 mx-auto mb-2 opacity-50" />
-            <p>Module not selected</p>
-            <p className="text-xs mt-1">Set workflow module to see custom fields</p>
+            <p>{t('customFields.moduleNotSelected')}</p>
+            <p className="text-xs mt-1">{t('customFields.setModuleToSeeFields')}</p>
           </div>
         </CardContent>
       </Card>
@@ -129,7 +131,7 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
         <CardContent className="p-6">
           <div className="text-center">
             <Icons.Loader2 className="size-8 animate-spin mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">Loading custom fields...</p>
+            <p className="text-sm text-muted-foreground">{t('customFields.loading')}</p>
           </div>
         </CardContent>
       </Card>
@@ -153,15 +155,15 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Custom Fields</CardTitle>
-          <CardDescription>For {module} entities</CardDescription>
+          <CardTitle className="text-sm">{t('customFields.title')}</CardTitle>
+          <CardDescription>{t('customFields.description', { module })}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center text-sm text-muted-foreground">
             <Icons.FileQuestion className="size-12 mx-auto mb-2 opacity-50" />
-            <p>No custom fields defined</p>
+            <p>{t('customFields.noFieldsDefined')}</p>
             <p className="text-xs mt-1">
-              Create custom fields in Admin → Custom Fields
+              {t('customFields.createFieldsInAdmin')}
             </p>
           </div>
         </CardContent>
@@ -173,10 +175,10 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-sm flex items-center justify-between">
-          <span>Custom Fields Reference</span>
-          <Badge variant="outline">{fields.length} fields</Badge>
+          <span>{t('customFields.referenceTitle')}</span>
+          <Badge variant="outline">{t('customFields.fieldsCount', { count: fields.length })}</Badge>
         </CardTitle>
-        <CardDescription>Available for {module} entities</CardDescription>
+        <CardDescription>{t('customFields.availableFor', { module })}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         <Accordion type="single" collapsible className="w-full">
@@ -207,7 +209,7 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
 
                   {/* Usage Path */}
                   <div>
-                    <div className="text-xs font-medium mb-1">📌 Usage Path:</div>
+                    <div className="text-xs font-medium mb-1">{t('customFields.usagePath')}:</div>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 bg-muted px-2 py-1 rounded text-xs">
                         customFields.{field.fieldKey}
@@ -225,7 +227,7 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
                   {/* Options (for select fields) */}
                   {(field.fieldType === 'select' || field.fieldType === 'radio') && field.options && (
                     <div>
-                      <div className="text-xs font-medium mb-1">📋 Options:</div>
+                      <div className="text-xs font-medium mb-1">{t('customFields.options')}:</div>
                       <div className="flex flex-wrap gap-1">
                         {field.options.map((opt: any, i: number) => (
                           <Badge key={i} variant="outline" className="text-xs">
@@ -238,7 +240,7 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
 
                   {/* Examples */}
                   <div>
-                    <div className="text-xs font-medium mb-1">💡 Examples:</div>
+                    <div className="text-xs font-medium mb-1">{t('customFields.examples')}:</div>
                     <div className="space-y-1">
                       {getExampleUsage(field).map((example, i) => (
                         <div key={i} className="flex items-center gap-2">

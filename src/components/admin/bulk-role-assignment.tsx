@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl';
 
 interface BulkRoleAssignmentProps {
   selectedUsers: Array<{ id: string; name: string; email: string }>;
@@ -38,6 +39,8 @@ export function BulkRoleAssignment({
   onOpenChange,
   onComplete,
 }: BulkRoleAssignmentProps) {
+  const t = useTranslations('users');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [selectedRoleId, setSelectedRoleId] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -49,7 +52,7 @@ export function BulkRoleAssignment({
 
   const handleBulkAssign = async () => {
     if (!selectedRoleId) {
-      toast.error("Please select a role");
+      toast.error(t('bulkAssignment.selectRoleError'));
       return;
     }
 
@@ -69,14 +72,14 @@ export function BulkRoleAssignment({
             userId: user.id,
             userName: realUserName,
             success: result.success,
-            message: result.message || (result.success ? "Success" : "Failed"),
+            message: result.message || (result.success ? tCommon('messages.success') : tCommon('messages.failed')),
           });
         } catch (error) {
           assignmentResults.push({
             userId: user.id,
             userName: user.name,
             success: false,
-            message: "Error occurred",
+            message: tCommon('messages.error'),
           });
         }
       }
@@ -91,16 +94,16 @@ export function BulkRoleAssignment({
       });
 
       if (successCount > 0) {
-        toast.success(`Role assigned to ${successCount} user(s)`);
+        toast.success(t('bulkAssignment.successCount', { count: successCount }));
         router.refresh();
         onComplete?.();
       }
 
       if (failedCount > 0) {
-        toast.error(`Failed to assign role to ${failedCount} user(s)`);
+        toast.error(t('bulkAssignment.failedCount', { count: failedCount }));
       }
     } catch (error) {
-      toast.error("An error occurred during bulk assignment");
+      toast.error(t('bulkAssignment.assignmentError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -119,17 +122,17 @@ export function BulkRoleAssignment({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Bulk Role Assignment
+            {t('bulkAssignment.title')}
           </DialogTitle>
           <DialogDescription>
-            Assign a role to {selectedUsers.length} selected user(s)
+            {t('bulkAssignment.description', { count: selectedUsers.length })}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Selected Users */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Selected Users:</label>
+            <label className="text-sm font-medium mb-2 block">{t('bulkAssignment.selectedUsers')}:</label>
             <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto border rounded-lg p-2">
               {selectedUsers.map((user) => (
                 <Badge key={user.id} variant="secondary">
@@ -141,14 +144,14 @@ export function BulkRoleAssignment({
 
           {/* Role Selection */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Select Role:</label>
+            <label className="text-sm font-medium mb-2 block">{t('bulkAssignment.selectRole')}:</label>
             <Select
               value={selectedRoleId}
               onValueChange={setSelectedRoleId}
               disabled={loading || !!results}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Choose a role..." />
+                <SelectValue placeholder={t('bulkAssignment.rolePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {availableRoles.map((role) => (
@@ -197,7 +200,7 @@ export function BulkRoleAssignment({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={loading}>
-            {results ? "Close" : "Cancel"}
+            {results ? tCommon('actions.close') : tCommon('actions.cancel')}
           </Button>
           {!results && (
             <Button
@@ -205,7 +208,7 @@ export function BulkRoleAssignment({
               disabled={loading || !selectedRoleId}
             >
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Assign to {selectedUsers.length} User(s)
+              {t('bulkAssignment.assignButton', { count: selectedUsers.length })}
             </Button>
           )}
         </DialogFooter>

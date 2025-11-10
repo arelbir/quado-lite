@@ -4,7 +4,8 @@ import { db } from '@/drizzle/db';
 import { visualWorkflow, visualWorkflowVersion } from '@/drizzle/schema';
 import { eq, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { currentUser } from '@/lib/auth';
+import { withAuth, createPermissionError } from '@/lib/helpers';
+import { checkPermission } from '@/lib/permissions/unified-permission-checker';
 
 /**
  * Create new visual workflow
@@ -15,12 +16,20 @@ export async function createVisualWorkflow(data: {
   module: 'DOF' | 'ACTION' | 'FINDING' | 'AUDIT';
   nodes: any[];
   edges: any[];
-}) {
-  try {
-    const user = await currentUser();
-    if (!user?.id) {
-      return { success: false, error: 'Unauthorized' };
+}): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
+
+    try {
 
     const [workflow] = await db
       .insert(visualWorkflow)
@@ -36,12 +45,13 @@ export async function createVisualWorkflow(data: {
       })
       .returning();
 
-    revalidatePath('/admin/workflows');
-    return { success: true, data: workflow };
-  } catch (error) {
-    console.error('[createVisualWorkflow] Error:', error);
-    return { success: false, error: 'Failed to create workflow' };
-  }
+      revalidatePath('/admin/workflows');
+      return { success: true, data: workflow };
+    } catch (error) {
+      console.error('[createVisualWorkflow] Error:', error);
+      return { success: false, error: 'Failed to create workflow' };
+    }
+  });
 }
 
 /**
@@ -56,12 +66,20 @@ export async function updateVisualWorkflow(
     edges?: any[];
     version?: string;
   }
-) {
-  try {
-    const user = await currentUser();
-    if (!user?.id) {
-      return { success: false, error: 'Unauthorized' };
+): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
+
+    try {
 
     const [workflow] = await db
       .update(visualWorkflow)
@@ -76,13 +94,14 @@ export async function updateVisualWorkflow(
       return { success: false, error: 'Workflow not found' };
     }
 
-    revalidatePath('/admin/workflows');
-    revalidatePath(`/admin/workflows/${id}`);
-    return { success: true, data: workflow };
-  } catch (error) {
-    console.error('[updateVisualWorkflow] Error:', error);
-    return { success: false, error: 'Failed to update workflow' };
-  }
+      revalidatePath('/admin/workflows');
+      revalidatePath(`/admin/workflows/${id}`);
+      return { success: true, data: workflow };
+    } catch (error) {
+      console.error('[updateVisualWorkflow] Error:', error);
+      return { success: false, error: 'Failed to update workflow' };
+    }
+  });
 }
 
 /**
@@ -96,12 +115,20 @@ export async function saveWorkflowVersion(
     nodes: any[];
     edges: any[];
   }
-) {
-  try {
-    const user = await currentUser();
-    if (!user?.id) {
-      return { success: false, error: 'Unauthorized' };
+): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
+
+    try {
 
     const [version] = await db
       .insert(visualWorkflowVersion)
@@ -115,29 +142,32 @@ export async function saveWorkflowVersion(
       })
       .returning();
 
-    revalidatePath(`/admin/workflows/${workflowId}`);
-    return { success: true, data: version };
-  } catch (error) {
-    console.error('[saveWorkflowVersion] Error:', error);
-    return { success: false, error: 'Failed to save version' };
-  }
+      revalidatePath(`/admin/workflows/${workflowId}`);
+      return { success: true, data: version };
+    } catch (error) {
+      console.error('[saveWorkflowVersion] Error:', error);
+      return { success: false, error: 'Failed to save version' };
+    }
+  });
 }
 
 /**
  * Publish workflow (make it ACTIVE)
  */
-export async function publishVisualWorkflow(id: string) {
-  try {
-    const user = await currentUser();
-    if (!user?.id) {
-      return { success: false, error: 'Unauthorized' };
+export async function publishVisualWorkflow(id: string): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
-    // TODO: Add admin permission check
-    // const userRole = user.role;
-    // if (userRole !== 'SUPER_ADMIN' && userRole !== 'QUALITY_MANAGER') {
-    //   return { success: false, error: 'Permission denied' };
-    // }
+    try {
 
     const [workflow] = await db
       .update(visualWorkflow)
@@ -154,24 +184,33 @@ export async function publishVisualWorkflow(id: string) {
       return { success: false, error: 'Workflow not found' };
     }
 
-    revalidatePath('/admin/workflows');
-    revalidatePath(`/admin/workflows/${id}`);
-    return { success: true, data: workflow };
-  } catch (error) {
-    console.error('[publishVisualWorkflow] Error:', error);
-    return { success: false, error: 'Failed to publish workflow' };
-  }
+      revalidatePath('/admin/workflows');
+      revalidatePath(`/admin/workflows/${id}`);
+      return { success: true, data: workflow };
+    } catch (error) {
+      console.error('[publishVisualWorkflow] Error:', error);
+      return { success: false, error: 'Failed to publish workflow' };
+    }
+  });
 }
 
 /**
  * Archive workflow
  */
-export async function archiveVisualWorkflow(id: string) {
-  try {
-    const user = await currentUser();
-    if (!user?.id) {
-      return { success: false, error: 'Unauthorized' };
+export async function archiveVisualWorkflow(id: string): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
+
+    try {
 
     const [workflow] = await db
       .update(visualWorkflow)
@@ -186,21 +225,34 @@ export async function archiveVisualWorkflow(id: string) {
       return { success: false, error: 'Workflow not found' };
     }
 
-    revalidatePath('/admin/workflows');
-    revalidatePath(`/admin/workflows/${id}`);
-    return { success: true, data: workflow };
-  } catch (error) {
-    console.error('[archiveVisualWorkflow] Error:', error);
-    return { success: false, error: 'Failed to archive workflow' };
-  }
+      revalidatePath('/admin/workflows');
+      revalidatePath(`/admin/workflows/${id}`);
+      return { success: true, data: workflow };
+    } catch (error) {
+      console.error('[archiveVisualWorkflow] Error:', error);
+      return { success: false, error: 'Failed to archive workflow' };
+    }
+  });
 }
 
 /**
  * Get all workflows
  */
-export async function getVisualWorkflows() {
-  try {
-    const workflows = await db.query.visualWorkflow.findMany({
+export async function getVisualWorkflows(): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    try {
+      const workflows = await db.query.visualWorkflow.findMany({
       with: {
         createdBy: {
           columns: {
@@ -213,19 +265,32 @@ export async function getVisualWorkflows() {
       orderBy: [desc(visualWorkflow.updatedAt)],
     });
 
-    return { success: true, data: workflows };
-  } catch (error) {
-    console.error('[getVisualWorkflows] Error:', error);
-    return { success: false, error: 'Failed to fetch workflows' };
-  }
+      return { success: true, data: workflows };
+    } catch (error) {
+      console.error('[getVisualWorkflows] Error:', error);
+      return { success: false, error: 'Failed to fetch workflows' };
+    }
+  });
 }
 
 /**
  * Get workflow by ID
  */
-export async function getVisualWorkflowById(id: string) {
-  try {
-    const workflow = await db.query.visualWorkflow.findFirst({
+export async function getVisualWorkflowById(id: string): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    try {
+      const workflow = await db.query.visualWorkflow.findFirst({
       where: eq(visualWorkflow.id, id),
       with: {
         createdBy: {
@@ -242,19 +307,32 @@ export async function getVisualWorkflowById(id: string) {
       return { success: false, error: 'Workflow not found' };
     }
 
-    return { success: true, data: workflow };
-  } catch (error) {
-    console.error('[getVisualWorkflowById] Error:', error);
-    return { success: false, error: 'Failed to fetch workflow' };
-  }
+      return { success: true, data: workflow };
+    } catch (error) {
+      console.error('[getVisualWorkflowById] Error:', error);
+      return { success: false, error: 'Failed to fetch workflow' };
+    }
+  });
 }
 
 /**
  * Get workflow versions
  */
-export async function getWorkflowVersions(workflowId: string) {
-  try {
-    const versions = await db.query.visualWorkflowVersion.findMany({
+export async function getWorkflowVersions(workflowId: string): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    try {
+      const versions = await db.query.visualWorkflowVersion.findMany({
       where: eq(visualWorkflowVersion.workflowId, workflowId),
       with: {
         createdBy: {
@@ -268,22 +346,31 @@ export async function getWorkflowVersions(workflowId: string) {
       orderBy: [desc(visualWorkflowVersion.createdAt)],
     });
 
-    return { success: true, data: versions };
-  } catch (error) {
-    console.error('[getWorkflowVersions] Error:', error);
-    return { success: false, error: 'Failed to fetch versions' };
-  }
+      return { success: true, data: versions };
+    } catch (error) {
+      console.error('[getWorkflowVersions] Error:', error);
+      return { success: false, error: 'Failed to fetch versions' };
+    }
+  });
 }
 
 /**
  * Restore archived workflow (make it DRAFT)
  */
-export async function restoreVisualWorkflow(id: string) {
-  try {
-    const user = await currentUser();
-    if (!user?.id) {
-      return { success: false, error: 'Unauthorized' };
+export async function restoreVisualWorkflow(id: string): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
+
+    try {
 
     const [workflow] = await db
       .update(visualWorkflow)
@@ -298,33 +385,41 @@ export async function restoreVisualWorkflow(id: string) {
       return { success: false, error: 'Workflow not found' };
     }
 
-    revalidatePath('/admin/workflows');
-    revalidatePath(`/admin/workflows/${id}`);
-    return { success: true, data: workflow };
-  } catch (error) {
-    console.error('[restoreVisualWorkflow] Error:', error);
-    return { success: false, error: 'Failed to restore workflow' };
-  }
+      revalidatePath('/admin/workflows');
+      revalidatePath(`/admin/workflows/${id}`);
+      return { success: true, data: workflow };
+    } catch (error) {
+      console.error('[restoreVisualWorkflow] Error:', error);
+      return { success: false, error: 'Failed to restore workflow' };
+    }
+  });
 }
 
 /**
  * Delete workflow
  */
-export async function deleteVisualWorkflow(id: string) {
-  try {
-    const user = await currentUser();
-    if (!user?.id) {
-      return { success: false, error: 'Unauthorized' };
+export async function deleteVisualWorkflow(id: string): Promise<any> {
+  return withAuth<any>(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "workflow",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
-    // TODO: Add permission check
+    try {
 
     await db.delete(visualWorkflow).where(eq(visualWorkflow.id, id));
 
-    revalidatePath('/admin/workflows');
-    return { success: true };
-  } catch (error) {
-    console.error('[deleteVisualWorkflow] Error:', error);
-    return { success: false, error: 'Failed to delete workflow' };
-  }
+      revalidatePath('/admin/workflows');
+      return { success: true, data: undefined };
+    } catch (error) {
+      console.error('[deleteVisualWorkflow] Error:', error);
+      return { success: false, error: 'Failed to delete workflow' };
+    }
+  });
 }

@@ -21,18 +21,19 @@ import { signup } from "@/server/actions/auth"
 import { PasswordInput } from "@/components/ui/password-input"
 import { toast } from "sonner"
 import {  Link } from "@/components/ui/link"
+import { useTranslations } from 'next-intl'
 
 
 
 
 export const SignupForm = () => {
-
+    const t = useTranslations('auth');
     const [isPending, startTransition] = useTransition()
     const searchParams = useSearchParams();
     // const callbackUrl = searchParams.get("callbackUrl");
 
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
-        ? "Email already in use with different provider!"
+        ? t('messages.emailInUse')
         : "";
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
@@ -61,14 +62,14 @@ export const SignupForm = () => {
                     if (res.data?.success) {
                         setSuccess(res.data.success);
                         if (res.data.link) {
-                            toast.success(<Link href={res.data.link}>Click here to verify your email</Link>), {
+                            toast.success(<Link href={res.data.link}>{t('messages.clickToVerifyEmail')}</Link>, {
                                 duration: 0,
-                            }
+                            })
                         }
                     }
 
                 })
-                .catch(() => setError("Something went wrong"));
+                .catch(() => setError(t('messages.somethingWentWrong')));
         })
 
     }
@@ -82,12 +83,12 @@ export const SignupForm = () => {
                         name="name"
                         render={({ field }) => (
                             <FormItem className="grid gap-2">
-                                <FormLabel>Username</FormLabel>
+                                <FormLabel>{t('fields.username')}</FormLabel>
                                 <FormControl>
                                     <Input
                                         disabled={isPending}
                                         id="name"
-                                        placeholder="username"
+                                        placeholder={t('placeholders.username')}
 
                                         {...field}
                                     />
@@ -101,13 +102,13 @@ export const SignupForm = () => {
                         name="email"
                         render={({ field }) => (
                             <FormItem className="grid gap-2">
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>{t('fields.email')}</FormLabel>
                                 <FormControl>
                                     <Input
                                         disabled={isPending}
                                         id="email"
                                         type="email"
-                                        placeholder="m@example.com"
+                                        placeholder={t('placeholders.emailExample')}
 
                                         {...field}
                                     />
@@ -121,12 +122,12 @@ export const SignupForm = () => {
                         name="password"
                         render={({ field }) => (
                             <FormItem className="grid gap-2">
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel>{t('fields.password')}</FormLabel>
                                 <FormControl>
                                     <PasswordInput
                                         disabled={isPending}
                                         id="password"
-                                        placeholder="********"
+                                        placeholder={t('placeholders.password')}
                                         autoComplete="new-password"
                                         {...field}
                                     />
@@ -140,12 +141,12 @@ export const SignupForm = () => {
                         name="confirmPassword"
                         render={({ field }) => (
                             <FormItem className="grid gap-2">
-                                <FormLabel>Confirm password</FormLabel>
+                                <FormLabel>{t('fields.confirmPassword')}</FormLabel>
                                 <FormControl>
                                     <PasswordInput
                                         disabled={isPending}
                                         id="password"
-                                        placeholder="********"
+                                        placeholder={t('placeholders.password')}
                                         autoComplete="new-password"
                                         {...field}
                                     />
@@ -159,7 +160,7 @@ export const SignupForm = () => {
                     <FormSuccess message={success} />
                     <LoadingButton loading={isPending}
                         className="w-full">
-                        Create an account
+                        {t('actions.createAccount')}
                     </LoadingButton>
                     {/* <Button variant="outline" className="w-full">
                         Sign up with GitHub

@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Database, Play, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useTranslations } from 'next-intl';
 
 interface HRSyncConfig {
   id: string;
@@ -42,10 +43,12 @@ interface HRSyncDashboardProps {
 }
 
 export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
+  const t = useTranslations('hrSync');
+  const tCommon = useTranslations('common');
   
   // Trigger sync
   const triggerSync = async (configId: string, sourceType: string) => {
-    toast.loading("Triggering sync...");
+    toast.loading(t('dashboard.triggeringSync'));
     try {
       // TODO: Call appropriate API based on sourceType
       const endpoints: Record<string, string> = {
@@ -56,7 +59,7 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
 
       const endpoint = endpoints[sourceType];
       if (!endpoint) {
-        toast.error("Unknown source type");
+        toast.error(t('dashboard.unknownSourceType'));
         return;
       }
 
@@ -69,12 +72,12 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
       const data = await response.json() as { success: boolean; error?: string };
       
       if (data.success) {
-        toast.success("Sync completed successfully");
+        toast.success(t('dashboard.syncCompleted'));
       } else {
-        toast.error("Sync failed: " + (data.error || "Unknown error"));
+        toast.error(t('dashboard.syncFailed', { error: data.error || tCommon('messages.unknownError') }));
       }
     } catch (error) {
-      toast.error("Failed to trigger sync");
+      toast.error(t('dashboard.triggerFailed'));
     }
   };
 
@@ -95,19 +98,19 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{stats.totalSyncs}</div>
-            <p className="text-xs text-muted-foreground">Total Syncs</p>
+            <p className="text-xs text-muted-foreground">{t('dashboard.stats.totalSyncs')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-600">{stats.successfulSyncs}</div>
-            <p className="text-xs text-muted-foreground">Successful</p>
+            <p className="text-xs text-muted-foreground">{t('dashboard.stats.successful')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-red-600">{stats.failedSyncs}</div>
-            <p className="text-xs text-muted-foreground">Failed</p>
+            <p className="text-xs text-muted-foreground">{t('dashboard.stats.failed')}</p>
           </CardContent>
         </Card>
       </div>
@@ -115,9 +118,9 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
       {/* Sync Configs */}
       <Card>
         <CardHeader>
-          <CardTitle>Sync Configurations</CardTitle>
+          <CardTitle>{t('dashboard.title')}</CardTitle>
           <CardDescription>
-            Manage your HR sync integrations
+            {t('dashboard.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -160,7 +163,7 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
                         disabled={!config.isActive}
                       >
                         <Play className="w-3 h-3 mr-2" />
-                        Trigger Sync
+                        {t('dashboard.triggerSync')}
                       </Button>
                     </div>
                   </CardContent>
@@ -170,8 +173,8 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <Database className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No sync configurations</p>
-              <Button className="mt-4">Create Config</Button>
+              <p>{t('dashboard.noConfigs')}</p>
+              <Button className="mt-4">{t('dashboard.createConfig')}</Button>
             </div>
           )}
         </CardContent>
@@ -181,29 +184,29 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
       {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle>{t('dashboard.quickActions.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button variant="outline" className="h-auto py-4">
               <div className="text-center">
                 <Database className="w-8 h-8 mx-auto mb-2" />
-                <div className="font-semibold">Create Config</div>
-                <div className="text-xs text-muted-foreground">Add new sync source</div>
+                <div className="font-semibold">{t('dashboard.quickActions.createConfig')}</div>
+                <div className="text-xs text-muted-foreground">{t('dashboard.quickActions.createConfigDesc')}</div>
               </div>
             </Button>
             <Button variant="outline" className="h-auto py-4">
               <div className="text-center">
                 <RefreshCw className="w-8 h-8 mx-auto mb-2" />
-                <div className="font-semibold">Sync All</div>
-                <div className="text-xs text-muted-foreground">Run all active syncs</div>
+                <div className="font-semibold">{t('dashboard.quickActions.syncAll')}</div>
+                <div className="text-xs text-muted-foreground">{t('dashboard.quickActions.syncAllDesc')}</div>
               </div>
             </Button>
             <Button variant="outline" className="h-auto py-4">
               <div className="text-center">
                 <AlertCircle className="w-8 h-8 mx-auto mb-2" />
-                <div className="font-semibold">View Errors</div>
-                <div className="text-xs text-muted-foreground">Check failed syncs</div>
+                <div className="font-semibold">{t('dashboard.quickActions.viewErrors')}</div>
+                <div className="text-xs text-muted-foreground">{t('dashboard.quickActions.viewErrorsDesc')}</div>
               </div>
             </Button>
           </div>

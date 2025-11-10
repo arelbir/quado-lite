@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import { createPosition, updatePosition } from "@/server/actions/organization-actions";
 import { Loader2 } from "lucide-react";
 import type { Position } from "@/lib/types";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -70,6 +71,8 @@ export function PositionDialog({
   position,
   onSuccess,
 }: PositionDialogProps) {
+  const t = useTranslations('organization');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEdit = !!position;
 
@@ -106,7 +109,7 @@ export function PositionDialog({
 
     try {
       if (isEdit && !position?.id) {
-        toast.error("Position ID is required for update");
+        toast.error(t('positions.messages.idRequired'));
         return;
       }
 
@@ -115,15 +118,15 @@ export function PositionDialog({
         : await createPosition(data);
 
       if (result.success) {
-        toast.success(result.message || (isEdit ? "Position updated successfully" : "Position created successfully"));
+        toast.success(result.message || (isEdit ? t('positions.messages.updated') : t('positions.messages.created')));
         onOpenChange(false);
         form.reset();
         onSuccess?.();
       } else {
-        toast.error(result.error || "An error occurred");
+        toast.error(result.error || tCommon('messages.error'));
       }
     } catch (error) {
-      toast.error("Failed to save position");
+      toast.error(t('positions.messages.saveError'));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -135,12 +138,12 @@ export function PositionDialog({
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Position" : "Create Position"}
+            {isEdit ? t('positions.editPosition') : t('positions.createNew')}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Update the position information below."
-              : "Add a new position to your organization."}
+              ? t('positions.description.update')
+              : t('positions.description.create')}
           </DialogDescription>
         </DialogHeader>
 
@@ -152,9 +155,9 @@ export function PositionDialog({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Position Name *</FormLabel>
+                    <FormLabel>{t('positions.fields.name')} *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Senior Software Engineer" {...field} />
+                      <Input placeholder={t('positions.placeholders.name')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -278,11 +281,11 @@ export function PositionDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {tCommon('actions.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEdit ? "Update" : "Create"}
+                {isEdit ? tCommon('actions.update') : tCommon('actions.create')}
               </Button>
             </DialogFooter>
           </form>

@@ -102,5 +102,29 @@
     "enterDescription": "Açıklama giriniz",
     "enterRootCause": "Kök neden giriniz",
     "enterImmediate": "Acil önlem giriniz"
+  },
+  
+  "card": {
+    "auto": "Otomatik",
+    "question": "Soru",
+    "answer": "Cevap",
+    "notes": "Not",
+    "details": "Detaylar"
+  },
+
+  "quickAssign": {
+    "assignResponsible": "Sorumlu Ata",
+    "title": "Sorumlu Ata",
+    "description": "Bulguyu bir süreç sahibine atayın ve risk seviyesini belirleyin",
+    "responsible": "Sorumlu",
+    "selectUserPlaceholder": "Kullanıcı seçin",
+    "riskLevel": "Risk Seviyesi",
+    "riskCritical": "Kritik",
+    "riskHigh": "Yüksek",
+    "riskMedium": "Orta",
+    "riskLow": "Düşük",
+    "assign": "Ata",
+    "selectUserError": "Lütfen bir kullanıcı seçin",
+    "assignSuccess": "Bulgu atandı"
   }
 }

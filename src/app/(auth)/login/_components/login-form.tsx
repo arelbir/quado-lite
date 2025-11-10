@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAction } from "next-safe-action/hooks"
 import { isExecuting } from "next-safe-action/status"
+import { normalizeEmailForLogin } from "@/lib/utils/email"
 import {
     Form,
     FormControl,
@@ -77,7 +78,7 @@ export const LoginForm = () => {
         <>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4" >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4" noValidate>
                     <FormField
                         control={form.control}
                         name="email"
@@ -88,10 +89,15 @@ export const LoginForm = () => {
                                     <Input
                                         disabled={isPending}
                                         id="email"
-                                        type="email"
-                                        placeholder="m@example.com"
-
+                                        type="text"
+                                        placeholder="ornek@abcteknoloji.com"
+                                        autoComplete="email"
                                         {...field}
+                                        onChange={(e) => {
+                                            // Normalize: Turkish chars to ASCII + trim + lowercase
+                                            const normalized = normalizeEmailForLogin(e.target.value);
+                                            field.onChange(normalized);
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />

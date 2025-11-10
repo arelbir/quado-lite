@@ -2,7 +2,8 @@
 
 import { db } from '@/drizzle/db';
 import { customFieldDefinitions } from '@/drizzle/schema';
-import { withAuth, requireAdmin, createValidationError, createNotFoundError } from '@/lib/helpers';
+import { withAuth, createValidationError, createNotFoundError, createPermissionError } from '@/lib/helpers';
+import { checkPermission } from '@/lib/permissions/unified-permission-checker';
 import { revalidatePath } from 'next/cache';
 import type { ActionResponse, CustomFieldDefinition, EntityType } from '@/lib/types';
 import { eq, and } from 'drizzle-orm';
@@ -13,7 +14,18 @@ import { eq, and } from 'drizzle-orm';
 export async function getCustomFieldDefinitions(
   entityType: EntityType
 ): Promise<ActionResponse<CustomFieldDefinition[]>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "custom-field",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const fields = await db
       .select()
       .from(customFieldDefinitions)
@@ -45,8 +57,17 @@ export async function createCustomFieldDefinition(data: {
   section?: string;
   order?: number;
 }): Promise<ActionResponse<CustomFieldDefinition>> {
-  return withAuth(async (user) => {
-    requireAdmin(user);
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "custom-field",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
 
     // Validate field key uniqueness
     const existing = await db
@@ -99,8 +120,17 @@ export async function updateCustomFieldDefinition(
   id: string,
   data: Partial<CustomFieldDefinition>
 ): Promise<ActionResponse<CustomFieldDefinition>> {
-  return withAuth(async (user) => {
-    requireAdmin(user);
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "custom-field",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
 
     const [existing] = await db
       .select()
@@ -133,8 +163,17 @@ export async function updateCustomFieldDefinition(
 export async function deleteCustomFieldDefinition(
   id: string
 ): Promise<ActionResponse> {
-  return withAuth(async (user) => {
-    requireAdmin(user);
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "custom-field",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
 
     const [existing] = await db
       .select()
@@ -168,8 +207,17 @@ export async function reorderCustomFields(
   entityType: EntityType,
   fieldIds: string[]
 ): Promise<ActionResponse> {
-  return withAuth(async (user) => {
-    requireAdmin(user);
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "custom-field",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
 
     // Update order for each field
     for (let i = 0; i < fieldIds.length; i++) {
@@ -197,7 +245,18 @@ export async function reorderCustomFields(
 export async function getCustomFieldDefinitionById(
   id: string
 ): Promise<ActionResponse<CustomFieldDefinition>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: any) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user,
+      resource: "custom-field",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const [field] = await db
       .select()
       .from(customFieldDefinitions)

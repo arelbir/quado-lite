@@ -15,12 +15,14 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { isEmpty } from 'radash'
 import UserCard from './user-card'
+import { useTranslations } from 'next-intl'
 
 type ProfileProps = {
   initialValues: ProfileSchema
 }
 
 export const ProfileForm = ({ initialValues }: ProfileProps) => {
+  const t = useTranslations('settings');
 
   const { execute, status } = useAction(updateProfile, {
     onSuccess: (res) => {
@@ -32,7 +34,7 @@ export const ProfileForm = ({ initialValues }: ProfileProps) => {
     },
     onError: (e) => {
       console.log(e)
-      toast.error(e.fetchError || e.serverError || 'An error occurred')
+      toast.error(e.fetchError || e.serverError || t('messages.errorOccurred'))
     }
   })
 
@@ -47,7 +49,7 @@ export const ProfileForm = ({ initialValues }: ProfileProps) => {
 
   const onSubmit = (data: ProfileSchema) => {
     const reqData = getUpdatedFields(initialValues, data)
-    if (isEmpty(reqData)) return toast.error('No changes made')
+    if (isEmpty(reqData)) return toast.error(t('messages.noChangesMade'))
     execute(reqData as Required<typeof reqData>)
   }
 
@@ -59,13 +61,12 @@ export const ProfileForm = ({ initialValues }: ProfileProps) => {
           name='username'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>{t('fields.username')}</FormLabel>
               <FormControl>
-                <Input placeholder='username' {...field} />
+                <Input placeholder={t('placeholders.username')} {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name. It can be your real name or a
-                pseudonym. You can only change this once every 30 days.
+                {t('descriptions.username')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -76,20 +77,20 @@ export const ProfileForm = ({ initialValues }: ProfileProps) => {
           name='image'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image</FormLabel>
+              <FormLabel>{t('fields.image')}</FormLabel>
               <FormControl>
-                <Input placeholder='image url' className='hidden' {...field} />
+                <Input placeholder={t('placeholders.imageUrl')} className='hidden' {...field} />
               </FormControl>
               <UserCard onChange={field.onChange} src={initialValues.image} />
               <FormDescription>
-                This image will be displayed on your profile.
+                {t('descriptions.image')}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <LoadingButton loading={isPending}>Update profile</LoadingButton>
+        <LoadingButton loading={isPending}>{t('actions.updateProfile')}</LoadingButton>
       </form>
     </Form>
   )

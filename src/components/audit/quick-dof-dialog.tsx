@@ -31,6 +31,8 @@ interface QuickDofDialogProps {
 }
 
 export function QuickDofDialog({ findingId, users }: QuickDofDialogProps) {
+  const t = useTranslations('dof');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [assignedToId, setAssignedToId] = useState("");
@@ -38,7 +40,7 @@ export function QuickDofDialog({ findingId, users }: QuickDofDialogProps) {
 
   const handleSubmit = () => {
     if (!assignedToId) {
-      toast.error("Lütfen DÖF sorumlusu seçin");
+      toast.error(t('quickAssign.selectUserError'));
       return;
     }
 
@@ -52,7 +54,7 @@ export function QuickDofDialog({ findingId, users }: QuickDofDialogProps) {
       });
 
       if (result.success) {
-        toast.success("DÖF oluşturuldu");
+        toast.success(t('quickDof.createSuccess'));
         setOpen(false);
         setAssignedToId("");
         router.refresh();
@@ -67,22 +69,22 @@ export function QuickDofDialog({ findingId, users }: QuickDofDialogProps) {
       <DialogTrigger asChild>
         <Button size="sm" className="w-full md:w-auto">
           <FileCheck className="h-4 w-4 mr-2" />
-          DÖF Aç
+          {t('quickDof.open')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Hızlı DÖF Aç</DialogTitle>
+          <DialogTitle>{t('quickDof.title')}</DialogTitle>
           <DialogDescription>
-            7 adımlı Düzeltici Önleyici Faaliyet başlatın
+            {t('quickDof.description')}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="assignee">DÖF Sorumlusu *</Label>
+            <Label htmlFor="assignee">{t('quickDof.responsible')}</Label>
             <Select value={assignedToId} onValueChange={setAssignedToId}>
               <SelectTrigger>
-                <SelectValue placeholder="Sorumlu seçin" />
+                <SelectValue placeholder={t('quickDof.selectUserPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
@@ -93,16 +95,16 @@ export function QuickDofDialog({ findingId, users }: QuickDofDialogProps) {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Sorumlu tüm DÖF adımlarını tamamlayacak
+              {t('quickDof.responsibleNote')}
             </p>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            İptal
+            {tCommon('cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={isPending}>
-            DÖF Başlat
+            {t('quickDof.start')}
           </Button>
         </DialogFooter>
       </DialogContent>

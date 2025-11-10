@@ -102,5 +102,29 @@
     "enterDescription": "Enter description",
     "enterRootCause": "Enter root cause",
     "enterImmediate": "Enter immediate action"
+  },
+  
+  "card": {
+    "auto": "Auto",
+    "question": "Question",
+    "answer": "Answer",
+    "notes": "Notes",
+    "details": "Details"
+  },
+
+  "quickAssign": {
+    "assignResponsible": "Assign Responsible",
+    "title": "Assign Responsible",
+    "description": "Assign the finding to a process owner and specify risk level",
+    "responsible": "Responsible",
+    "selectUserPlaceholder": "Select user",
+    "riskLevel": "Risk Level",
+    "riskCritical": "Critical",
+    "riskHigh": "High",
+    "riskMedium": "Medium",
+    "riskLow": "Low",
+    "assign": "Assign",
+    "selectUserError": "Please select a user",
+    "assignSuccess": "Finding assigned"
   }
 }

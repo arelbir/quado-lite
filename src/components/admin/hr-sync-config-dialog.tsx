@@ -35,9 +35,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createHRSyncConfig, updateHRSyncConfig } from "@/server/actions/hr-sync-actions";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  name: z.string().min(2, "Name must be at least 2 characters"), // Will be handled by form validation
   description: z.string().optional(),
   sourceType: z.enum(["LDAP", "CSV", "REST_API", "WEBHOOK", "MANUAL"]),
   syncMode: z.enum(["Full", "Delta", "Selective"]).default("Full"),
@@ -70,6 +71,8 @@ export function HRSyncConfigDialog({
   config,
   onSuccess,
 }: HRSyncConfigDialogProps) {
+  const t = useTranslations('hrSync');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!config;
 
@@ -134,16 +137,16 @@ export function HRSyncConfigDialog({
       if (result.success) {
         toast.success(
           result.message ||
-            `Config ${isEditMode ? "updated" : "created"} successfully`
+            t('config.messages.' + (isEditMode ? 'updated' : 'created'))
         );
         onOpenChange(false);
         form.reset();
         onSuccess?.();
       } else {
-        toast.error(result.error || "An error occurred");
+        toast.error(result.error || tCommon('messages.error'));
       }
     } catch (error) {
-      toast.error(`Failed to ${isEditMode ? "update" : "create"} config`);
+      toast.error(t('config.messages.' + (isEditMode ? 'updateError' : 'createError')));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -155,12 +158,12 @@ export function HRSyncConfigDialog({
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditMode ? "Edit HR Sync Config" : "Create HR Sync Config"}
+            {isEditMode ? t('config.editConfig') : t('config.createNew')}
           </DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? "Update the configuration settings"
-              : "Create a new HR synchronization configuration"}
+              ? t('config.description.update')
+              : t('config.description.create')}
           </DialogDescription>
         </DialogHeader>
 
@@ -172,9 +175,9 @@ export function HRSyncConfigDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Config Name</FormLabel>
+                  <FormLabel>{t('config.fields.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. LDAP Active Directory" {...field} />
+                    <Input placeholder={t('config.placeholders.name')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -187,10 +190,10 @@ export function HRSyncConfigDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('config.fields.description')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe this sync configuration..."
+                      placeholder={t('config.placeholders.description')}
                       rows={2}
                       {...field}
                     />
@@ -207,7 +210,7 @@ export function HRSyncConfigDialog({
                 name="sourceType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Source Type</FormLabel>
+                    <FormLabel>{t('config.fields.sourceType')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -215,7 +218,7 @@ export function HRSyncConfigDialog({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select source" />
+                          <SelectValue placeholder={t('config.placeholders.sourceType')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -237,7 +240,7 @@ export function HRSyncConfigDialog({
                 name="syncMode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sync Mode</FormLabel>
+                    <FormLabel>{t('config.fields.syncMode')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -245,7 +248,7 @@ export function HRSyncConfigDialog({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select mode" />
+                          <SelectValue placeholder={t('config.placeholders.syncMode')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -309,11 +312,11 @@ export function HRSyncConfigDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {tCommon('actions.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditMode ? "Update Config" : "Create Config"}
+                {isEditMode ? t('config.updateConfig') : t('config.createConfig')}
               </Button>
             </DialogFooter>
           </form>

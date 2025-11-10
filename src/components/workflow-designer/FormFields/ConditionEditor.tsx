@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { ConditionTemplates } from './ConditionTemplates';
 import { VisualFormulaBuilder } from './VisualFormulaBuilder';
+import { useTranslations } from 'next-intl';
 
 interface ConditionEditorProps {
   value: string;
@@ -57,10 +58,15 @@ const COMMON_VALUES = [
 export function ConditionEditor({
   value,
   onChange,
-  label = 'Condition',
-  placeholder = 'Enter condition...',
+  label,
+  placeholder,
   customFieldKeys = [],
 }: ConditionEditorProps) {
+  const t = useTranslations('workflow');
+  
+  // Use translated defaults if not provided
+  const finalLabel = label || t('fields.condition');
+  const finalPlaceholder = placeholder || t('placeholders.enterCondition');
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -194,7 +200,7 @@ export function ConditionEditor({
 
   return (
     <div className="space-y-2">
-      <Label>{label} *</Label>
+      <Label>{finalLabel} *</Label>
       
       <div className="relative">
         <Textarea
@@ -202,7 +208,7 @@ export function ConditionEditor({
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={finalPlaceholder}
           rows={4}
           className="font-mono text-xs"
         />

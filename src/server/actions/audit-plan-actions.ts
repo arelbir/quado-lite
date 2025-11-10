@@ -10,7 +10,9 @@ import {
   requireCreatorOrAdmin, 
   createActionError,
   revalidateAuditPaths,
+  createPermissionError,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import { startWorkflow } from "@/server/actions/workflow-actions";
 import { getAuditWorkflowId, buildAuditMetadata } from "@/lib/workflow/workflow-integration";
 
@@ -216,7 +218,18 @@ export async function createScheduledPlan(data: {
   recurrenceInterval?: number;
   maxOccurrences?: number;
 }): Promise<ActionResponse<{ id: string }>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "plan",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const [plan] = await db
       .insert(auditPlans)
       .values({
@@ -243,7 +256,7 @@ export async function createScheduledPlan(data: {
     revalidateAuditPaths({ plans: true });
     
     return { success: true, data: { id: plan!.id } };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -255,7 +268,18 @@ export async function startAdhocAudit(data: {
   templateId: string;
   auditDate?: Date;
 }): Promise<ActionResponse<{ auditId: string; planId: string }>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "plan",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const { auditId } = await createAuditFromPlan({
       title: data.title,
       description: data.description,
@@ -287,7 +311,7 @@ export async function startAdhocAudit(data: {
         planId: plan!.id,
       },
     };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -407,26 +431,48 @@ export async function getAuditPlans() {
  * Planı iptal et
  */
 export async function cancelAuditPlan(planId: string): Promise<ActionResponse> {
-  return withAuth(async () => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "plan",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     await updatePlanStatus(planId, "Cancelled");
     revalidateAuditPaths({ plans: true, all: true });
     return { success: true, data: undefined };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
  * Planı manuel olarak başlat (vaktinden önce)
  */
 export async function startPlanManually(planId: string): Promise<ActionResponse<{ auditId: string }>> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
     const planResult = await getPlanWithValidation(planId, { requirePending: true });
     if ('error' in planResult) {
       return { success: false, error: planResult.error };
     }
     const { plan } = planResult;
 
-    if (!requireCreatorOrAdmin(user, plan.createdById!)) {
-      return { success: false, error: "Only plan creator or admin can start manually" };
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "plan",
+      action: "update",
+      entity: {
+        id: plan.id,
+        createdById: plan.createdById,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     // 🔥 VALIDATION: Denetçi atanmış olmalı
@@ -462,15 +508,26 @@ export async function updateAuditPlan(
     templateId?: string;
   }
 ): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
     const planResult = await getPlanWithValidation(planId, { requirePending: true });
     if ('error' in planResult) {
       return { success: false, error: planResult.error };
     }
     const { plan } = planResult;
 
-    if (!requireCreatorOrAdmin(user, plan.createdById!)) {
-      return { success: false, error: "Only plan creator or admin can update" };
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "plan",
+      action: "update",
+      entity: {
+        id: plan.id,
+        createdById: plan.createdById,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -491,15 +548,26 @@ export async function updateAuditPlan(
  * Planı sil (soft delete)
  */
 export async function deletePlan(planId: string): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
     const planResult = await getPlanWithValidation(planId, { requireNotCreated: true });
     if ('error' in planResult) {
       return { success: false, error: planResult.error };
     }
     const { plan } = planResult;
 
-    if (!requireCreatorOrAdmin(user, plan.createdById!)) {
-      return { success: false, error: "Only plan creator or admin can delete" };
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "plan",
+      action: "delete",
+      entity: {
+        id: plan.id,
+        createdById: plan.createdById,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db

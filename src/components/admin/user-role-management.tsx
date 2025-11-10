@@ -40,6 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from 'next-intl';
 import { Plus, X, Loader2, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -81,6 +82,8 @@ export function UserRoleManagement({
   userRoles,
   availableRoles,
 }: UserRoleManagementProps) {
+  const t = useTranslations('users');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [isAdding, setIsAdding] = useState(false);
   const [selectedRoleId, setSelectedRoleId] = useState<string>("");
@@ -88,13 +91,13 @@ export function UserRoleManagement({
   const [loading, setLoading] = useState(false);
 
   // Get roles that are not already assigned
-  const unassignedRoles = availableRoles.filter(
-    (role) => !userRoles.some((ur) => ur.roleId === role.id)
-  );
+  const unassignedRoles = availableRoles?.filter(
+    (role) => !userRoles?.some((ur) => ur.role?.id === role.id)
+  ) || [];
 
   const handleAddRole = async () => {
     if (!selectedRoleId) {
-      toast.error("Please select a role");
+      toast.error(t('roleManagement.selectRoleError'));
       return;
     }
 
@@ -103,15 +106,15 @@ export function UserRoleManagement({
       const result = await assignRoleToUser(userId, selectedRoleId);
 
       if (result.success) {
-        toast.success(result.message || "Role assigned successfully");
+        toast.success(result.message || t('roleManagement.assignedSuccess'));
         setIsAdding(false);
         setSelectedRoleId("");
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to assign role");
+        toast.error(result.error || t('roleManagement.assignFailed'));
       }
     } catch (error) {
-      toast.error("An error occurred while assigning role");
+      toast.error(t('roleManagement.assignError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -124,14 +127,14 @@ export function UserRoleManagement({
       const result = await removeRoleFromUser(userId, roleId);
 
       if (result.success) {
-        toast.success(result.message || "Role removed successfully");
+        toast.success(result.message || t('roleManagement.removedSuccess'));
         setRemovingRoleId(null);
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to remove role");
+        toast.error(result.error || t('roleManagement.removeFailed'));
       }
     } catch (error) {
-      toast.error("An error occurred while removing role");
+      toast.error(t('roleManagement.removeError'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -145,16 +148,16 @@ export function UserRoleManagement({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Role Assignments
+              {t('roleManagement.title')}
             </CardTitle>
             <CardDescription>
-              Manage roles for {userName}
+              {t('roleManagement.description', { userName })}
             </CardDescription>
           </div>
           {!isAdding && unassignedRoles.length > 0 && (
             <Button onClick={() => setIsAdding(true)} size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              Add Role
+              {t('roleManagement.addRole')}
             </Button>
           )}
         </div>
@@ -166,7 +169,7 @@ export function UserRoleManagement({
             <div className="flex items-center gap-2">
               <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Select a role..." />
+                  <SelectValue placeholder={t('roleManagement.selectRolePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {unassignedRoles.map((role) => (
@@ -175,7 +178,7 @@ export function UserRoleManagement({
                         <span className="font-medium">{role.name}</span>
                         {role.isSystem && (
                           <Badge variant="secondary" className="text-xs">
-                            System
+                            {t('roleManagement.system')}
                           </Badge>
                         )}
                       </div>
@@ -191,7 +194,7 @@ export function UserRoleManagement({
                 size="sm"
               >
                 {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Assign Role
+                {t('roleManagement.assignRole')}
               </Button>
               <Button
                 onClick={() => {
@@ -202,7 +205,7 @@ export function UserRoleManagement({
                 size="sm"
                 disabled={loading}
               >
-                Cancel
+                {tCommon('actions.cancel')}
               </Button>
             </div>
           </div>
@@ -212,7 +215,7 @@ export function UserRoleManagement({
         {userRoles.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Shield className="h-12 w-12 mx-auto mb-3 opacity-20" />
-            <p className="text-sm">No roles assigned yet</p>
+            <p className="text-sm">{t('roleManagement.noRolesAssigned')}</p>
             {unassignedRoles.length > 0 && (
               <Button
                 onClick={() => setIsAdding(true)}
@@ -221,7 +224,7 @@ export function UserRoleManagement({
                 className="mt-4"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Assign First Role
+                {t('roleManagement.assignFirstRole')}
               </Button>
             )}
           </div>
@@ -240,7 +243,7 @@ export function UserRoleManagement({
                     </Badge>
                     {userRole.role.isSystem && (
                       <Badge variant="secondary" className="text-xs">
-                        System
+                        {t('roleManagement.system')}
                       </Badge>
                     )}
                   </div>
@@ -270,21 +273,20 @@ export function UserRoleManagement({
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Remove Role</AlertDialogTitle>
+              <AlertDialogTitle>{t('roleManagement.removeRoleTitle')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to remove this role from {userName}? This
-                action will revoke all permissions associated with this role.
+                {t('roleManagement.removeRoleDescription', { userName })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={loading}>{tCommon('actions.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => removingRoleId && handleRemoveRole(removingRoleId)}
                 disabled={loading}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Remove Role
+                {t('roleManagement.removeRole')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

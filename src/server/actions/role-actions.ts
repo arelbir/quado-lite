@@ -16,6 +16,8 @@ import {
   createNotFoundError, 
   createPermissionError 
 } from "@/lib/helpers/error-helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import type { User } from "@/lib/types";
 
 interface ActionResponse {
   success: boolean;
@@ -41,7 +43,18 @@ interface UpdateRoleData {
  * Create a new role with permissions
  */
 export async function createRole(data: CreateRoleData): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "role",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Validate input
     if (!data.name || data.name.trim().length < 2) {
       return createValidationError("Role name must be at least 2 characters");
@@ -89,7 +102,7 @@ export async function createRole(data: CreateRoleData): Promise<ActionResponse> 
       message: "Role created successfully",
       data: newRole,
     };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -100,7 +113,18 @@ export async function updateRole(
   roleId: string,
   data: UpdateRoleData
 ): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "role",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Fetch role
     const role = await db.query.roles.findFirst({
       where: eq(roles.id, roleId),
@@ -171,7 +195,7 @@ export async function updateRole(
       message: "Role updated successfully",
       data: null,
     };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -179,7 +203,18 @@ export async function updateRole(
  * Soft delete a role
  */
 export async function deleteRole(roleId: string): Promise<ActionResponse> {
-  return withAuth(async (user) => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "role",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     // Fetch role
     const role = await db.query.roles.findFirst({
       where: eq(roles.id, roleId),
@@ -220,7 +255,7 @@ export async function deleteRole(roleId: string): Promise<ActionResponse> {
       message: "Role deleted successfully",
       data: null,
     };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -228,7 +263,18 @@ export async function deleteRole(roleId: string): Promise<ActionResponse> {
  * Fetch role with permissions, menus, and users
  */
 export async function getRoleById(roleId: string): Promise<ActionResponse> {
-  return withAuth(async () => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "role",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const roleData = await getRoleWithRelations(roleId);
 
     if (!roleData || !roleData.id) {
@@ -247,7 +293,18 @@ export async function getRoleById(roleId: string): Promise<ActionResponse> {
  * Fetch all active roles (for dropdowns, assignments, etc.)
  */
 export async function getAllRoles(): Promise<ActionResponse> {
-  return withAuth(async () => {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "role",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const rolesList = await db.query.roles.findMany({
       where: eq(roles.isActive, true),
       orderBy: (roles, { asc }) => [asc(roles.name)],
@@ -263,5 +320,77 @@ export async function getAllRoles(): Promise<ActionResponse> {
       success: true,
       data: rolesList,
     };
+  });
+}
+
+/**
+ * UPDATE ROLE PERMISSIONS
+ * Update the permissions assigned to a role
+ */
+export async function updateRolePermissions(
+  roleId: string,
+  permissionIds: string[]
+) {
+  return withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "role",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
+    // Validate role exists
+    const role = await db.query.roles.findFirst({
+      where: eq(roles.id, roleId),
+    });
+
+    if (!role) {
+      return createNotFoundError("Role");
+    }
+
+    // Prevent updating system roles
+    if (role.isSystem) {
+      return createValidationError("Cannot modify system role permissions");
+    }
+
+    try {
+      // Start transaction
+      await db.transaction(async (tx) => {
+        // Remove all existing permissions for this role
+        await tx
+          .delete(rolePermissions)
+          .where(eq(rolePermissions.roleId, roleId));
+
+        // Add new permissions
+        if (permissionIds.length > 0) {
+          await tx.insert(rolePermissions).values(
+            permissionIds.map(permissionId => ({
+              roleId,
+              permissionId,
+            }))
+          );
+        }
+      });
+
+      revalidatePath("/admin/roles");
+      revalidatePath("/admin/permissions");
+
+      return {
+        success: true,
+        message: `Updated ${permissionIds.length} permissions for role ${role.name}`,
+        data: undefined,
+      };
+
+    } catch (error) {
+      console.error(`Failed to update permissions for role ${roleId}:`, error);
+      return {
+        success: false,
+        error: "Failed to update role permissions",
+      };
+    }
   });
 }

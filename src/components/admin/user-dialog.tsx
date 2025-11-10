@@ -43,6 +43,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { updateUser, createUser } from "@/server/actions/user-actions";
 import { Loader2 } from "lucide-react";
+import type { User as UserType } from "@/lib/types";
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -101,7 +103,7 @@ interface Manager {
 interface UserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: User | null;
+  user: UserType | null;
   companies: Company[];
   branches: Branch[];
   departments: Department[];
@@ -121,6 +123,8 @@ export function UserDialog({
   managers,
   onSuccess,
 }: UserDialogProps) {
+  const t = useTranslations('users');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!user;
 
@@ -181,7 +185,7 @@ export function UserDialog({
       } else {
         // Create new user
         if (!data.password) {
-          toast.error("Password is required for new users");
+          toast.error(t('messages.passwordRequired'));
           setIsSubmitting(false);
           return;
         }
@@ -201,15 +205,15 @@ export function UserDialog({
       }
 
       if (result.success) {
-        toast.success(result.message || (isEditMode ? "User updated successfully" : "User created successfully"));
+        toast.success(result.message || (isEditMode ? t('messages.updated') : t('messages.created')));
         onOpenChange(false);
         form.reset();
         onSuccess?.();
       } else {
-        toast.error(result.error || (isEditMode ? "Failed to update user" : "Failed to create user"));
+        toast.error(result.error || (isEditMode ? t('messages.updateError') : t('messages.createError')));
       }
     } catch (error) {
-      toast.error(isEditMode ? "Failed to update user" : "Failed to create user");
+      toast.error(isEditMode ? t('messages.updateError') : t('messages.createError'));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -220,11 +224,11 @@ export function UserDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? "Edit User" : "Create New User"}</DialogTitle>
+          <DialogTitle>{isEditMode ? t('editUser') : t('createNew')}</DialogTitle>
           <DialogDescription>
             {isEditMode 
-              ? "Update user information and organizational assignments" 
-              : "Add a new user to the system"}
+              ? t('description.update') 
+              : t('description.create')}
           </DialogDescription>
         </DialogHeader>
 

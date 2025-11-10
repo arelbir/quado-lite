@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { db } from "@/drizzle/db";
-import { dofs, user } from "@/drizzle/schema";
+import { user } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { DofWizardContent } from "@/components/dof/dof-wizard-content";
 import { getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
+import { getDofWithRelations } from "@/lib/db/query-helpers";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -39,52 +40,10 @@ export default async function DofDetailPage({ params }: PageProps) {
     : defaultLocale;
   
   const t = await getTranslations({ locale, namespace: 'dof' });
-  const dof = await db.query.dofs.findFirst({
-    where: eq(dofs.id, id),
-    with: {
-      finding: true,
-      assignedTo: {
-        columns: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      manager: {
-        columns: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      createdBy: {
-        columns: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      // HYBRID: DÖF'e bağlı action'ları çek
-      actions: {
-        with: {
-          assignedTo: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          manager: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        } as any,
-      },
-    } as any,
-  }) as any;
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
+  
+  // Get DOF with relations using type-safe helper
+  const dof = await getDofWithRelations(id);
 
   if (!dof) {
     notFound();
@@ -129,7 +88,7 @@ export default async function DofDetailPage({ params }: PageProps) {
       </Card>
 
       {/* Wizard Content */}
-      <Suspense fallback={<div>Yükleniyor...</div>}>
+      <Suspense fallback={<div>{tCommon('status.loading')}</div>}>
         <DofWizardContent dof={dof} currentStep={currentStep} users={users} />
       </Suspense>
     </div>

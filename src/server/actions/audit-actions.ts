@@ -13,6 +13,7 @@ import {
   createValidationError,
   revalidateAuditPaths,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import { startWorkflow } from "@/server/actions/workflow-actions";
 import { getAuditCompletionWorkflowId, buildAuditMetadata } from "@/lib/workflow/workflow-integration";
 
@@ -25,8 +26,15 @@ export async function createAudit(data: {
   auditDate?: Date;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError<{ id: string }>("Only auditors can create audits");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [audit] = await db
@@ -62,8 +70,20 @@ export async function completeAudit(auditId: string): Promise<ActionResponse> {
       return createValidationError("Only active audits can be completed");
     }
 
-    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
-      return createPermissionError("Only audit creator can complete the audit");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit",
+      action: "complete",
+      entity: {
+        id: audit.id,
+        createdById: audit.createdById,
+        status: audit.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     // Check all findings are assigned
@@ -132,8 +152,20 @@ export async function closeAudit(auditId: string): Promise<ActionResponse> {
       return createValidationError("Only audits pending closure can be closed");
     }
 
-    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
-      return createPermissionError("Only audit creator can close the audit");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit",
+      action: "complete",
+      entity: {
+        id: audit.id,
+        createdById: audit.createdById,
+        status: audit.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     const openFindings = await db.query.findings.findMany({
@@ -229,12 +261,24 @@ export async function updateAudit(
       return createNotFoundError("Audit");
     }
 
-    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
-      return createPermissionError("Only audit creator or admin can update");
-    }
-
     if (audit.status === "Closed") {
       return createValidationError("Closed audits cannot be edited");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit",
+      action: "update",
+      entity: {
+        id: audit.id,
+        createdById: audit.createdById,
+        status: audit.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -263,12 +307,24 @@ export async function archiveAudit(auditId: string): Promise<ActionResponse> {
       return createNotFoundError("Audit");
     }
 
-    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
-      return createPermissionError("Only audit creator or admin can archive");
-    }
-
     if (audit.status !== "Active" && audit.status !== "InReview") {
       return createValidationError("Only active or in-review audits can be archived");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit",
+      action: "update",
+      entity: {
+        id: audit.id,
+        createdById: audit.createdById,
+        status: audit.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -297,12 +353,24 @@ export async function reactivateAudit(auditId: string): Promise<ActionResponse> 
       return createNotFoundError("Audit");
     }
 
-    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
-      return createPermissionError("Only audit creator or admin can reactivate");
-    }
-
     if (audit.status !== "Archived") {
       return createValidationError("Only archived audits can be reactivated");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit",
+      action: "update",
+      entity: {
+        id: audit.id,
+        createdById: audit.createdById,
+        status: audit.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -331,12 +399,24 @@ export async function deleteAudit(auditId: string): Promise<ActionResponse> {
       return createNotFoundError("Audit");
     }
 
-    if (!requireCreatorOrAdmin(user, audit.createdById ?? '')) {
-      return createPermissionError("Only audit creator or admin can delete");
-    }
-
     if (audit.status === "Closed") {
       return createValidationError("Closed audits cannot be deleted");
+    }
+
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "audit",
+      action: "delete",
+      entity: {
+        id: audit.id,
+        createdById: audit.createdById,
+        status: audit.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db

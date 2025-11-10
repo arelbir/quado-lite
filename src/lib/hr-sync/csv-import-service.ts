@@ -28,9 +28,7 @@ import {
 } from "@/drizzle/schema/hr-sync";
 import { user } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
-
-// Note: Install with: pnpm add papaparse @types/papaparse
-// import Papa from 'papaparse';
+import Papa from 'papaparse';
 
 /**
  * CSV IMPORT SERVICE CLASS
@@ -50,24 +48,29 @@ export class CSVImportService {
    * Convert CSV file to JSON array
    */
   async parseCSV(fileContent: string): Promise<any[]> {
-    console.log(`📄 Parsing CSV file...`);
+    console.log(`📄 Parsing CSV file with PapaParse...`);
 
-    // TODO: Use papaparse for production
-    // return new Promise((resolve, reject) => {
-    //   Papa.parse(fileContent, {
-    //     header: true,
-    //     skipEmptyLines: true,
-    //     complete: (results) => {
-    //       resolve(results.data);
-    //     },
-    //     error: (error) => {
-    //       reject(error);
-    //     }
-    //   });
-    // });
-
-    // MOCK: Parse simple CSV
-    return this.parseMockCSV(fileContent);
+    return new Promise((resolve, reject) => {
+      Papa.parse(fileContent, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: (header) => header.trim(),
+        transform: (value) => value.trim(),
+        complete: (results) => {
+          console.log(`✅ Parsed ${results.data.length} rows from CSV`);
+          
+          if (results.errors.length > 0) {
+            console.warn(`⚠️ CSV parsing warnings:`, results.errors);
+          }
+          
+          resolve(results.data);
+        },
+        error: (error: Error) => {
+          console.error('❌ CSV parsing failed:', error);
+          reject(new Error(`CSV parsing failed: ${error.message}`));
+        }
+      });
+    });
   }
 
   /**

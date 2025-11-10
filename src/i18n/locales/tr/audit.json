@@ -144,5 +144,21 @@
     "enterDescription": "Açıklama giriniz",
     "selectDateRange": "Tarih aralığı seçin",
     "searchTitle": "Başlık ara..."
+  },
+
+  "questionsForm": {
+    "answerAtLeastOne": "Lütfen en az bir soruyu cevaplayın",
+    "saveFailed": "Kaydetme başarısız",
+    "saveError": "Bir hata oluştu",
+    "saveSuccess": "{count} cevap başarıyla kaydedildi!",
+    "otherBank": "Diğer",
+    "answered": "cevaplandı",
+    "nonCompliant": "uygunsuz",
+    "autoSaving": "Otomatik kaydediliyor...",
+    "saved": "kaydedildi",
+    "unsavedChanges": "Kaydedilmemiş değişiklikler",
+    "saveDraft": "Taslak Kaydet",
+    "saving": "Kaydediliyor...",
+    "saveAll": "Tümünü Kaydet"
   }
 }

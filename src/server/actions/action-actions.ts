@@ -14,6 +14,7 @@ import {
   revalidateFindingPaths,
   revalidateDOFPaths,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 import { startWorkflow } from "@/server/actions/workflow-actions";
 import { getActionWorkflowId, buildActionMetadata } from "@/lib/workflow/workflow-integration";
 
@@ -26,6 +27,7 @@ export async function createAction(data: {
   details: string;
   assignedToId: string;
   managerId?: string | null;
+  dueDate?: Date;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
     const finding = await db.query.findings.findFirst({
@@ -36,10 +38,21 @@ export async function createAction(data: {
       return createNotFoundError<{ id: string }>("Finding");
     }
 
-    // Check permission: Process owner or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (finding.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError<{ id: string }>("Only process owner can create actions");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "action",
+      action: "create",
+      entity: {
+        id: finding.id,
+        assignedToId: finding.assignedToId,
+        createdById: finding.createdById,
+        status: finding.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [action] = await db
@@ -49,6 +62,7 @@ export async function createAction(data: {
         details: data.details,
         assignedToId: data.assignedToId,
         managerId: data.managerId,
+        dueDate: data.dueDate,
         status: "Assigned",
         createdById: user.id,
       })
@@ -109,10 +123,21 @@ export async function createDofAction(data: {
       return createNotFoundError<{ id: string }>("DÖF");
     }
 
-    // Check permission: DOF owner or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (dof.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError<{ id: string }>("Only DÖF owner can create actions");
+    // ✅ UNIFIED PERMISSION CHECK (DOF update permission)
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "dof",
+      action: "update",
+      entity: {
+        id: dof.id,
+        assignedToId: dof.assignedToId,
+        createdById: dof.createdById,
+        status: dof.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [action] = await db
@@ -154,10 +179,21 @@ export async function completeAction(
       return createNotFoundError("Action");
     }
 
-    // Check permission: Assigned user or admin
-    const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
-    if (action.assignedToId !== user.id && !isAdmin) {
-      return createPermissionError("Only assigned user can complete this action");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "action",
+      action: "complete",
+      entity: {
+        id: action.id,
+        assignedToId: action.assignedToId,
+        createdById: action.createdById,
+        status: action.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     // Update action to InProgress
@@ -190,13 +226,22 @@ export async function managerApproveAction(actionId: string): Promise<ActionResp
       return createNotFoundError("Action");
     }
 
-    // Check permission: Manager or admin
-    const isAdmin = user.userRoles?.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
-    
-    if (action.managerId !== user.id && !isAdmin) {
-      return createPermissionError("Only assigned manager can approve this action");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "action",
+      action: "approve",
+      entity: {
+        id: action.id,
+        assignedToId: action.assignedToId,
+        managerId: action.managerId,
+        createdById: action.createdById,
+        status: action.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     if (action.status !== "InProgress") {
@@ -236,13 +281,22 @@ export async function managerRejectAction(
       return createNotFoundError("Action");
     }
 
-    // Check permission: Manager or admin
-    const isAdmin = user.userRoles?.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
-    
-    if (action.managerId !== user.id && !isAdmin) {
-      return createPermissionError("Only assigned manager can reject this action");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "action",
+      action: "reject",
+      entity: {
+        id: action.id,
+        assignedToId: action.assignedToId,
+        managerId: action.managerId,
+        createdById: action.createdById,
+        status: action.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     if (action.status !== "InProgress") {
@@ -287,8 +341,22 @@ export async function cancelAction(
       return createNotFoundError("Action");
     }
 
-    if (action.managerId !== user.id && action.createdById !== user.id) {
-      return createPermissionError("Only manager or creator can cancel this action");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "action",
+      action: "cancel",
+      entity: {
+        id: action.id,
+        assignedToId: action.assignedToId,
+        managerId: action.managerId,
+        createdById: action.createdById,
+        status: action.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db
@@ -326,8 +394,21 @@ export async function addActionProgress(
       return createNotFoundError<{ id: string }>("Action");
     }
 
-    if (action.assignedToId !== user.id) {
-      return createPermissionError<{ id: string }>("Only assigned user can add progress notes");
+    // ✅ UNIFIED PERMISSION CHECK (action update permission)
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "action",
+      action: "update",
+      entity: {
+        id: action.id,
+        assignedToId: action.assignedToId,
+        createdById: action.createdById,
+        status: action.status,
+      },
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [progressNote] = await db
@@ -348,7 +429,30 @@ export async function addActionProgress(
  * Belirli bir bulguya ait aksiyonları getir
  */
 export async function getActionsByFinding(findingId: string) {
-  const result = await withAuth(async () => {
+  const result = await withAuth(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK (finding read permission)
+    const finding = await db.query.findings.findFirst({
+      where: eq(findings.id, findingId),
+    });
+
+    if (finding) {
+      const perm = await checkPermission({
+        user: user as any,
+        resource: "finding",
+        action: "read",
+        entity: {
+          id: finding.id,
+          assignedToId: finding.assignedToId,
+          createdById: finding.createdById,
+          status: finding.status,
+        },
+      });
+
+      if (!perm.allowed) {
+        return { success: false, error: perm.reason || "Permission denied" };
+      }
+    }
+
     const data = await db.query.actions.findMany({
       where: eq(actions.findingId, findingId),
       with: {
@@ -369,10 +473,11 @@ export async function getActionsByFinding(findingId: string) {
 
 /**
  * Kullanıcının aksiyonlarını getir (Sorumlu veya Yönetici olarak)
+ * ✅ UNIFIED: Uses admin bypass from checkPermission
  */
 export async function getMyActions() {
   const result = await withAuth(async (user: User) => {
-    // Check if user is admin
+    // ✅ Admin check via role system (already filtered in withAuth)
     const isAdmin = user.userRoles?.some((ur: any) => ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN');
     if (isAdmin) {
       const data = await db.query.actions.findMany({

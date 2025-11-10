@@ -23,7 +23,9 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
+import { updateRolePermissions } from "@/server/actions/role-actions";
 
 interface Permission {
   id: string;
@@ -49,6 +51,8 @@ export function PermissionMatrix({
   assignedPermissionIds,
   isSystemRole,
 }: PermissionMatrixProps) {
+  const t = useTranslations('roles');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(
     new Set(assignedPermissionIds)
@@ -71,7 +75,7 @@ export function PermissionMatrix({
   // Toggle permission
   const togglePermission = (permissionId: string) => {
     if (isSystemRole) {
-      toast.error("Cannot modify system role permissions");
+      toast.error(t('permissionMatrix.systemRoleError'));
       return;
     }
 
@@ -115,21 +119,23 @@ export function PermissionMatrix({
   // Save changes
   const saveChanges = async () => {
     if (isSystemRole) {
-      toast.error("Cannot modify system role permissions");
+      toast.error(t('permissionMatrix.systemRoleError'));
       return;
     }
 
     setIsSaving(true);
     try {
-      // TODO: Implement API call to update role permissions
-      // await updateRolePermissions(roleId, Array.from(selectedPermissions));
+      const result = await updateRolePermissions(roleId, Array.from(selectedPermissions));
       
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Mock delay
+      if (!result.success) {
+        toast.error(result.error || t('permissionMatrix.updateFailed'));
+        return;
+      }
       
-      toast.success("Permissions updated successfully");
+      toast.success(t('permissionMatrix.permissionsUpdated'));
       router.refresh();
     } catch (error) {
-      toast.error("Failed to update permissions");
+      toast.error(t('permissionMatrix.updateFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -150,17 +156,17 @@ export function PermissionMatrix({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Badge variant="outline">
-            {selectedPermissions.size} / {permissions.length} permissions selected
+            {selectedPermissions.size} / {permissions.length} {t('permissionMatrix.permissionsSelected')}
           </Badge>
           {hasChanges() && (
             <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-              Unsaved changes
+              {t('permissionMatrix.unsavedChanges')}
             </Badge>
           )}
         </div>
         {!isSystemRole && hasChanges() && (
           <Button onClick={saveChanges} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save Changes"}
+            {isSaving ? t('permissionMatrix.saving') : t('permissionMatrix.saveChanges')}
           </Button>
         )}
       </div>
@@ -172,7 +178,7 @@ export function PermissionMatrix({
             <div className="flex items-center gap-2 text-yellow-800">
               <Lock className="w-4 h-4" />
               <span className="text-sm font-medium">
-                System roles cannot be modified
+                {t('permissionMatrix.systemRoleWarning')}
               </span>
             </div>
           </CardContent>
@@ -182,9 +188,9 @@ export function PermissionMatrix({
       {/* CRUD Permission Matrix */}
       <Card>
         <CardHeader>
-          <CardTitle>CRUD Permission Matrix</CardTitle>
+          <CardTitle>{t('permissionMatrix.title')}</CardTitle>
           <CardDescription>
-            Toggle permissions by clicking on the checkboxes
+            {t('permissionMatrix.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -193,7 +199,7 @@ export function PermissionMatrix({
               <thead>
                 <tr className="border-b-2">
                   <th className="text-left p-3 font-medium text-sm bg-muted sticky left-0">
-                    Module
+                    {t('permissionMatrix.module')}
                   </th>
                   {CRUD_ACTIONS.map((action) => (
                     <th key={action} className="text-center p-3 font-medium text-sm bg-muted min-w-[100px]">
@@ -202,7 +208,7 @@ export function PermissionMatrix({
                   ))}
                   {!isSystemRole && (
                     <th className="text-center p-3 font-medium text-sm bg-muted">
-                      Actions
+                      {t('permissionMatrix.actions')}
                     </th>
                   )}
                 </tr>
@@ -254,7 +260,7 @@ export function PermissionMatrix({
                               onClick={() => selectAllCRUD(resource)}
                               className="h-7 px-2 text-xs"
                             >
-                              All
+                              {t('permissionMatrix.selectAll')}
                             </Button>
                             <Button
                               variant="ghost"
@@ -262,7 +268,7 @@ export function PermissionMatrix({
                               onClick={() => clearAllCRUD(resource)}
                               className="h-7 px-2 text-xs"
                             >
-                              None
+                              {t('permissionMatrix.clearAll')}
                             </Button>
                           </div>
                         </td>

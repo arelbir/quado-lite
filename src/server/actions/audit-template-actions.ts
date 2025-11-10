@@ -6,10 +6,10 @@ import { eq, and, isNull } from "drizzle-orm";
 import type { ActionResponse, User } from "@/lib/types";
 import { 
   withAuth, 
-  requireAdmin,
   createPermissionError,
   revalidateAuditPaths,
 } from "@/lib/helpers";
+import { checkPermission } from "@/lib/permissions/unified-permission-checker";
 
 /**
  * Denetim şablonu oluştur
@@ -22,8 +22,15 @@ export async function createAuditTemplate(data: {
   estimatedDurationMinutes?: string;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth<{ id: string }>(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError<{ id: string }>("Only admins can create templates");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "template",
+      action: "create",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError<{ id: string }>(perm.reason || "Permission denied");
     }
 
     const [template] = await db
@@ -46,8 +53,19 @@ export async function createAuditTemplate(data: {
 /**
  * Tüm şablonları listele
  */
-export async function getAuditTemplates() {
-  const result = await withAuth(async () => {
+export async function getAuditTemplates(): Promise<any> {
+  const result = await withAuth<any[]>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "template",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const templates = await db.query.auditTemplates.findMany({
       where: isNull(auditTemplates.deletedAt),
       with: {
@@ -80,8 +98,19 @@ export async function getAuditTemplates() {
 /**
  * Tek bir şablonu detaylı getir
  */
-export async function getAuditTemplateById(templateId: string) {
-  const result = await withAuth(async () => {
+export async function getAuditTemplateById(templateId: string): Promise<any> {
+  const result = await withAuth<any>(async (user: User) => {
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "template",
+      action: "read",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
+    }
+
     const template = await db.query.auditTemplates.findFirst({
       where: and(
         eq(auditTemplates.id, templateId),
@@ -132,8 +161,15 @@ export async function updateAuditTemplate(
   }
 ): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only admins can update templates");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "template",
+      action: "update",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     const questionBankIdsJson = data.questionBankIds
@@ -159,8 +195,15 @@ export async function updateAuditTemplate(
  */
 export async function deleteAuditTemplate(templateId: string): Promise<ActionResponse> {
   return withAuth(async (user: User) => {
-    if (!requireAdmin(user)) {
-      return createPermissionError("Only admins can delete templates");
+    // ✅ UNIFIED PERMISSION CHECK
+    const perm = await checkPermission({
+      user: user as any,
+      resource: "template",
+      action: "delete",
+    });
+
+    if (!perm.allowed) {
+      return createPermissionError(perm.reason || "Permission denied");
     }
 
     await db

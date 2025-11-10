@@ -28,6 +28,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createRole, updateRole } from "@/server/actions/role-actions";
+import { useTranslations } from 'next-intl';
+import type { roles, permissions } from "@/drizzle/schema/role-system";
+
+type Role = typeof roles.$inferSelect;
+type Permission = typeof permissions.$inferSelect;
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -40,25 +45,11 @@ const CRUD_ACTIONS = ['Create', 'Read', 'Update', 'Delete'] as const;
 
 type FormData = z.infer<typeof formSchema>;
 
-interface Role {
-  id: string;
-  name: string;
-  description: string | null;
-  permissions: { id: string }[];
-  isSystem?: boolean;
-}
-
-interface Permission {
-  id: string;
-  name: string;
-  description: string | null;
-  module: string | null;
-}
-
 interface RoleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   role?: Role | null;
+  rolePermissions?: Array<{ id: string }>;
   permissions: Permission[];
   onSuccess?: () => void;
 }
@@ -67,9 +58,12 @@ export function RoleDialog({
   open,
   onOpenChange,
   role,
+  rolePermissions,
   permissions,
   onSuccess,
 }: RoleDialogProps) {
+  const t = useTranslations('roles');
+  const tCommon = useTranslations('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!role;
 
@@ -88,7 +82,7 @@ export function RoleDialog({
       form.reset({
         name: role.name,
         description: role.description || "",
-        permissions: role.permissions?.map(p => p.id) || [],
+        permissions: rolePermissions?.map(p => p.id) || [],
       });
     } else {
       form.reset({
@@ -97,7 +91,7 @@ export function RoleDialog({
         permissions: [],
       });
     }
-  }, [role, form]);
+  }, [role, rolePermissions, form]);
 
   async function onSubmit(data: FormData) {
     setIsSubmitting(true);
@@ -120,15 +114,15 @@ export function RoleDialog({
       }
 
       if (result.success) {
-        toast.success(result.message || `Role ${isEditMode ? "updated" : "created"} successfully`);
+        toast.success(result.message || (isEditMode ? t('messages.updated') : t('messages.created')));
         onOpenChange(false);
         form.reset();
         onSuccess?.();
       } else {
-        toast.error(result.error || "An error occurred");
+        toast.error(result.error || tCommon('messages.error'));
       }
     } catch (error) {
-      toast.error(`Failed to ${isEditMode ? "update" : "create"} role`);
+      toast.error(isEditMode ? t('messages.updateError') : t('messages.createError'));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -175,12 +169,12 @@ export function RoleDialog({
       <DialogContent className="max-w-[90vw] w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            {isEditMode ? "Edit Role" : "Create New Role"}
+            {isEditMode ? t('editRole') : t('createNew')}
           </DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? "Update role information and permissions"
-              : "Create a new role with specific permissions"}
+              ? t('description.update')
+              : t('description.create')}
           </DialogDescription>
         </DialogHeader>
 
@@ -192,7 +186,7 @@ export function RoleDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role Name</FormLabel>
+                  <FormLabel>{t('fields.name')}</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g. Auditor, Manager" {...field} />
                   </FormControl>
@@ -207,7 +201,7 @@ export function RoleDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('fields.description')}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Describe the role responsibilities..."
@@ -340,11 +334,11 @@ export function RoleDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {tCommon('actions.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditMode ? "Update Role" : "Create Role"}
+                {isEditMode ? tCommon('actions.update') : tCommon('actions.create')}
               </Button>
             </DialogFooter>
           </form>
