@@ -34,6 +34,17 @@
   "createdAt": "Oluşturulma",
   "updatedAt": "Güncellenme",
   "date": "Tarih",
+  "fields": {
+    "createdAt": "Oluşturulma Tarihi",
+    "updatedAt": "Güncellenme Tarihi",
+    "completedAt": "Tamamlanma Tarihi",
+    "createdBy": "Oluşturan"
+  },
+  "roles": {
+    "manager": "Yönetici",
+    "responsible": "Sorumlu",
+    "assignedTo": "Atanan"
+  },
   "status": {
     "loading": "Yükleniyor...",
     "saving": "Kaydediliyor...",
@@ -67,7 +78,11 @@
     "cannotBeUndone": "Bu işlem geri alınamaz.",
     "selectOption": "Seçiniz...",
     "noResults": "Sonuç bulunamadı",
-    "allRightsReserved": "Tüm hakları saklıdır"
+    "allRightsReserved": "Tüm hakları saklıdır",
+    "cancel": "İptal",
+    "confirmComplete": "Evet, Tamamla",
+    "confirmClose": "Evet, Kapat",
+    "approveClosure": "Kapanışı Onayla"
   },
   "labels": {
     "importance": "Önem",
@@ -91,6 +106,14 @@
     "rowsSelected": "satır seçildi",
     "page": "Sayfa",
     "previous": "Önceki",
-    "next": "Sonraki"
+    "next": "Sonraki",
+    "toggleColumns": "Sütunları Göster/Gizle",
+    "selected": "seçildi",
+    "clearFilters": "Filtreleri Temizle",
+    "rowsPerPage": "Sayfa başına satır",
+    "goToFirstPage": "İlk sayfaya git",
+    "goToPreviousPage": "Önceki sayfaya git",
+    "goToNextPage": "Sonraki sayfaya git",
+    "goToLastPage": "Son sayfaya git"
   }
 }

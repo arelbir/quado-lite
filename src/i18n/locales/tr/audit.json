@@ -112,6 +112,8 @@
     "newFindings": "Yeni",
     "selectProcess": "Süreç seçin",
     "noQuestions": "Henüz soru eklenmedi",
+    "noQuestionsInAudit": "Bu denetimde soru yok",
+    "startWithQuestions": "Soru havuzundan soru ekleyerek başlayın",
     "auditCompletedSuccess": "Denetim tamamlandı! Bulgular süreç sahipleri tarafından işleniyor.",
     "auditClosedSuccess": "Denetim kapatıldı ve arşivlendi.",
     "confirmCompleteAudit": "Bu denetimi tamamlamak üzeresiniz.",
@@ -120,7 +122,12 @@
     "findingsUnderReview": "Bulgular süreç sahipleri tarafından tamamlanana kadar denetim \"İncelemede\" statüsünde kalacak.",
     "allTasksCompleted": "Tüm işlemler tamamlandı",
     "reportDownloaded": "Rapor indirildi!",
-    "reportError": "Rapor oluşturulurken hata oluştu."
+    "reportError": "Rapor oluşturulurken hata oluştu.",
+    "findingsCompleting": "bulgu tamamlanıyor...",
+    "findingsChecking": "Bulgular kontrol ediliyor...",
+    "auditWillDisappear": "Denetim ekranınızdan kalkacak ve bulgular tamamlandığında tekrar size dönecek.",
+    "auditArchived": "Denetim kapatıldığında arşive taşınacak ve sadece raporlarda görünecek.",
+    "archived": "Arşivlendi"
   },
   
   "sections": {
@@ -144,6 +151,12 @@
     "enterDescription": "Açıklama giriniz",
     "selectDateRange": "Tarih aralığı seçin",
     "searchTitle": "Başlık ara..."
+  },
+
+  "actions": {
+    "downloadReport": "Rapor İndir",
+    "completeAudit": "Denetimi Tamamla",
+    "closeAudit": "Denetimi Kapat"
   },
 
   "questionsForm": {

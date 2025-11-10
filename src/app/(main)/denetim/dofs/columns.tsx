@@ -107,7 +107,7 @@ export function useDofColumns(): ColumnDef<DofRecord>[] {
           <Button asChild size="sm" variant="ghost">
             <Link href={`/denetim/dofs/${row.original.id}`}>
               <Eye className="h-4 w-4 mr-2" />
-              {tCommon('view')}
+              {tCommon('actions.view')}
             </Link>
           </Button>
         );

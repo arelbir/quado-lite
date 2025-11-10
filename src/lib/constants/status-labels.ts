@@ -26,7 +26,7 @@ export type FindingStatus = "New" | "Assigned" | "InProgress" | "PendingAuditorC
 /**
  * Action Status Types
  */
-export type ActionStatus = "Assigned" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
+export type ActionStatus = "Assigned" | "InProgress" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
 
 /**
  * Action Type Categories
@@ -118,14 +118,18 @@ export const FINDING_STATUS_COLORS = {
 export const ACTION_STATUS_LABELS = {
   Assigned: "Atandı",
   InProgress: "Devam Ediyor",
+  PendingManagerApproval: "Yönetici Onayı Bekliyor",
   Completed: "Tamamlandı",
+  Rejected: "Reddedildi",
   Cancelled: "İptal Edildi",
 } as const;
 
 export const ACTION_STATUS_COLORS = {
   Assigned: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
   InProgress: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+  PendingManagerApproval: "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400",
   Completed: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+  Rejected: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
   Cancelled: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
 } as const;
 

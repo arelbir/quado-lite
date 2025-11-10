@@ -18,6 +18,7 @@
     "finding": "İlgili Bulgu",
     "status": "Durum",
     "responsiblePerson": "Sorumlu Kişi",
+    "assignedTo": "Atanan Kişi",
     "department": "Departman",
     "dueDate": "Termin Tarihi",
     "completedDate": "Tamamlanma Tarihi"
@@ -161,7 +162,8 @@
     "enterWhy": "Neden önemli?",
     "enterMeasure": "Geçici önlemi giriniz",
     "enterAnalysis": "Analizinizi giriniz",
-    "enterRootCause": "Kök nedeni giriniz"
+    "enterRootCause": "Kök nedeni giriniz",
+    "searchProblem": "Problem ara..."
   },
   
   "quickDof": {

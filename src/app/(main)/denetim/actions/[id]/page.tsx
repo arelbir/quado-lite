@@ -137,7 +137,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
               </Link>
             </Button>
             <div>
-              <h1 className="text-lg font-bold">Aksiyon</h1>
+              <h1 className="text-lg font-bold">{t('singular')}</h1>
               <p className="text-xs text-muted-foreground">#{action.id.substring(0, 8)}</p>
             </div>
           </div>
@@ -187,7 +187,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      Yapılan İş
+                      {t('fields.workDone')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -261,7 +261,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
 
                     {action.completedAt && (
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1">Tamamlanma</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">{t('fields.completedAt')}</p>
                         <p className="text-sm">
                           {new Date(action.completedAt).toLocaleString("tr-TR", { 
                             day: '2-digit', 
@@ -276,7 +276,7 @@ export default async function ActionDetailPage({ params }: PageProps) {
 
                     {action.updatedAt && (
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1">Son Güncelleme</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">{t('fields.updatedAt')}</p>
                         <p className="text-sm">
                           {new Date(action.updatedAt).toLocaleString("tr-TR", { 
                             day: '2-digit', 

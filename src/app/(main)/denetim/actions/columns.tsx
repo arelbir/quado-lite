@@ -13,7 +13,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 export type ActionRecord = {
   id: string;
   details: string;
-  status: "Assigned" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
+  status: "Assigned" | "InProgress" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
   type: "Simple" | "Corrective" | "Preventive";
   createdAt: Date;
   updatedAt: Date | null;
@@ -72,7 +72,7 @@ export function useActionColumns(): ColumnDef<ActionRecord>[] {
       <DataTableColumnHeader column={column} title={t('fields.status')} />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as "Assigned" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
+      const status = row.getValue("status") as "Assigned" | "InProgress" | "PendingManagerApproval" | "Completed" | "Rejected" | "Cancelled";
       return <StatusBadge status={status} type="action" />;
     },
     filterFn: (row, id, value) => {
@@ -130,7 +130,7 @@ export function useActionColumns(): ColumnDef<ActionRecord>[] {
         <Button asChild size="sm" variant="ghost">
           <Link href={`/denetim/actions/${row.original.id}`}>
             <Eye className="h-4 w-4 mr-2" />
-            {tCommon('view')}
+            {tCommon('actions.view')}
           </Link>
         </Button>
       );

@@ -133,13 +133,13 @@ export function AuditStatusActions({
                     </p>
                   </div>
                 )}
-                <p className="text-sm">Denetim ekranınızdan kalkacak ve bulgular tamamlandığında tekrar size dönecek.</p>
+                <p className="text-sm">{t('messages.auditWillDisappear')}</p>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>İptal</AlertDialogCancel>
+              <AlertDialogCancel>{tCommon('common.cancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={handleCompleteAudit} disabled={isPending}>
-                Evet, Tamamla
+                {tCommon('common.confirmComplete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -149,8 +149,8 @@ export function AuditStatusActions({
       {audit.status === "InReview" && (
         <div className="text-xs text-muted-foreground">
           {openFindingsCount > 0 
-            ? `${openFindingsCount} bulgu tamamlanıyor...` 
-            : "Bulgular kontrol ediliyor..."}
+            ? `${openFindingsCount} ${t('messages.findingsCompleting')}` 
+            : t('messages.findingsChecking')}
         </div>
       )}
 
@@ -159,7 +159,7 @@ export function AuditStatusActions({
           <AlertDialogTrigger asChild>
             <Button size="sm" disabled={isPending}>
               <Lock className="h-4 w-4 mr-2" />
-              Kapanışı Onayla
+              {tCommon('common.approveClosure')}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -172,15 +172,15 @@ export function AuditStatusActions({
                     ✅ {t('messages.allTasksCompleted')}
                   </p>
                   <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                    Denetim kapatıldığında arşive taşınacak ve sadece raporlarda görünecek.
+                    {t('messages.auditArchived')}
                   </p>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>İptal</AlertDialogCancel>
+              <AlertDialogCancel>{tCommon('common.cancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={handleCloseAudit} disabled={isPending}>
-                Evet, Kapat
+                {tCommon('common.confirmClose')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -189,7 +189,7 @@ export function AuditStatusActions({
 
       {audit.status === "Closed" && (
         <div className="text-xs text-muted-foreground">
-          Arşivlendi
+          {t('messages.archived')}
         </div>
       )}
     </div>
