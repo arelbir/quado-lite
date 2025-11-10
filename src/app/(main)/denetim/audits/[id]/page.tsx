@@ -335,9 +335,9 @@ export default async function AuditDetailPage({ params, searchParams }: PageProp
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <HelpCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Bu denetimde soru yok</h3>
+                <h3 className="text-lg font-medium mb-2">{t('messages.noQuestionsInAudit')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Soru havuzundan soru ekleyerek başlayın
+                  {t('messages.startWithQuestions')}
                 </p>
                 {audit.status === "Active" && availableQuestions.length > 0 && (
                   <AddQuestionDialog

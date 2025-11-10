@@ -21,6 +21,7 @@
   },
   "action": {
     "Assigned": "Atandı",
+    "InProgress": "Devam Ediyor",
     "PendingManagerApproval": "Yönetici Onayı Bekliyor",
     "Completed": "Tamamlandı",
     "Rejected": "Reddedildi",

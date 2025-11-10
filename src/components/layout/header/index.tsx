@@ -105,7 +105,7 @@ export const Header = async () => {
       <div className="w-full flex-1">
         <HeaderBreadcrumb />
       </div>
-      <Link href="https://github.com/gooooooooney/nextjs-admin-shadcn"
+      <Link href="https://github.com/arelbir/quado-lite"
         className={cn(buttonVariants({
           variant: 'ghost',
         }),

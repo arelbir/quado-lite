@@ -20,6 +20,7 @@ export function ActionsTableClient({ data, pageCount }: ActionsTableClientProps)
 
   const statusOptions = [
     { label: getStatusLabel('Assigned'), value: 'Assigned' },
+    { label: getStatusLabel('InProgress'), value: 'InProgress' },
     { label: getStatusLabel('PendingManagerApproval'), value: 'PendingManagerApproval' },
     { label: getStatusLabel('Completed'), value: 'Completed' },
     { label: getStatusLabel('Cancelled'), value: 'Cancelled' },
