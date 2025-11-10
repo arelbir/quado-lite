@@ -12,6 +12,8 @@ export const publicRoutes = [
 
 export const publicPages = [
   "/not-found",
+  "/",  // Dashboard - available to all authenticated users
+  "/admin/workflows/my-tasks",  // My Tasks - available to all authenticated users
 ]
 
 
