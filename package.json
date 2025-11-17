@@ -80,6 +80,7 @@
     "drizzle-orm": "^0.30.10",
     "drizzle-zod": "^0.5.1",
     "exceljs": "^4.4.0",
+    "framer-motion": "^12.23.24",
     "holy-loader": "^2.3.1",
     "ioredis": "^5.8.2",
     "jspdf": "^3.0.3",
