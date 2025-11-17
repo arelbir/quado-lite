@@ -1,28 +1,62 @@
-export * from "./auth";
+/**
+ * SCHEMA INDEX - CORE FRAMEWORK MODULES ONLY
+ * Import order is important for foreign key relationships
+ */
+
+// ============================================
+// CORE ENUMS
+// ============================================
 export * from "./enum";
-export * from "./menu";
-export * from "./task";
-// 🔥 NEW: Enterprise Organization  
+
+// ============================================
+// AUTHENTICATION & AUTHORIZATION
+// ============================================
+export * from "./auth";
+
+// ============================================
+// ORGANIZATION STRUCTURE
+// ============================================
 export * from "./organization";
-// 🔥 NEW: Multi-Role & Permission System (MUST be before user to allow import)
+
+// ============================================
+// ROLE & PERMISSION SYSTEM
+// (Must be before user to allow import)
+// ============================================
 export * from "./role-system";
-// User (after role-system so it can import userRoles table)
+
+// ============================================
+// USER MANAGEMENT
+// (After role-system so it can import userRoles table)
+// ============================================
 export * from "./user";
-// 🔥 NEW: Teams & Groups (Week 4)
+
+// ============================================
+// TEAMS & GROUPS
+// ============================================
 export * from "./teams-groups";
-// 🔥 NEW: HR Integration (Week 5-6)
-export * from "./hr-sync";
-// 🔥 NEW: Workflow System (Week 9-10)
+
+// ============================================
+// MENU SYSTEM
+// ============================================
+export * from "./menu";
+
+// ============================================
+// WORKFLOW ENGINE
+// ============================================
 export * from "./workflow";
-// 🔥 NEW: Workflow Designer (Visual)
 export * from "./workflow-definition";
-// 🔥 NEW: Hybrid Form System - Custom Fields
+
+// ============================================
+// CUSTOM FIELDS SYSTEM
+// ============================================
 export * from "./custom-field";
-// Kurumsal Denetim Sistemi
-export * from "./audit";
-export * from "./finding";
-export * from "./action";
-export * from "./action-progress";
-export * from "./dof";
-export * from "./question-bank";
+
+// ============================================
+// HR INTEGRATION
+// ============================================
+export * from "./hr-sync";
+
+// ============================================
+// NOTIFICATION SYSTEM
+// ============================================
 export * from "./notification";

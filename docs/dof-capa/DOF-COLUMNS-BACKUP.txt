@@ -1,2 +1,0 @@
-// Old columns.tsx backed up - use columns-simple.tsx instead
-// See columns-simple.tsx for the clean i18n version
