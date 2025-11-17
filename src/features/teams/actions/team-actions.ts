@@ -19,7 +19,7 @@ import { checkPermission } from '@/core/permissions/unified-permission-checker';
 export async function createTeam(data: {
   name: string;
   description?: string;
-  type: 'DEPARTMENT' | 'PROJECT' | 'FUNCTIONAL' | 'TEMPORARY';
+  type: 'Permanent' | 'Project' | 'Virtual';
   departmentId?: string;
   leaderId?: string;
 }): Promise<any> {
@@ -48,11 +48,11 @@ export async function createTeam(data: {
         .returning();
 
       // If leaderId provided, add them as a member
-      if (data.leaderId) {
+      if (data.leaderId && team) {
         await db.insert(userTeams).values({
           teamId: team.id,
           userId: data.leaderId,
-          role: 'LEADER',
+          role: 'Lead',
           joinedAt: new Date(),
         });
       }
@@ -74,7 +74,7 @@ export async function updateTeam(
   data: {
     name?: string;
     description?: string;
-    type?: 'DEPARTMENT' | 'PROJECT' | 'FUNCTIONAL' | 'TEMPORARY';
+    type?: 'Permanent' | 'Project' | 'Virtual';
     departmentId?: string;
     leaderId?: string;
     isActive?: boolean;
@@ -141,7 +141,7 @@ export async function deleteTeam(id: string): Promise<any> {
         .where(eq(teams.id, id));
 
       revalidatePath('/admin/teams');
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[deleteTeam] Error:', error);
       return { success: false, error: 'Failed to delete team' };
@@ -155,7 +155,7 @@ export async function deleteTeam(id: string): Promise<any> {
 export async function addTeamMember(data: {
   teamId: string;
   userId: string;
-  role?: 'LEADER' | 'MEMBER' | 'ADMIN';
+  role?: 'Owner' | 'Admin' | 'Lead' | 'Member';
 }): Promise<any> {
   return withAuth<any>(async (user: any) => {
     const perm = await checkPermission({
@@ -186,7 +186,7 @@ export async function addTeamMember(data: {
         .values({
           teamId: data.teamId,
           userId: data.userId,
-          role: data.role || 'MEMBER',
+          role: data.role || 'Member',
           joinedAt: new Date(),
         })
         .returning();
@@ -229,7 +229,7 @@ export async function removeTeamMember(data: {
         );
 
       revalidatePath(`/admin/teams/${data.teamId}`);
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[removeTeamMember] Error:', error);
       return { success: false, error: 'Failed to remove member' };
@@ -243,7 +243,7 @@ export async function removeTeamMember(data: {
 export async function updateTeamMemberRole(data: {
   teamId: string;
   userId: string;
-  role: 'LEADER' | 'MEMBER' | 'ADMIN';
+  role: 'Owner' | 'Admin' | 'Lead' | 'Member';
 }): Promise<any> {
   return withAuth<any>(async (user: any) => {
     const perm = await checkPermission({
@@ -315,18 +315,18 @@ export async function changeTeamLeader(data: {
       // Remove old leader role
       await db
         .update(userTeams)
-        .set({ role: 'MEMBER' })
+        .set({ role: 'Member' })
         .where(
           and(
             eq(userTeams.teamId, data.teamId),
-            eq(userTeams.role, 'LEADER')
+            eq(userTeams.role, 'Lead')
           )
         );
 
       // Set new leader role
       await db
         .update(userTeams)
-        .set({ role: 'LEADER' })
+        .set({ role: 'Lead' })
         .where(
           and(
             eq(userTeams.teamId, data.teamId),
@@ -335,7 +335,7 @@ export async function changeTeamLeader(data: {
         );
 
       revalidatePath(`/admin/teams/${data.teamId}`);
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[changeTeamLeader] Error:', error);
       return { success: false, error: 'Failed to change leader' };
