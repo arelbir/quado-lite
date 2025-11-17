@@ -95,7 +95,7 @@ http://localhost:3000/admin/users
 
 ### **4. Direct URL Test:**
 ```
-http://localhost:3000/admin/users/detail?id=004fd62e-2a22-49ac-ab17-04c909a89e05
+http://localhost:3000/admin/users/detail?id=proje-tanitim-1
 ```
 
 **Beklenen:** Sayfa açılır ✅
