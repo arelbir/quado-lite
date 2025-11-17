@@ -1,10 +1,14 @@
 /**
  * UPLOAD HELPERS
- * Helper functions for file uploads using MinIO
+ * Server-side helper functions for file uploads using MinIO
+ * Note: This file imports MinIO client and should only be used server-side
  */
 
 import { nanoid } from 'nanoid';
 import { minioClient, BUCKET_NAME, ensureBucketExists, getPublicUrl } from './minio-client';
+
+// Re-export client-safe utilities
+export { extractFilename, validateFile, formatFileSize, getFileExtension, isImageFile } from './file-utils';
 
 /**
  * Upload a file to MinIO
@@ -65,51 +69,4 @@ export async function getPresignedUrl(
   expirySeconds: number = 3600
 ): Promise<string> {
   return await minioClient.presignedGetObject(BUCKET_NAME, key, expirySeconds);
-}
-
-/**
- * Validate file type and size
- */
-export function validateFile(
-  file: File,
-  options: {
-    maxSize?: number; // in bytes
-    allowedTypes?: string[];
-  } = {}
-): { valid: boolean; error?: string } {
-  const { maxSize = 10 * 1024 * 1024, allowedTypes } = options; // Default 10MB
-  
-  if (file.size > maxSize) {
-    return {
-      valid: false,
-      error: `File size exceeds ${maxSize / 1024 / 1024}MB limit`,
-    };
-  }
-  
-  if (allowedTypes && !allowedTypes.includes(file.type)) {
-    return {
-      valid: false,
-      error: `File type ${file.type} is not allowed`,
-    };
-  }
-  
-  return { valid: true };
-}
-
-/**
- * Extract filename from URL or path
- */
-export function extractFilename(url?: string | null): string | null {
-  if (!url) return null;
-  
-  try {
-    const urlObj = new URL(url);
-    const pathname = urlObj.pathname;
-    const parts = pathname.split('/');
-    return parts[parts.length - 1] || null;
-  } catch {
-    // If not a valid URL, try to extract from path
-    const parts = url.split('/');
-    return parts[parts.length - 1] || null;
-  }
 }
