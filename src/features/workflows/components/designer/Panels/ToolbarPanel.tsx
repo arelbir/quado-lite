@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/card';
 import { Icons } from '@/components/shared/icons';
 import { useWorkflowStore } from '../Hooks/useWorkflowStore';
 import { useTranslations } from 'next-intl';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 export function ToolbarPanel() {
   const t = useTranslations('workflow');
@@ -46,60 +48,54 @@ export function ToolbarPanel() {
     addNode(newNode);
   };
 
+  const onDragStart = (event: React.DragEvent, nodeType: 'start' | 'process' | 'end' | 'decision' | 'approval') => {
+    event.dataTransfer.setData('application/reactflow', nodeType);
+    event.dataTransfer.effectAllowed = 'move';
+  };
+
+  const nodeTypes = [
+    { type: 'start' as const, icon: Icons.Play, color: 'text-green-500', label: t('step.start') },
+    { type: 'process' as const, icon: Icons.CheckCircle2, color: 'text-blue-500', label: t('step.process') },
+    { type: 'end' as const, icon: Icons.Flag, color: 'text-red-500', label: t('step.end') },
+    { type: 'decision' as const, icon: Icons.GitBranch, color: 'text-yellow-500', label: t('step.decision') },
+    { type: 'approval' as const, icon: Icons.ShieldCheck, color: 'text-purple-500', label: t('step.approval') },
+  ];
+
   return (
     <Card className="p-4">
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold mb-3">{t('toolbar.addNode')}</h3>
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-sm font-semibold mb-2">{t('toolbar.addNode')}</h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Drag to canvas or click to add
+          </p>
+        </div>
         
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2"
-          onClick={() => handleAddNode('start')}
-        >
-          <Icons.Play className="size-4 text-green-500" />
-          <span>{t('step.start')}</span>
-        </Button>
+        <Separator />
         
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2"
-          onClick={() => handleAddNode('process')}
-        >
-          <Icons.CheckCircle2 className="size-4 text-blue-500" />
-          <span>{t('step.process')}</span>
-        </Button>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2"
-          onClick={() => handleAddNode('end')}
-        >
-          <Icons.Flag className="size-4 text-red-500" />
-          <span>{t('step.end')}</span>
-        </Button>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2"
-          onClick={() => handleAddNode('decision')}
-        >
-          <Icons.GitBranch className="size-4 text-yellow-500" />
-          <span>{t('step.decision')}</span>
-        </Button>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2"
-          onClick={() => handleAddNode('approval')}
-        >
-          <Icons.ShieldCheck className="size-4 text-purple-500" />
-          <span>{t('step.approval')}</span>
-        </Button>
+        <div className="space-y-2">
+          {nodeTypes.map(({ type, icon: Icon, color, label }) => (
+            <div
+              key={type}
+              draggable
+              onDragStart={(e) => onDragStart(e, type)}
+              className="cursor-move"
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start gap-2 hover:bg-accent"
+                onClick={() => handleAddNode(type)}
+              >
+                <Icon className={`size-4 ${color}`} />
+                <span>{label}</span>
+                <Badge variant="secondary" className="ml-auto text-xs">
+                  {type}
+                </Badge>
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
     </Card>
   );

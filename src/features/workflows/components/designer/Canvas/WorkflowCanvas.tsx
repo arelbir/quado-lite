@@ -1,11 +1,13 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import ReactFlow, {
   Background,
   Controls,
   MiniMap,
   BackgroundVariant,
+  ReactFlowProvider,
+  useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -15,8 +17,13 @@ import { ProcessNode } from '../Nodes/ProcessNode';
 import { EndNode } from '../Nodes/EndNode';
 import { DecisionNode } from '../Nodes/DecisionNode';
 import { ApprovalNode } from '../Nodes/ApprovalNode';
+import { useTranslations } from 'next-intl';
 
-export function WorkflowCanvas() {
+function WorkflowCanvasInner() {
+  const t = useTranslations('workflow');
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const { screenToFlowPosition } = useReactFlow();
+  
   // Memoize nodeTypes to prevent React Flow warning
   const nodeTypes = useMemo(() => ({
     start: StartNode,
@@ -33,6 +40,7 @@ export function WorkflowCanvas() {
     onEdgesChange,
     onConnect,
     selectNode,
+    addNode,
   } = useWorkflowStore();
 
   const handleNodeClick = useCallback(
@@ -46,8 +54,60 @@ export function WorkflowCanvas() {
     selectNode(null);
   }, [selectNode]);
 
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData('application/reactflow') as 'start' | 'process' | 'end' | 'decision' | 'approval';
+
+      if (typeof type === 'undefined' || !type) {
+        return;
+      }
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const nodeId = `${type}-${Date.now()}`;
+      
+      const newNode = {
+        id: nodeId,
+        type,
+        position,
+        data: {
+          label: 
+            type === 'start' ? t('step.start') : 
+            type === 'end' ? t('step.end') : 
+            type === 'decision' ? t('step.decision') :
+            type === 'approval' ? t('step.approval') :
+            t('step.newStep'),
+          ...(type === 'process' && {
+            assignedRole: '',
+            deadlineHours: 24,
+          }),
+          ...(type === 'decision' && {
+            condition: '',
+          }),
+          ...(type === 'approval' && {
+            approvers: [],
+            approvalType: 'ANY',
+          }),
+        },
+      };
+
+      addNode(newNode);
+    },
+    [screenToFlowPosition, t, addNode]
+  );
+
   return (
-    <div className="h-full w-full">
+    <div ref={reactFlowWrapper} className="h-full w-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -56,6 +116,8 @@ export function WorkflowCanvas() {
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
         onPaneClick={handlePaneClick}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         fitView
         snapToGrid
@@ -86,5 +148,13 @@ export function WorkflowCanvas() {
         />
       </ReactFlow>
     </div>
+  );
+}
+
+export function WorkflowCanvas() {
+  return (
+    <ReactFlowProvider>
+      <WorkflowCanvasInner />
+    </ReactFlowProvider>
   );
 }
