@@ -122,7 +122,7 @@ function base32Encode(buffer: Buffer): string {
   let output = '';
 
   for (let i = 0; i < buffer.length; i++) {
-    value = (value << 8) | buffer[i];
+    value = (value << 8) | (buffer[i] || 0);
     bits += 8;
 
     while (bits >= 5) {
