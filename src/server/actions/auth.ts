@@ -1,7 +1,7 @@
 "use server"
 
 import { DEFAULT_LOGIN_REDIRECT } from "@/config/routes";
-import { action } from "@/lib/safe-action"
+import { action } from "@/lib/core/safe-action"
 import { LoginSchema, NewPasswordSchema, RegisterByAdminSchema, ResetSchema, SignupByTokenSchema, SignupSchema } from "@/schema/auth"
 import { signIn, signOut } from "@/server/auth";
 import { getUserByEmail, getUserById, updateUserEmail, updateUserPassword } from "@/server/data/user";
@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
 import { AuthError } from "next-auth";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
-import { generatePasswordResetToken, generateRegisterEmailVerificationToken, generateVerificationToken } from "@/lib/tokens";
+import { generatePasswordResetToken, generateRegisterEmailVerificationToken, generateVerificationToken } from "@/lib/core/tokens";
 import { deletePasswordResetToken, getPasswordResetTokenByToken } from "@/server/data/password-reset-token";
 import { sendPasswordResetEmail, sendRegisterEmail, sendVerificationEmail } from "@/server/mail/send-email";
 import { deleteVerificationToken, getVerificationTokenByToken } from "@/server/data/verification-token";

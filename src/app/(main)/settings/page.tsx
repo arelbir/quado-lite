@@ -1,5 +1,5 @@
 import { ProfileForm } from "./_components/profile-form"
-import { getLatestUser } from "@/lib/auth"
+import { getLatestUser } from "@/lib/auth/server"
 import { SettingsTitle } from "./_components/settings-title"
 import { getTranslations } from 'next-intl/server'
 

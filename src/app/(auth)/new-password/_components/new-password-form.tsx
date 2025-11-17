@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/form"
 import { Button, LoadingButton } from "@/components/ui/button"
 import { useSearchParams } from "next/navigation"
-import { FormError } from "@/components/form-error"
-import { FormSuccess } from "@/components/form-succcess"
+import { FormError } from "@/components/shared/form-error"
+import { FormSuccess } from "@/components/shared/form-success"
 import { NewPasswordSchema } from "@/schema/auth"
 import { newPassword } from "@/server/actions/auth"
-import { Icons } from "@/components/icons"
+import { Icons } from "@/components/shared/icons"
 import { PasswordInput } from "@/components/ui/password-input"
 
 

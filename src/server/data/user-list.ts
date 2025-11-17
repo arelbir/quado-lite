@@ -2,7 +2,7 @@
 
 import { db } from "@/drizzle/db";
 import { user } from "@/drizzle/schema";
-import { currentUser } from "@/lib/auth";
+import { currentUser } from "@/lib/auth/server";
 
 /**
  * Tüm aktif kullanıcıları listeler (admin olmayanlara gösterilmez)

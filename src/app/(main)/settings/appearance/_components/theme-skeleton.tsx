@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Theme } from "@/drizzle/schema"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 
 
 type ThemeSkeletonProps = {

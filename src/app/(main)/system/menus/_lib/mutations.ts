@@ -1,7 +1,7 @@
 import { type Row } from "@tanstack/react-table"
 import { toast } from "sonner"
 
-import { getErrorMessage } from "@/lib/handle-error"
+import { getErrorMessage } from "@/lib/core/error"
 
 import { deleteMenusAction, updateMenu } from "./actions"
 import { MenuWithChildren } from "@/drizzle/schema"

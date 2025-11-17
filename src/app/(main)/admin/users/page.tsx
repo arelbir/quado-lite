@@ -18,7 +18,7 @@ import { db } from "@/drizzle/db";
 import { user, departments, positions } from "@/drizzle/schema";
 import { count, or, ilike, sql } from "drizzle-orm";
 import { UsersTableClient } from "./users-table-client";
-import { paginate, getPaginationInfo } from "@/lib/pagination-helper";
+import { paginate, getPaginationInfo } from "@/lib/core/pagination";
 
 export const metadata: Metadata = {
   title: "User Management | Admin",

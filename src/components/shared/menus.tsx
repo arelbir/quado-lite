@@ -1,4 +1,4 @@
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/shared/icons";
 import { MenuItem } from "@/components/layout/sidebar/sidebar-container";
 
 export const defaultRoutes: MenuItem[] = [

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,

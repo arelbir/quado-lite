@@ -10,7 +10,7 @@ import { eq } from "drizzle-orm";
 import { env } from "@/env";
 import { NextResponse } from "next/server";
 import { authRoutes, publicPages } from "./routes";
-import { getMatchMenus } from "@/lib/compare";
+import { getMatchMenus } from "@/lib/core/compare";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.

@@ -4,7 +4,7 @@ import { MenuWithChildren } from "@/drizzle/schema"
 import { DownloadIcon, PlusIcon } from "@radix-ui/react-icons"
 import { type Table } from "@tanstack/react-table"
 
-import { exportTableToCSV } from "@/lib/export"
+import { exportTableToCSV } from "@/lib/export/config"
 import { Button } from "@/components/ui/button"
 
 import { CreateMenuDialog } from "./create-menu-dialog"

@@ -3,7 +3,7 @@ import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons"
 import type { Column } from "@tanstack/react-table"
 import { useTranslations } from 'next-intl'
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {

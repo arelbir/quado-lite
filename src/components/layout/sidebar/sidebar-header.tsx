@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { Separator } from '@/components/ui/separator';
-import { Icons } from '@/components/icons';
-import { cn } from '@/lib/utils';
+import { Icons } from '@/components/shared/icons';
+import { cn } from '@/lib/utils/cn';
 
 export const SidebarHeader = ({ collapsed }: { collapsed: boolean }) => {
   return (

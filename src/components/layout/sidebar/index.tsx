@@ -1,4 +1,4 @@
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/shared/icons";
 import { MenuWithChildren, session } from "@/drizzle/schema";
 import { getUserPermissions } from "@/server/data/permissions";
 import { LucideIcon } from "lucide-react";

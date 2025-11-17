@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -8,7 +8,7 @@
  * - Context-aware permission checking
  */
 
-import { currentUser } from "@/lib/auth";
+import { currentUser } from "@/lib/auth/server";
 import type { User, ActionResponse } from "@/lib/types";
 import { createPermissionChecker, type PermissionCheck } from "@/lib/auth/permission-checker";
 

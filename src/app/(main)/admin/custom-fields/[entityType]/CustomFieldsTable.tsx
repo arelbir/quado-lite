@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { CustomFieldDialog } from './CustomFieldDialog';
 import { deleteCustomFieldDefinition } from '@/server/actions/custom-field-definition-actions';
 import { toast } from 'sonner';

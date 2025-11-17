@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { cn, composeEventHandlers } from "@/lib/utils"
+import { cn, composeEventHandlers } from "@/lib/utils/cn"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import {
   Tooltip,

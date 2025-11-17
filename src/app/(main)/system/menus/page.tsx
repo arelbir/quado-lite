@@ -4,7 +4,7 @@ import { MenusTable } from "./_components/menus-table"
 import { MenusTableProvider } from "./_components/menus-table-provider"
 import { Shell } from "@/components/layout/shell"
 import { getMenus } from "./_lib/queries"
-import { DateRangePicker } from "@/components/date-range-picker"
+import { DateRangePicker } from "@/components/shared/date-range-picker"
 import { searchParamsSchema } from "./_lib/validations"
 
 

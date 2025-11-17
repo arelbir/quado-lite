@@ -1,5 +1,5 @@
 import { Provider } from "@/components/provider";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
+import { TailwindIndicator } from "@/components/shared/tailwind-indicator";
 import { Toaster } from "@/components/ui/sonner";
 import { ViewTransitions } from 'next-view-transitions'
 import HolyLoader from "holy-loader";

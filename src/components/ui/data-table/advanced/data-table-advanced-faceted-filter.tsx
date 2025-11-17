@@ -2,7 +2,7 @@ import type { DataTableFilterOption, Option } from "@/types/data-table"
 import { CheckIcon } from "@radix-ui/react-icons"
 import type { Column } from "@tanstack/react-table"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 import {
   Command,
   CommandEmpty,

@@ -1,4 +1,4 @@
-import { getLatestUser } from "@/lib/auth";
+import { getLatestUser } from "@/lib/auth/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError, UTApi } from "uploadthing/server";
 

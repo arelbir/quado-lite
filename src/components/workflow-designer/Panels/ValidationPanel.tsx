@@ -1,7 +1,7 @@
 'use client';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { useWorkflowStore } from '../Hooks/useWorkflowStore';
 import { useFlowValidation } from '../Hooks/useFlowValidation';
 import { useTranslations } from 'next-intl';

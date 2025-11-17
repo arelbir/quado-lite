@@ -23,7 +23,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { syncFromLDAP } from "@/lib/hr-sync/ldap-sync-service";
-import { currentUser } from "@/lib/auth";
+import { currentUser } from "@/lib/auth/server";
 import { db } from "@/drizzle/db";
 import { hrSyncLogs } from "@/drizzle/schema/hr-sync";
 import { eq } from "drizzle-orm";

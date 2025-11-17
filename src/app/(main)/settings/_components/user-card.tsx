@@ -5,11 +5,11 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DrawerDialog } from "@/components/ui/custom/drawer-dialog";
 import { ImageUpload } from "@/components/ui/custom/image-upload";
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/shared/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { deleteUploadthingFiles } from "@/server/actions/uploadthing";
 import { toast } from "sonner";
-import { extractFilename } from "@/lib/file";
+import { extractFilename } from "@/lib/core/file";
 import { Label } from "@/components/ui/label";
 
 

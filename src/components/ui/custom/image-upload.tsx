@@ -3,8 +3,8 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Icons } from "@/components/icons";
-import { useUploadThing } from "@/lib/uploadthing";
+import { Icons } from "@/components/shared/icons";
+import { useUploadThing } from "@/lib/core/uploadthing";
 import ProgressBar from "./progress-bar";
 import { LoadingButton } from "../button";
 interface FileUploadProgress {

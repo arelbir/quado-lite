@@ -3,7 +3,7 @@
 import { memo } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Card } from '@/components/ui/card';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { useTranslations } from 'next-intl';
 
 export const StartNode = memo(({ data, selected }: NodeProps) => {

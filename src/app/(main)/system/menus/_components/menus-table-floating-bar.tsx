@@ -23,7 +23,7 @@ import {
 
 import { deleteMenus, updateMenus } from "../_lib/mutations"
 import { MenuWithChildren, menuStatus, type Menu } from "@/drizzle/schema"
-import { Kbd } from "@/components/kbd"
+import { Kbd } from "@/components/shared/kbd"
 
 interface MenusTableFloatingBarProps {
   table: Table<MenuWithChildren>

@@ -8,10 +8,10 @@ import {
   AccordionItem,
   AccordionTriggerWithoutChevronIcon,
 } from '@/components/ui/accordion';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/cn';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Dropdown } from './dropdown';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { MenuItem } from './sidebar-container';
 

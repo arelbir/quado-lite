@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { useWorkflowStore } from '../Hooks/useWorkflowStore';
 import { useTranslations } from 'next-intl';
 

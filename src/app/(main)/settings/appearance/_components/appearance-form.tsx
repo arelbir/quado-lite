@@ -11,7 +11,7 @@ import { updatePreferences } from '@/server/actions/user'
 import { useAction } from 'next-safe-action/hooks'
 import { toast } from 'sonner'
 import { isExecuting } from 'next-safe-action/status'
-import { getUpdatedFields } from '@/lib/object-utils'
+import { getUpdatedFields } from '@/lib/core/object'
 import { isEmpty } from 'radash'
 import { useTheme } from 'next-themes'
 

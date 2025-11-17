@@ -24,7 +24,7 @@ import { CheckCircle2, XCircle, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { updateRolePermissions } from "@/server/actions/role-actions";
 
 interface Permission {

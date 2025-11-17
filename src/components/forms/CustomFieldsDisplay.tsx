@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import type { CustomFieldWithValue } from '@/lib/types';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 
 interface CustomFieldsDisplayProps {
   fields: CustomFieldWithValue[];

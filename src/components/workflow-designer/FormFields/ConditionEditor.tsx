@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { ConditionTemplates } from './ConditionTemplates';
 import { VisualFormulaBuilder } from './VisualFormulaBuilder';
 import { useTranslations } from 'next-intl';

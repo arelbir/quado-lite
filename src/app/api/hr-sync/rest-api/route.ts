@@ -22,7 +22,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { syncFromRESTAPI } from "@/lib/hr-sync/rest-api-service";
-import { currentUser } from "@/lib/auth";
+import { currentUser } from "@/lib/auth/server";
 
 export async function POST(request: NextRequest) {
   try {

@@ -25,7 +25,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { importFromCSV } from "@/lib/hr-sync/csv-import-service";
-import { currentUser } from "@/lib/auth";
+import { currentUser } from "@/lib/auth/server";
 import { db } from "@/drizzle/db";
 import { hrSyncConfigs } from "@/drizzle/schema/hr-sync";
 import { eq } from "drizzle-orm";

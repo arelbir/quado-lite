@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { Separator } from '@/components/ui/separator';
 import { RoleSelector } from '../FormFields/RoleSelector';
 import { ConditionEditor } from '../FormFields/ConditionEditor';

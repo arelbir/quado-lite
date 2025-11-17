@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { Separator } from '@/components/ui/separator';
 import { getCustomFieldDefinitions } from '@/server/actions/custom-field-definition-actions';
 import type { CustomFieldDefinition, EntityType } from '@/lib/types';

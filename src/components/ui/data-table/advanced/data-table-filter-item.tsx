@@ -5,7 +5,7 @@ import { TrashIcon } from "@radix-ui/react-icons"
 import type { Table } from "@tanstack/react-table"
 
 import { dataTableConfig } from "@/config/data-table"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 import { useDebounce } from "@/hooks/use-debounce"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

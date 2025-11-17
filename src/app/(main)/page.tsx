@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, Building2, Shield, GitBranch, Bell, Workflow, FileText, Settings } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { currentUser } from "@/lib/auth";
+import { currentUser } from "@/lib/auth/server";
 
 /**
  * FRAMEWORK DASHBOARD

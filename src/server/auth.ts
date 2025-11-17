@@ -1,5 +1,5 @@
 import { authConfig } from "@/config/auth";
-import { comparePassword } from "@/lib/compare";
+import { comparePassword } from "@/lib/core/compare";
 import Credentials from "next-auth/providers/credentials";
 import NextAuth from "next-auth";
 import { db } from "@/drizzle/db";

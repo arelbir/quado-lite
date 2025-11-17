@@ -8,7 +8,7 @@ import { type Row } from "@tanstack/react-table"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { getErrorMessage } from "@/lib/handle-error"
+import { getErrorMessage } from "@/lib/core/error"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,

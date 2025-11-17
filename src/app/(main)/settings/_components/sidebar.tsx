@@ -1,5 +1,5 @@
 "use client"
-import { Icons } from "@/components/icons"
+import { Icons } from "@/components/shared/icons"
 import { MenuItem } from "@/components/layout/sidebar/sidebar-container"
 import { ItemLink } from "@/components/layout/sidebar/sidebar-item"
 import { usePathname } from "next/navigation"

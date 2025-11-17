@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { 
   Command,
   CommandEmpty,

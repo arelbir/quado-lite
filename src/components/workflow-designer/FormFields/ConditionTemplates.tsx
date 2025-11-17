@@ -7,7 +7,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { Badge } from '@/components/ui/badge';
 import {
   Popover,

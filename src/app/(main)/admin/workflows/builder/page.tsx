@@ -7,7 +7,7 @@ import { PropertiesPanel } from '@/components/workflow-designer/Panels/Propertie
 import { ValidationPanel } from '@/components/workflow-designer/Panels/ValidationPanel';
 import { CustomFieldsReference } from '@/components/workflow-designer/Panels/CustomFieldsReference';
 import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import { useWorkflowStore } from '@/components/workflow-designer/Hooks/useWorkflowStore';
 import { useAutoSave, loadDraft, clearDraft, hasDraft } from '@/components/workflow-designer/Hooks/useAutoSave';
 import { createVisualWorkflow, getVisualWorkflowById, updateVisualWorkflow } from '@/server/actions/visual-workflow-actions';

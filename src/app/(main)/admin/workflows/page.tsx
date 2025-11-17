@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { getVisualWorkflows } from '@/server/actions/visual-workflow-actions';
 import { WorkflowsTable } from './workflows-table';
 import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/shared/icons';
 import Link from 'next/link';
 
 export const metadata = {

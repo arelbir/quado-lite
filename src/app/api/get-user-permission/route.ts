@@ -2,7 +2,7 @@ import { getMenusByUserId } from "@/server/data/menu";
 import { getUserByEmail } from "@/server/data/user";
 import { getMenusByUserRoles, getUserRoles, isSuperAdmin } from "@/server/data/role-menu";
 import { NextRequest, NextResponse } from "next/server";
-import { getMenuHierarchy } from "@/lib/array-util";
+import { getMenuHierarchy } from "@/lib/core/array";
 import { MenuWithChildren } from "@/drizzle/schema";
 
 export async function GET(request: NextRequest) {

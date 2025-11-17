@@ -6,7 +6,7 @@ import { Cross2Icon } from "@radix-ui/react-icons"
 import type { Table } from "@tanstack/react-table"
 import { DateRange } from "react-day-picker"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "./data-table-view-options"

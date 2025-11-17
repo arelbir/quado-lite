@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 
 interface ProgressBarProps extends React.ComponentPropsWithoutRef<"div"> {
   progress: number;

@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { FadeLoader } from "react-spinners";
 import { useSearchParams } from "next/navigation";
 
-import { FormError } from "@/components/form-error";
+import { FormError } from "@/components/shared/form-error";
 import { newEmailVerification } from "@/server/actions/auth";
-import { FormSuccess } from "@/components/form-succcess";
-import { wait } from "@/lib/utils";
+import { FormSuccess } from "@/components/shared/form-success";
+import { wait } from "@/lib/utils/cn";
 import { signOut } from "next-auth/react";
 
 export const NewVerificationForm = () => {

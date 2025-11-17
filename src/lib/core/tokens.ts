@@ -1,5 +1,4 @@
-
-import { generateUUID } from "./utils";
+import { randomUUID } from "crypto";
 import { getPasswordResetTokenByEmail } from "@/server/data/password-reset-token";
 import { getVerificationTokenByEmail } from "@/server/data/verification-token";
 import { getNewEmailVerificationTokenByUserId } from "@/server/data/email-verification-token";
@@ -7,6 +6,8 @@ import { getRegisterVerificationTokenByEmail } from "@/server/data/signup-verifi
 import { newEmailVerificationToken, passwordResetToken, registerVerificationToken, verificationToken } from "@/drizzle/schema";
 import { db } from "@/drizzle/db";
 import { eq } from "drizzle-orm";
+
+const generateUUID = () => randomUUID();
 
 
 export const generatePasswordResetToken = async (email: string) => {

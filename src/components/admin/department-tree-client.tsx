@@ -36,7 +36,7 @@ import {
   Eye
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { useTranslations } from 'next-intl';
 
 interface Department {

@@ -6,7 +6,7 @@ import type { DataTableFilterField, DataTableFilterOption } from "@/types/data-t
 import { CaretSortIcon, PlusIcon } from "@radix-ui/react-icons"
 import type { Table } from "@tanstack/react-table"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 import { Button } from "@/components/ui/button"
 
 import { DataTableFilterItem } from "./data-table-filter-item"

@@ -1,7 +1,7 @@
 import React from 'react'
 import { SettingsTitle } from '../_components/settings-title'
 import { EmailForm } from './_components/email-form'
-import { getLatestUser } from '@/lib/auth'
+import { getLatestUser } from '@/lib/auth/server'
 
 const EmailSettingsPage = async () => {
   const userinfo = await getLatestUser()

@@ -3,12 +3,12 @@
 import { unstable_noStore as noStore, revalidatePath } from "next/cache"
 import { eq, inArray } from "drizzle-orm"
 
-import { getErrorMessage } from "@/lib/handle-error"
+import { getErrorMessage } from "@/lib/core/error"
 
 import { db } from "@/drizzle/db"
 import type { CreateMenuSchema, UpdateMenuSchema } from "./validations"
 import { menuTable } from "@/drizzle/schema"
-import { currentUser } from "@/lib/auth"
+import { currentUser } from "@/lib/auth/server"
 
 
 // export async function seedTasks(

@@ -3,8 +3,8 @@ import { format, toDate } from "date-fns"
 import { eq, inArray, isNotNull } from "drizzle-orm";
 import { user, Theme, UserStatus, userMenuTable } from "@/drizzle/schema";
 import { userRoles as userRolesTable } from "@/drizzle/schema/role-system";
-import { currentUser } from "@/lib/auth";
-import to from "@/lib/utils";
+import { currentUser } from "@/lib/auth/server";
+import to from "@/lib/utils/cn";
 import { SignupSchema } from "@/schema/auth";
 import { z } from "zod";
 import { env } from "@/env";

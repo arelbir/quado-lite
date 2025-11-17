@@ -1,4 +1,4 @@
-import { getLatestUser } from "@/lib/auth"
+import { getLatestUser } from "@/lib/auth/server"
 import { SettingsTitle } from "../_components/settings-title"
 import { AppearanceForm } from "./_components/appearance-form"
 

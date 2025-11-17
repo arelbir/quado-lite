@@ -4,17 +4,17 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Sheet, SheetTrigger, SheetContent } from '@/components/ui/sheet'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import ThemeToggle from '@/components/theme-toggle'
+import ThemeToggle from '@/components/shared/theme-toggle'
 import { UserDropdown } from './user-dropdown'
-import { Icons } from '@/components/icons'
+import { Icons } from '@/components/shared/icons'
 import { HeaderBreadcrumb } from './breadcrumb'
-import { getLatestUser } from '@/lib/auth'
-import { cn } from '@/lib/utils'
+import { getLatestUser } from '@/lib/auth/server'
+import { cn } from '@/lib/utils/cn'
 import { getGithubStar } from '@/server/other'
 import { Skeleton } from '@/components/ui/skeleton'
 import { NotificationBell } from '@/components/notifications/notification-bell'
 import { getUnreadCount } from '@/server/actions/notification-actions'
-import { LanguageSwitcher } from '@/components/language-switcher'
+import { LanguageSwitcher } from '@/components/shared/language-switcher'
 
 
 
