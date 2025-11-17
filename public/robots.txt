@@ -1,0 +1,16 @@
+# robots.txt for Enterprise Audit Management System
+
+User-agent: *
+Allow: /
+Allow: /landing
+Allow: /deployment-docs/
+Allow: /docs/
+
+Disallow: /admin/
+Disallow: /api/
+Disallow: /denetim/
+Disallow: /settings/
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://yourdomain.com/sitemap.xml
