@@ -1,0 +1,136 @@
+{
+  "hero": {
+    "title": "Enterprise Audit Management System",
+    "subtitle": "Kurumsal denetim yönetim sistemi",
+    "description": "Enterprise-grade audit management system with advanced workflow engine, 4-layer RBAC, and comprehensive CAPA tracking. ISO compliant, production-ready.",
+    "cta": {
+      "docs": "View Documentation",
+      "github": "View on GitHub",
+      "start": "Get Started"
+    },
+    "badge": "Production Ready"
+  },
+  "features": {
+    "title": "Features",
+    "subtitle": "Everything you need for enterprise audit processes",
+    "list": [
+      {
+        "title": "Audit Management",
+        "description": "Template-based audits, scoring & risk assessment. Comprehensive audit templates and automatic score calculation."
+      },
+      {
+        "title": "Finding Tracking",
+        "description": "Finding management with severity classification. Criticality-based finding management and tracking system."
+      },
+      {
+        "title": "CAPA Workflows",
+        "description": "Simple actions & 8-step DOF process (ISO compliant). Simple actions and ISO-compliant 8-step DOF process."
+      },
+      {
+        "title": "4-Layer RBAC",
+        "description": "Admin bypass, role-based, workflow-based, ownership-based permissions. Multi-layered secure authorization system."
+      },
+      {
+        "title": "Workflow Engine",
+        "description": "Visual builder with auto-assignment strategies. Visual workflow designer and automatic assignment strategies."
+      },
+      {
+        "title": "Real-time Dashboard",
+        "description": "Task tracking and analytics. Real-time task tracking and analytical reporting."
+      },
+      {
+        "title": "Smart Notifications",
+        "description": "Email alerts and deadline monitoring. Smart notifications and deadline tracking system."
+      },
+      {
+        "title": "Multi-language",
+        "description": "Turkish & English support. Full Turkish and English language support."
+      }
+    ]
+  },
+  "tech": {
+    "title": "Tech Stack",
+    "subtitle": "Modern, reliable, and scalable technologies",
+    "frontend": {
+      "title": "Frontend",
+      "items": ["Next.js 15", "React", "TypeScript", "Tailwind CSS v4", "shadcn/ui"]
+    },
+    "backend": {
+      "title": "Backend",
+      "items": ["Next.js Server Actions", "Drizzle ORM", "PostgreSQL", "Redis"]
+    },
+    "other": {
+      "title": "Other",
+      "items": ["NextAuth.js v5", "BullMQ", "Resend", "UploadThing", "next-intl"]
+    }
+  },
+  "architecture": {
+    "title": "System Architecture",
+    "subtitle": "Layered structure following Clean Architecture principles",
+    "layers": [
+      {
+        "title": "Frontend Layer",
+        "description": "Next.js 15 + React + TypeScript + shadcn/ui. Server Components and Client Components."
+      },
+      {
+        "title": "Server Actions Layer",
+        "description": "action-actions, dof-actions, finding-actions, audit-actions, workflow-actions."
+      },
+      {
+        "title": "Permission Layer",
+        "description": "Unified permission checker. 4-layer model: Admin bypass, Role-based, Workflow-based, Ownership-based."
+      },
+      {
+        "title": "Database Layer",
+        "description": "PostgreSQL + Drizzle ORM. Users, Roles, Permissions, Workflows, Audits, Findings, Actions, DOFs."
+      }
+    ]
+  },
+  "deployment": {
+    "title": "Deployment Options",
+    "subtitle": "Deploy easily on your preferred platform",
+    "options": [
+      {
+        "title": "Vercel",
+        "description": "Recommended deployment platform. Zero-config, automatic HTTPS.",
+        "tag": "Recommended"
+      },
+      {
+        "title": "Docker",
+        "description": "Containerized deployment. Easy setup with Docker Compose."
+      },
+      {
+        "title": "Railway",
+        "description": "Alternative cloud platform. Quick and easy deployment."
+      }
+    ]
+  },
+  "stats": {
+    "title": "Project Statistics",
+    "items": [
+      {
+        "label": "Lines of Code",
+        "value": "50,000+"
+      },
+      {
+        "label": "Components",
+        "value": "200+"
+      },
+      {
+        "label": "Database Tables",
+        "value": "40+"
+      },
+      {
+        "label": "Quality Score",
+        "value": "9.5/10"
+      }
+    ]
+  },
+  "footer": {
+    "description": "Built with ❤️ using amazing open-source tools",
+    "docs": "Documentation",
+    "deployment": "Deployment Guide",
+    "testing": "Testing Guide",
+    "license": "MIT License"
+  }
+}
