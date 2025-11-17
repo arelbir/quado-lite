@@ -25,7 +25,7 @@ import { seedRoleMenus } from "./10-role-menus";
 async function masterSeed() {
   console.log("\n");
   console.log("═══════════════════════════════════════════════════");
-  console.log("🌱 MASTER SEED - 150-Person Company");
+  console.log("🌱 MASTER SEED - Generic Framework (10 Users)");
   console.log("═══════════════════════════════════════════════════");
 
   try {
@@ -63,7 +63,7 @@ async function masterSeed() {
     console.log("  ✅ 5 Branches (with managers)");
     console.log("  ✅ 12 Departments (with managers)");
     console.log("  ✅ 15 Positions (Hierarchical)");
-    console.log("  ✅ 150 Users (Realistic distribution)");
+    console.log("  ✅ 10 Users (Demo team)");
     console.log("  ✅ 4 System Roles (RBAC)");
     console.log("  ✅ Core Menu Items");
     console.log("  ✅ 10 Teams (with leaders)");
