@@ -75,11 +75,11 @@ export async function POST(request: NextRequest) {
     const [notification] = await db
       .insert(notifications)
       .values({
-        userId,
-        category,
+        userId: userId,
+        category: category as any,
         title,
         message,
-        relatedEntityType,
+        relatedEntityType: relatedEntityType as any,
         relatedEntityId,
       })
       .returning();
