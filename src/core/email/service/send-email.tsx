@@ -65,7 +65,7 @@ export async function sendPasswordResetEmail(
 
   // Production: Send via SMTP
   try {
-    const html = render(<MagicLinkEmail magicLink={resetLink} previewTitle={subject} />);
+    const html = await render(<MagicLinkEmail magicLink={resetLink} previewTitle={subject} />);
     
     const result = await SMTPEmailService.send({
       to: email,
@@ -104,7 +104,7 @@ export async function sendRegisterEmail({
 
   // Production: Send via SMTP
   try {
-    const html = render(<MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />);
+    const html = await render(<MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />);
     
     const result = await SMTPEmailService.send({
       to: email,

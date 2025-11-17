@@ -1,8 +1,6 @@
 "use server";
 
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { SMTPEmailService } from '@/lib/email/smtp';
 
 interface BaseEmailData {
   to: string | string[];
@@ -13,7 +11,7 @@ interface BaseEmailData {
 
 /**
  * GENERIC EMAIL SERVICE - Framework Core
- * Basic email sending functionality
+ * SMTP-based email sending (vendor-free)
  * 
  * For domain-specific email templates:
  * - Create your own email templates in your domain module
@@ -21,27 +19,19 @@ interface BaseEmailData {
  */
 export class EmailService {
   /**
-   * Generic email sender
+   * Generic email sender via SMTP
    */
   static async send(data: BaseEmailData) {
     try {
-      const emailPayload: any = {
-        from: process.env.SMTP_FROM || 'Enterprise Framework <noreply@framework.com>',
+      // Use SMTP service instead of Resend
+      const result = await SMTPEmailService.send({
         to: data.to,
         subject: data.subject,
-      };
+        html: data.html,
+        text: data.text || data.subject, // Fallback to subject if no text
+      });
 
-      if (data.html) emailPayload.html = data.html;
-      if (data.text) emailPayload.text = data.text;
-
-      // Fallback: if neither html nor text provided, use subject as text
-      if (!data.html && !data.text) {
-        emailPayload.text = data.subject;
-      }
-
-      await resend.emails.send(emailPayload);
-
-      return { success: true };
+      return result;
     } catch (error) {
       console.error('Error sending email:', error);
       return { success: false, error };
