@@ -27,7 +27,10 @@ export function NotificationBell({ userId }: NotificationBellProps) {
     try {
       const response = await fetch(`/api/notifications?userId=${userId}`);
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as {
+          notifications: any[];
+          unreadCount: number;
+        };
         setNotifications(data.notifications || []);
         setUnreadCount(data.unreadCount || 0);
       }

@@ -55,7 +55,14 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json() as {
+      userId: string;
+      category: string;
+      title: string;
+      message: string;
+      relatedEntityType?: string;
+      relatedEntityId?: string;
+    };
     const { userId, category, title, message, relatedEntityType, relatedEntityId } = body;
 
     if (!userId || !category || !title || !message) {

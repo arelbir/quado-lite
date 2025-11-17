@@ -9,7 +9,7 @@ import { eq, and } from "drizzle-orm";
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json() as { userId: string };
     const { userId } = body;
 
     if (!userId) {
