@@ -50,39 +50,16 @@ const SYSTEM_ROLES = [
     isSystem: true,
   },
   
-  // Quality Management Roles
-  {
-    name: "Quality Manager",
-    code: "QUALITY_MANAGER",
-    description: "Manage quality systems, approve audits, findings, and DOFs",
-    category: "Functional" as const,
-    scope: "Department" as const,
-    isSystem: false,
-  },
-  {
-    name: "Auditor",
-    code: "AUDITOR",
-    description: "Conduct audits, create findings",
-    category: "Functional" as const,
-    scope: "Global" as const,
-    isSystem: false,
-  },
-  {
-    name: "Process Owner",
-    code: "PROCESS_OWNER",
-    description: "Manage processes, close findings, manage actions",
-    category: "Functional" as const,
-    scope: "Department" as const,
-    isSystem: false,
-  },
-  {
-    name: "Action Owner",
-    code: "ACTION_OWNER",
-    description: "Complete assigned corrective/preventive actions",
-    category: "Functional" as const,
-    scope: "Global" as const,
-    isSystem: false,
-  },
+  // Add your domain-specific roles here
+  // Example:
+  // {
+  //   name: "Custom Role",
+  //   code: "CUSTOM_ROLE",
+  //   description: "Your role description",
+  //   category: "Functional" as const,
+  //   scope: "Department" as const,
+  //   isSystem: false,
+  // },
 ];
 
 /**
@@ -90,43 +67,6 @@ const SYSTEM_ROLES = [
  * Granular permissions (Resource + Action)
  */
 const PERMISSIONS = [
-  // Audit Permissions
-  { code: "audit.create", resource: "Audit", action: "Create", category: "Audit Management", name: "Create Audit" },
-  { code: "audit.read", resource: "Audit", action: "Read", category: "Audit Management", name: "View Audit" },
-  { code: "audit.update", resource: "Audit", action: "Update", category: "Audit Management", name: "Update Audit" },
-  { code: "audit.delete", resource: "Audit", action: "Delete", category: "Audit Management", name: "Delete Audit" },
-  { code: "audit.approve", resource: "Audit", action: "Approve", category: "Audit Management", name: "Approve Audit" },
-  { code: "audit.export", resource: "Audit", action: "Export", category: "Audit Management", name: "Export Audit" },
-  
-  // Finding Permissions
-  { code: "finding.create", resource: "Finding", action: "Create", category: "Finding Management", name: "Create Finding" },
-  { code: "finding.read", resource: "Finding", action: "Read", category: "Finding Management", name: "View Finding" },
-  { code: "finding.update", resource: "Finding", action: "Update", category: "Finding Management", name: "Update Finding" },
-  { code: "finding.delete", resource: "Finding", action: "Delete", category: "Finding Management", name: "Delete Finding" },
-  { code: "finding.assign", resource: "Finding", action: "Assign", category: "Finding Management", name: "Assign Finding" },
-  { code: "finding.close", resource: "Finding", action: "Close", category: "Finding Management", name: "Close Finding" },
-  { code: "finding.approve", resource: "Finding", action: "Approve", category: "Finding Management", name: "Approve Finding" },
-  { code: "finding.reject", resource: "Finding", action: "Reject", category: "Finding Management", name: "Reject Finding" },
-  
-  // Action Permissions
-  { code: "action.create", resource: "Action", action: "Create", category: "Action Management", name: "Create Action" },
-  { code: "action.read", resource: "Action", action: "Read", category: "Action Management", name: "View Action" },
-  { code: "action.update", resource: "Action", action: "Update", category: "Action Management", name: "Update Action" },
-  { code: "action.delete", resource: "Action", action: "Delete", category: "Action Management", name: "Delete Action" },
-  { code: "action.complete", resource: "Action", action: "Complete", category: "Action Management", name: "Complete Action" },
-  { code: "action.approve", resource: "Action", action: "Approve", category: "Action Management", name: "Approve Action" },
-  { code: "action.reject", resource: "Action", action: "Reject", category: "Action Management", name: "Reject Action" },
-  { code: "action.cancel", resource: "Action", action: "Cancel", category: "Action Management", name: "Cancel Action" },
-  
-  // DOF Permissions
-  { code: "dof.create", resource: "DOF", action: "Create", category: "DOF Management", name: "Create DOF" },
-  { code: "dof.read", resource: "DOF", action: "Read", category: "DOF Management", name: "View DOF" },
-  { code: "dof.update", resource: "DOF", action: "Update", category: "DOF Management", name: "Update DOF" },
-  { code: "dof.delete", resource: "DOF", action: "Delete", category: "DOF Management", name: "Delete DOF" },
-  { code: "dof.submit", resource: "DOF", action: "Submit", category: "DOF Management", name: "Submit DOF" },
-  { code: "dof.approve", resource: "DOF", action: "Approve", category: "DOF Management", name: "Approve DOF" },
-  { code: "dof.reject", resource: "DOF", action: "Reject", category: "DOF Management", name: "Reject DOF" },
-  
   // User Permissions
   { code: "user.create", resource: "User", action: "Create", category: "User Management", name: "Create User" },
   { code: "user.read", resource: "User", action: "Read", category: "User Management", name: "View User" },
@@ -147,9 +87,21 @@ const PERMISSIONS = [
   { code: "role.delete", resource: "Role", action: "Delete", category: "System Management", name: "Delete Role" },
   
   // Report Permissions
-  { code: "report.audit", resource: "Report", action: "Export", category: "Reporting", name: "Export Audit Reports" },
-  { code: "report.finding", resource: "Report", action: "Export", category: "Reporting", name: "Export Finding Reports" },
-  { code: "report.dof", resource: "Report", action: "Export", category: "Reporting", name: "Export DOF Reports" },
+  { code: "report.export", resource: "Report", action: "Export", category: "Reporting", name: "Export Reports" },
+  { code: "report.create", resource: "Report", action: "Create", category: "Reporting", name: "Create Report" },
+  { code: "report.read", resource: "Report", action: "Read", category: "Reporting", name: "View Report" },
+  
+  // Workflow Permissions
+  { code: "workflow.create", resource: "Workflow", action: "Create", category: "Workflow Management", name: "Create Workflow" },
+  { code: "workflow.read", resource: "Workflow", action: "Read", category: "Workflow Management", name: "View Workflow" },
+  { code: "workflow.update", resource: "Workflow", action: "Update", category: "Workflow Management", name: "Update Workflow" },
+  { code: "workflow.delete", resource: "Workflow", action: "Delete", category: "Workflow Management", name: "Delete Workflow" },
+  { code: "workflow.approve", resource: "Workflow", action: "Approve", category: "Workflow Management", name: "Approve in Workflow" },
+  { code: "workflow.reject", resource: "Workflow", action: "Reject", category: "Workflow Management", name: "Reject in Workflow" },
+  
+  // Notification Permissions
+  { code: "notification.read", resource: "Notification", action: "Read", category: "System", name: "View Notifications" },
+  { code: "notification.send", resource: "Notification", action: "Send", category: "System", name: "Send Notifications" },
   
   // Custom Fields Permissions
   { code: "customfield.create", resource: "CustomField", action: "Create", category: "System Management", name: "Create Custom Field" },
@@ -168,84 +120,35 @@ const ROLE_PERMISSION_MAPPINGS: Record<string, string[] | "all"> = {
   
   // Admin: Most permissions except system management
   ADMIN: [
-    // Audit
-    "audit.create", "audit.read", "audit.update", "audit.delete", "audit.approve", "audit.export",
-    // Finding
-    "finding.create", "finding.read", "finding.update", "finding.delete", "finding.assign", "finding.close", "finding.approve", "finding.reject",
-    // Action
-    "action.create", "action.read", "action.update", "action.delete", "action.approve", "action.reject", "action.cancel",
-    // DOF
-    "dof.create", "dof.read", "dof.update", "dof.delete", "dof.approve", "dof.reject",
-    // User
+    // User Management
     "user.create", "user.read", "user.update", "user.delete", "user.assign_role",
-    // Department
+    // Organization
     "department.create", "department.read", "department.update", "department.delete",
+    // Workflows
+    "workflow.create", "workflow.read", "workflow.update", "workflow.delete", "workflow.approve", "workflow.reject",
     // Custom Fields
     "customfield.create", "customfield.read", "customfield.update", "customfield.delete",
+    // Notifications
+    "notification.read", "notification.send",
     // Reports
-    "report.audit", "report.finding", "report.dof",
+    "report.export", "report.create", "report.read",
   ],
   
   // Manager: Department-level management
   MANAGER: [
-    "audit.read", "audit.export",
-    "finding.read", "finding.assign",
-    "action.read", "action.approve", "action.reject",
-    "dof.read", "dof.approve", "dof.reject",
     "user.read",
     "department.read",
-    "report.audit", "report.finding", "report.dof",
-  ],
-  
-  // Quality Manager: Full quality system access
-  QUALITY_MANAGER: [
-    "audit.create", "audit.read", "audit.update", "audit.approve", "audit.export",
-    "finding.read", "finding.update", "finding.approve", "finding.reject", "finding.close",
-    "action.read", "action.approve", "action.reject",
-    "dof.read", "dof.approve", "dof.reject",
-    "user.read",
-    "department.read",
-    "customfield.create", "customfield.read", "customfield.update", "customfield.delete",
-    "report.audit", "report.finding", "report.dof",
-  ],
-  
-  // Auditor: Conduct audits and create findings
-  AUDITOR: [
-    "audit.create", "audit.read", "audit.update", "audit.export",
-    "finding.create", "finding.read", "finding.update", "finding.assign",
-    "action.read",
-    "dof.read",
-    "user.read",
-    "department.read",
-  ],
-  
-  // Process Owner: Manage actions and close findings
-  PROCESS_OWNER: [
-    "audit.read",
-    "finding.read", "finding.close",
-    "action.create", "action.read", "action.update", "action.complete", "action.approve", "action.reject",
-    "dof.create", "dof.read", "dof.update", "dof.submit",
-    "user.read",
-    "department.read",
-  ],
-  
-  // Action Owner: Complete assigned actions
-  ACTION_OWNER: [
-    "audit.read",
-    "finding.read",
-    "action.read", "action.complete",
-    "dof.read",
-    "user.read",
+    "workflow.read", "workflow.approve", "workflow.reject",
+    "notification.read",
+    "report.read", "report.export",
   ],
   
   // User: Basic read access
   USER: [
-    "audit.read",
-    "finding.read",
-    "action.read",
-    "dof.read",
     "user.read",
     "department.read",
+    "workflow.read",
+    "notification.read",
   ],
 };
 

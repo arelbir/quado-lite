@@ -9,27 +9,26 @@ interface PageProps {
 }
 
 export default async function CustomFieldsPage({ params }: PageProps) {
-  const entityType = params.entityType.toUpperCase() as 'AUDIT' | 'FINDING' | 'ACTION' | 'DOF';
+  const entityType = params.entityType.toUpperCase();
   
   const result = await getCustomFieldDefinitions(entityType);
   const fields = result.success && result.data ? result.data : [];
 
-  const entityLabels = {
-    AUDIT: 'Audit',
-    FINDING: 'Finding',
-    ACTION: 'Action',
-    DOF: 'DOF'
-  };
+  // Format entity type for display
+  const entityLabel = entityType
+    .split('_')
+    .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(' ');
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">
-          Custom Fields - {entityLabels[entityType]}
+          Custom Fields - {entityLabel}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Add additional fields to {entityLabels[entityType].toLowerCase()} forms
+          Add additional fields to {entityLabel.toLowerCase()} forms
         </p>
       </div>
 

@@ -25,7 +25,8 @@ export type CustomFieldType =
   | 'rating'         // Star rating (1-5)
   | 'slider';        // Numeric slider
 
-export type EntityType = 'AUDIT' | 'FINDING' | 'ACTION' | 'DOF';
+// Generic entity type - can be any string (Document, Workflow, CustomEntity, etc.)
+export type EntityType = string;
 
 export type CustomFieldStatus = 'ACTIVE' | 'ARCHIVED';
 
