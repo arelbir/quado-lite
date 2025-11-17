@@ -87,7 +87,7 @@ export function ConditionalBuilder({
             </>
           ) : (
             <>
-              <Icons.EyeOff className="size-4 mr-2" />
+              <Icons.X className="size-4 mr-2" />
               Disabled
             </>
           )}
