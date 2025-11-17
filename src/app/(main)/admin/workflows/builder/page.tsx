@@ -129,10 +129,15 @@ function WorkflowBuilderContent() {
 
   const performSave = async (
     name: string,
-    module: "DOF" | "ACTION" | "FINDING" | "AUDIT" | "",
+    module: string,
   ) => {
-    if (!module || !["DOF", "ACTION", "FINDING", "AUDIT"].includes(module)) {
-      toast.error(tWorkflow("messages.invalidModule"));
+    if (!module || module.trim() === "") {
+      toast.error("Please select an entity type");
+      return;
+    }
+
+    if (!name || name.trim() === "") {
+      toast.error("Please enter a workflow name");
       return;
     }
 
@@ -220,67 +225,134 @@ function WorkflowBuilderContent() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* Header */}
-      <div className="border-b p-4 flex items-center justify-between bg-background">
-        <div>
-          <h1 className="text-2xl font-bold">
-            {isEditMode
-              ? tWorkflow("builder.header.titleEdit", { name: workflowName })
-              : tWorkflow("builder.header.title")}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {isEditMode && workflowModule
-              ? tWorkflow("builder.header.subtitleEdit", {
-                  module: tWorkflow(`modules.${workflowModule}` as any),
-                })
-              : tWorkflow("builder.header.subtitle")}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <WorkflowTemplatesPanel />
-          <Button variant="outline" onClick={handleClear}>
-            <Icons.Trash className="size-4 mr-2" />
-            {tCommon("actions.clear")}
-          </Button>
-          <Button onClick={handleSave}>
-            <Icons.Save className="size-4 mr-2" />
-            {isEditMode
-              ? tCommon("actions.update")
-              : tCommon("actions.save")}
-          </Button>
+    <div className="h-screen flex flex-col bg-background">
+      {/* Modern Header with Stats */}
+      <div className="border-b bg-gradient-to-r from-background to-muted/20">
+        <div className="px-6 py-4 flex items-center justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Icons.Workflow className="size-5 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight">
+                  {isEditMode ? workflowName : "Workflow Builder"}
+                </h1>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  {isEditMode && workflowModule && (
+                    <span className="flex items-center gap-1">
+                      <Icons.Tag className="size-3" />
+                      {workflowModule}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1">
+                    <Icons.Box className="size-3" />
+                    {nodes.length} nodes
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Icons.Network className="size-3" />
+                    {edges.length} connections
+                  </span>
+                  <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <Icons.CheckCircle2 className="size-3" />
+                    Auto-saved
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <WorkflowTemplatesPanel />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleClear}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <Icons.Trash2 className="size-4 mr-2" />
+              Clear
+            </Button>
+            <Button 
+              size="sm"
+              onClick={handleSave}
+              className="bg-primary hover:bg-primary/90"
+            >
+              <Icons.Save className="size-4 mr-2" />
+              {isEditMode ? "Update" : "Save"}
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - Improved Layout */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Toolbar */}
-        <div className="w-64 border-r bg-muted/30 overflow-y-auto flex flex-col gap-4 p-4">
-          <ToolbarPanel />
-          <NodeTemplatesPanel />
+        {/* Left Sidebar - Wider */}
+        <div className="w-80 border-r bg-muted/20 overflow-y-auto">
+          <div className="p-4 space-y-4">
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                Node Library
+              </h3>
+              <ToolbarPanel />
+            </div>
+            <NodeTemplatesPanel />
+          </div>
         </div>
 
-        {/* Center Canvas */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1">
+        {/* Center Canvas - More Space */}
+        <div className="flex-1 flex flex-col relative">
+          {/* Canvas */}
+          <div className="flex-1 relative">
             <WorkflowCanvas />
+            
+            {/* Floating Quick Stats */}
+            <div className="absolute bottom-4 left-4 z-10">
+              <div className="bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg px-3 py-2">
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="flex items-center gap-1.5">
+                    <div className="size-2 rounded-full bg-green-500" />
+                    <span className="text-muted-foreground">Ready</span>
+                  </span>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-muted-foreground">
+                    Press <kbd className="px-1.5 py-0.5 bg-muted rounded">Del</kbd> to delete
+                  </span>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-muted-foreground">
+                    <kbd className="px-1.5 py-0.5 bg-muted rounded">Shift</kbd> to multi-select
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           
-          {/* Validation Panel at bottom */}
-          <div className="border-t p-4 bg-background">
-            <ValidationPanel />
+          {/* Validation Panel - Compact */}
+          <div className="border-t bg-muted/10">
+            <div className="px-4 py-3">
+              <ValidationPanel />
+            </div>
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="w-96 border-l overflow-y-auto flex flex-col">
-          {/* Node Properties */}
-          <div className="flex-1 border-b">
-            <PropertiesPanel />
-          </div>
-          {/* Custom Fields Reference */}
-          <div className="p-4">
-            <CustomFieldsReference module={workflowModule} />
+        {/* Right Sidebar - Better Organized */}
+        <div className="w-[400px] border-l bg-background overflow-y-auto">
+          <div className="flex flex-col h-full">
+            {/* Properties Section */}
+            <div className="flex-1 border-b">
+              <div className="p-4">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  Properties
+                </h3>
+                <PropertiesPanel />
+              </div>
+            </div>
+            
+            {/* Custom Fields Section */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4">
+                <CustomFieldsReference module={workflowModule} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
