@@ -19,8 +19,8 @@ import { checkPermission } from '@/core/permissions/unified-permission-checker';
 export async function createGroup(data: {
   name: string;
   description?: string;
-  type: 'INTEREST' | 'SKILL' | 'COMMUNITY' | 'PROJECT';
-  visibility: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
+  type: 'Functional' | 'Project' | 'Committee' | 'Custom';
+  visibility: 'Public' | 'Private' | 'Restricted';
   departmentId?: string;
 }): Promise<any> {
   return withAuth<any>(async (user: any) => {
@@ -48,12 +48,14 @@ export async function createGroup(data: {
         .returning();
 
       // Add creator as owner
-      await db.insert(groupMembers).values({
-        groupId: group.id,
-        userId: user.id,
-        role: 'OWNER',
-        joinedAt: new Date(),
-      });
+      if (group) {
+        await db.insert(groupMembers).values({
+          groupId: group.id,
+          userId: user.id,
+          role: 'Owner',
+          joinedAt: new Date(),
+        });
+      }
 
       revalidatePath('/admin/groups');
       return { success: true, data: group };
@@ -72,8 +74,8 @@ export async function updateGroup(
   data: {
     name?: string;
     description?: string;
-    type?: 'INTEREST' | 'SKILL' | 'COMMUNITY' | 'PROJECT';
-    visibility?: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
+    type?: 'Functional' | 'Project' | 'Committee' | 'Custom';
+    visibility?: 'Public' | 'Private' | 'Restricted';
     departmentId?: string;
     isActive?: boolean;
   }
@@ -139,7 +141,7 @@ export async function deleteGroup(id: string): Promise<any> {
         .where(eq(groups.id, id));
 
       revalidatePath('/admin/groups');
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[deleteGroup] Error:', error);
       return { success: false, error: 'Failed to delete group' };
@@ -153,7 +155,7 @@ export async function deleteGroup(id: string): Promise<any> {
 export async function addGroupMember(data: {
   groupId: string;
   userId: string;
-  role?: 'OWNER' | 'ADMIN' | 'MEMBER';
+  role?: 'Owner' | 'Admin' | 'Lead' | 'Member';
 }): Promise<any> {
   return withAuth<any>(async (user: any) => {
     const perm = await checkPermission({
@@ -184,7 +186,7 @@ export async function addGroupMember(data: {
         .values({
           groupId: data.groupId,
           userId: data.userId,
-          role: data.role || 'MEMBER',
+          role: data.role || 'Member',
           joinedAt: new Date(),
         })
         .returning();
@@ -227,7 +229,7 @@ export async function removeGroupMember(data: {
         );
 
       revalidatePath(`/admin/groups/${data.groupId}`);
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[removeGroupMember] Error:', error);
       return { success: false, error: 'Failed to remove member' };
@@ -241,7 +243,7 @@ export async function removeGroupMember(data: {
 export async function updateGroupMemberRole(data: {
   groupId: string;
   userId: string;
-  role: 'OWNER' | 'ADMIN' | 'MEMBER';
+  role: 'Owner' | 'Admin' | 'Lead' | 'Member';
 }): Promise<any> {
   return withAuth<any>(async (user: any) => {
     const perm = await checkPermission({
@@ -325,7 +327,7 @@ export async function joinGroup(groupId: string): Promise<any> {
         return { success: false, error: 'Group not found' };
       }
 
-      if (group.visibility !== 'PUBLIC') {
+      if (group.visibility !== 'Public') {
         return { success: false, error: 'Group is not public' };
       }
 
@@ -346,7 +348,7 @@ export async function joinGroup(groupId: string): Promise<any> {
         .values({
           groupId,
           userId: user.id,
-          role: 'MEMBER',
+          role: 'Member',
           joinedAt: new Date(),
         })
         .returning();
@@ -376,7 +378,7 @@ export async function leaveGroup(groupId: string): Promise<any> {
         );
 
       revalidatePath(`/admin/groups/${groupId}`);
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[leaveGroup] Error:', error);
       return { success: false, error: 'Failed to leave group' };
