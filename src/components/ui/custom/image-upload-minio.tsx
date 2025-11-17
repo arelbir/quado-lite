@@ -59,7 +59,7 @@ export function ImageUploadMinio({ onChange }: ImageUploadProps) {
   const [filesToUpload, setFilesToUpload] = useState<FileUploadProgress[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = async (file: File): Promise<{ url: string; key: string }> => {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -72,7 +72,7 @@ export function ImageUploadMinio({ onChange }: ImageUploadProps) {
       throw new Error('Upload failed');
     }
 
-    const data = await response.json();
+    const data = await response.json() as { success: boolean; url: string; key: string };
     return data;
   };
 
