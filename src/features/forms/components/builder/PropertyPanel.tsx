@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Icons } from '@/components/shared/icons';
 import { Separator } from '@/components/ui/separator';
+import { ConditionalBuilder } from './ConditionalBuilder';
 
 interface PropertyPanelProps {
   field: any | null;
@@ -209,6 +210,18 @@ export function PropertyPanel({ field, onUpdate }: PropertyPanelProps) {
               />
             </div>
           )}
+
+          <Separator />
+
+          {/* Conditional Logic */}
+          <div className="space-y-3">
+            <h4 className="font-medium text-sm">Conditional Logic</h4>
+            <ConditionalBuilder
+              availableFields={[]}
+              value={field.schema['ui:conditional']}
+              onChange={(value) => handleChange('schema.ui:conditional', value)}
+            />
+          </div>
 
           <Separator />
 
