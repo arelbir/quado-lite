@@ -18,6 +18,7 @@ import { checkPermission } from '@/core/permissions/unified-permission-checker';
  */
 export async function createGroup(data: {
   name: string;
+  code: string;
   description?: string;
   type: 'Functional' | 'Project' | 'Committee' | 'Custom';
   visibility: 'Public' | 'Private' | 'Restricted';
@@ -39,9 +40,11 @@ export async function createGroup(data: {
         .insert(groups)
         .values({
           name: data.name,
+          code: data.code,
           description: data.description,
           type: data.type,
           visibility: data.visibility,
+          ownerId: user.id,
           departmentId: data.departmentId,
           createdById: user.id,
         })

@@ -18,6 +18,7 @@ import { checkPermission } from '@/core/permissions/unified-permission-checker';
  */
 export async function createTeam(data: {
   name: string;
+  code: string;
   description?: string;
   type: 'Permanent' | 'Project' | 'Virtual';
   departmentId?: string;
@@ -39,6 +40,7 @@ export async function createTeam(data: {
         .insert(teams)
         .values({
           name: data.name,
+          code: data.code,
           description: data.description,
           type: data.type,
           departmentId: data.departmentId,
