@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getVisualWorkflows } from '@/server/actions/visual-workflow-actions';
+import { getVisualWorkflows } from '@/features/workflows/actions/visual-workflow-actions';
 import { WorkflowsTable } from './workflows-table';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/shared/icons';

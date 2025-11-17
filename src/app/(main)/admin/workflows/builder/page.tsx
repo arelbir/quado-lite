@@ -1,16 +1,16 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { WorkflowCanvas } from '@/components/workflow-designer/Canvas/WorkflowCanvas';
-import { ToolbarPanel } from '@/components/workflow-designer/Panels/ToolbarPanel';
-import { PropertiesPanel } from '@/components/workflow-designer/Panels/PropertiesPanel';
-import { ValidationPanel } from '@/components/workflow-designer/Panels/ValidationPanel';
-import { CustomFieldsReference } from '@/components/workflow-designer/Panels/CustomFieldsReference';
+import { WorkflowCanvas } from '@/features/workflows/components/designer/Canvas/WorkflowCanvas';
+import { ToolbarPanel } from '@/features/workflows/components/designer/Panels/ToolbarPanel';
+import { PropertiesPanel } from '@/features/workflows/components/designer/Panels/PropertiesPanel';
+import { ValidationPanel } from '@/features/workflows/components/designer/Panels/ValidationPanel';
+import { CustomFieldsReference } from '@/features/workflows/components/designer/Panels/CustomFieldsReference';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/shared/icons';
-import { useWorkflowStore } from '@/components/workflow-designer/Hooks/useWorkflowStore';
-import { useAutoSave, loadDraft, clearDraft, hasDraft } from '@/components/workflow-designer/Hooks/useAutoSave';
-import { createVisualWorkflow, getVisualWorkflowById, updateVisualWorkflow } from '@/server/actions/visual-workflow-actions';
+import { useWorkflowStore } from '@/features/workflows/components/designer/Hooks/useWorkflowStore';
+import { useAutoSave, loadDraft, clearDraft, hasDraft } from '@/features/workflows/components/designer/Hooks/useAutoSave';
+import { createVisualWorkflow, getVisualWorkflowById, updateVisualWorkflow } from '@/features/workflows/actions/visual-workflow-actions';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import {

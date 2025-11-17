@@ -12,8 +12,8 @@ import { getLatestUser } from '@/lib/auth/server'
 import { cn } from '@/lib/utils/cn'
 import { getGithubStar } from '@/server/other'
 import { Skeleton } from '@/components/ui/skeleton'
-import { NotificationBell } from '@/components/notifications/notification-bell'
-import { getUnreadCount } from '@/server/actions/notification-actions'
+import { NotificationBell } from '@/features/notifications/components/notification-bell'
+import { getUnreadCount } from '@/features/notifications/actions/notification-actions'
 import { LanguageSwitcher } from '@/components/shared/language-switcher'
 
 

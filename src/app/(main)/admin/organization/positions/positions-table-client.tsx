@@ -8,7 +8,7 @@ import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableFilterField } from "@/types/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { PositionDialog } from "@/components/admin/position-dialog";
+import { PositionDialog } from "@/features/organization/components/position-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { deletePosition } from "@/server/actions/organization-actions";
+import { deletePosition } from "@/features/organization/actions/organization-actions";
 
 interface PositionsTableClientProps {
   positions: Position[];

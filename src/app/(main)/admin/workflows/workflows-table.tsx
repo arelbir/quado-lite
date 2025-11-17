@@ -35,7 +35,7 @@ import {
   archiveVisualWorkflow,
   restoreVisualWorkflow,
   deleteVisualWorkflow,
-} from '@/server/actions/visual-workflow-actions';
+} from '@/features/workflows/actions/visual-workflow-actions';
 import { toast } from 'sonner';
 
 interface Workflow {

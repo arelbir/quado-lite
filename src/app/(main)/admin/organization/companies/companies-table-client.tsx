@@ -8,7 +8,7 @@ import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableFilterField } from "@/types/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { CompanyDialog } from "@/components/admin/company-dialog";
+import { CompanyDialog } from "@/features/organization/components/company-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { deleteCompany } from "@/server/actions/organization-actions";
+import { deleteCompany } from "@/features/organization/actions/organization-actions";
 
 interface CompaniesTableClientProps {
   companies: Company[];

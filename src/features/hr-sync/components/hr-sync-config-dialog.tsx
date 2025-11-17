@@ -34,7 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { createHRSyncConfig, updateHRSyncConfig } from "@/server/actions/hr-sync-actions";
+import { createHRSyncConfig, updateHRSyncConfig } from "@/features/hr-sync/actions/hr-sync-actions";
 import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({

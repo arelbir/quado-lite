@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, Mail, Building2, Briefcase, Shield, Calendar, ArrowLeft, Edit } from "lucide-react";
 import { format } from "date-fns";
-import { UserRoleManagement } from "@/components/admin/user-role-management";
+import { UserRoleManagement } from "@/features/users/components/user-role-management";
 
 export default function UserDetailPage() {
   const searchParams = useSearchParams();

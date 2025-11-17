@@ -17,7 +17,7 @@
 
 import { Queue, Worker, Job, QueueEvents } from 'bullmq';
 import { Redis } from 'ioredis';
-import { LDAPSyncService } from '@/lib/hr-sync/ldap-sync-service';
+import { LDAPSyncService } from '@/features/hr-sync/lib/ldap-sync-service';
 import { db } from '@/core/database/client';
 import { hrSyncLogs, hrSyncConfigs } from '@/core/database/schema/hr-sync';
 import { eq } from 'drizzle-orm';

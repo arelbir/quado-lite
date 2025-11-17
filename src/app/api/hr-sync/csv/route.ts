@@ -24,7 +24,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { importFromCSV } from "@/lib/hr-sync/csv-import-service";
+import { importFromCSV } from "@/features/hr-sync/lib/csv-import-service";
 import { currentUser } from "@/lib/auth/server";
 import { db } from "@/core/database/client";
 import { hrSyncConfigs } from "@/core/database/schema/hr-sync";

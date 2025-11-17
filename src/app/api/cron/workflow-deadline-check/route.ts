@@ -18,8 +18,8 @@ import {
   processOverdueAssignments,
   getApproachingDeadlineAssignments,
   getDeadlineStats,
-} from "@/lib/workflow/deadline-monitor";
-import { notifyDeadlineApproaching } from "@/lib/workflow/workflow-notifications";
+} from "@/features/workflows/lib/deadline-monitor";
+import { notifyDeadlineApproaching } from "@/features/workflows/lib/workflow-notifications";
 
 /**
  * GET endpoint for cron job

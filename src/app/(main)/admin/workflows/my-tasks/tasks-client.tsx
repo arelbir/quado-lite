@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
-import { transitionWorkflow } from "@/server/actions/workflow-actions";
+import { transitionWorkflow } from "@/features/workflows/actions/workflow-actions";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';
 

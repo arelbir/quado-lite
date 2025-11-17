@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getUserRoles } from "@/server/actions/user-actions";
+import { getUserRoles } from "@/features/users/actions/user-actions";
 
 export async function GET(
   request: Request,

@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/shared/icons';
 import { Separator } from '@/components/ui/separator';
-import { getCustomFieldDefinitions } from '@/server/actions/custom-field-definition-actions';
+import { getCustomFieldDefinitions } from '@/features/custom-fields/actions/definition-actions';
 import type { CustomFieldDefinition, EntityType } from '@/lib/types';
 import { toast } from 'sonner';
 import {

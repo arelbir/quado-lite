@@ -1,4 +1,4 @@
-import { getCustomFieldDefinitions } from '@/server/actions/custom-field-definition-actions';
+import { getCustomFieldDefinitions } from '@/features/custom-fields/actions/definition-actions';
 import { CustomFieldsTable } from './CustomFieldsTable';
 import { Card } from '@/components/ui/card';
 

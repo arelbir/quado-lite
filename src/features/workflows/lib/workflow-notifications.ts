@@ -5,7 +5,7 @@
  * Created: 2025-01-25
  */
 
-import { NotificationService } from "@/lib/notifications/notification-service";
+import { NotificationService } from "@/features/notifications/lib/notification-service";
 
 /**
  * Send notification when workflow task is assigned

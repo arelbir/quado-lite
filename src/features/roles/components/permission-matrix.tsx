@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils/cn";
-import { updateRolePermissions } from "@/server/actions/role-actions";
+import { updateRolePermissions } from "@/features/roles/actions/role-actions";
 
 interface Permission {
   id: string;

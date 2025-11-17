@@ -14,7 +14,7 @@
 import { db } from "@/core/database/client";
 import { workflowDefinitions } from "@/core/database/schema";
 import { eq, and } from "drizzle-orm";
-import { getCustomFieldValues } from "@/server/actions/custom-field-value-actions";
+import { getCustomFieldValues } from "@/features/custom-fields/actions/value-actions";
 
 /**
  * Cache for workflow definition IDs (to avoid repeated DB queries)

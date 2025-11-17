@@ -43,7 +43,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { createBranch, updateBranch } from "@/server/actions/organization-actions";
+import { createBranch, updateBranch } from "@/features/organization/actions/organization-actions";
 import { Loader2 } from "lucide-react";
 import type { Branch, Company } from "@/lib/types";
 import { useTranslations } from 'next-intl';

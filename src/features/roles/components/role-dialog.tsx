@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { createRole, updateRole } from "@/server/actions/role-actions";
+import { createRole, updateRole } from "@/features/roles/actions/role-actions";
 import { useTranslations } from 'next-intl';
 import type { roles, permissions } from "@/core/database/schema/role-system";
 

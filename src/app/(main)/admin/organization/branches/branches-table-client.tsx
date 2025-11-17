@@ -8,7 +8,7 @@ import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableFilterField } from "@/types/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { BranchDialog } from "@/components/admin/branch-dialog";
+import { BranchDialog } from "@/features/organization/components/branch-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { deleteBranch } from "@/server/actions/organization-actions";
+import { deleteBranch } from "@/features/organization/actions/organization-actions";
 import type { Company, BranchWithRelations } from "@/lib/types";
 
 interface BranchesTableClientProps {

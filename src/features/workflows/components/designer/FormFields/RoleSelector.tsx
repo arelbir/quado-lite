@@ -28,7 +28,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { getWorkflowRoles, getWorkflowUsers, getWorkflowDepartments } from '@/server/actions/workflow-data-actions';
+import { getWorkflowRoles, getWorkflowUsers, getWorkflowDepartments } from '@/features/workflows/actions/workflow-data-actions';
 import { useTranslations } from 'next-intl';
 
 // Static dynamic assignment templates (no need for server action)

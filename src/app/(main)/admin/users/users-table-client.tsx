@@ -9,7 +9,7 @@ import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableFilterField } from "@/types/data-table";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { UserDialog } from "@/components/admin/user-dialog";
+import { UserDialog } from "@/features/users/components/user-dialog";
 import { useTranslations } from 'next-intl';
 import {
   AlertDialog,
@@ -21,8 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { deleteUser } from "@/server/actions/user-actions";
-import { BulkRoleAssignment } from "@/components/admin/bulk-role-assignment";
+import { deleteUser } from "@/features/users/actions/user-actions";
+import { BulkRoleAssignment } from "@/features/roles/components/bulk-role-assignment";
 import { Users } from "lucide-react";
 
 interface Company {

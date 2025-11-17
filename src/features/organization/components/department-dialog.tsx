@@ -44,7 +44,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { createDepartment, updateDepartment } from "@/server/actions/department-actions";
+import { createDepartment, updateDepartment } from "@/features/organization/actions/department-actions";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from 'next-intl';
 

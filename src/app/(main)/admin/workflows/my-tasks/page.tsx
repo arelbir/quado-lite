@@ -1,4 +1,4 @@
-import { getMyWorkflowTasks } from "@/server/actions/workflow-actions";
+import { getMyWorkflowTasks } from "@/features/workflows/actions/workflow-actions";
 import { WorkflowTasksClient } from "./tasks-client";
 
 export default async function MyWorkflowTasksPage() {

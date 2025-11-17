@@ -15,7 +15,7 @@
 
 import { Metadata } from "next";
 import { db } from "@/core/database/client";
-import { OrgChartView } from "@/components/admin/org-chart-view";
+import { OrgChartView } from "@/features/organization/components/org-chart-view";
 
 export const metadata: Metadata = {
   title: "Organization Chart | Admin",

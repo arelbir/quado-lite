@@ -41,7 +41,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { updateUser, createUser } from "@/server/actions/user-actions";
+import { updateUser, createUser } from "@/features/users/actions/user-actions";
 import { Loader2 } from "lucide-react";
 import type { User as UserType } from "@/lib/types";
 import { useTranslations } from 'next-intl';

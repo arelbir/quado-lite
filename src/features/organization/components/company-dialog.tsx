@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { createCompany, updateCompany } from "@/server/actions/organization-actions";
+import { createCompany, updateCompany } from "@/features/organization/actions/organization-actions";
 import { Loader2 } from "lucide-react";
 import type { Company } from "@/lib/types";
 import { useTranslations } from 'next-intl';

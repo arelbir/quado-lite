@@ -3,7 +3,7 @@
 import { utapi } from "@/server/uploadthing"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
-import { updateProfile } from "./user"
+import { getLatestUser } from "@/features/auth";
 
 const uploadthingDeleteFilesSchema = z.string()
 
@@ -16,9 +16,7 @@ export const deleteUploadthingFiles = async (params: z.infer<typeof uploadthingD
   }
  
   const res = await utapi.deleteFiles(result.data)
-  if (res.success) {
-    updateProfile({ image: "" })
-  }
+  // Note: updateProfile needs to be called separately after file deletion
   revalidatePath("/", "layout")
   revalidatePath("/settings/profile", "page")
   return res

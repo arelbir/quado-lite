@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getRoleById } from "@/server/actions/role-actions";
+import { getRoleById } from "@/features/roles/actions/role-actions";
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   try {

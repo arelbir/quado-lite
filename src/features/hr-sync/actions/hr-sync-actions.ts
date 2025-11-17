@@ -11,7 +11,7 @@ import {
   createPermissionError,
 } from "@/lib/helpers/error-helpers";
 import { checkPermission } from "@/core/permissions/unified-permission-checker";
-import { addHRSyncJob, getQueueStatus, cancelSyncJob } from "@/lib/queue/hr-sync-queue";
+import { addHRSyncJob, getQueueStatus, cancelSyncJob } from "@/features/notifications/lib/hr-sync-queue";
 
 interface ActionResponse {
   success: boolean;

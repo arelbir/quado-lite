@@ -17,7 +17,7 @@ import { db } from "@/core/database/client";
 import { eq } from "drizzle-orm";
 import { roles } from "@/core/database/schema";
 import { notFound } from "next/navigation";
-import { PermissionMatrix } from "@/components/admin/permission-matrix";
+import { PermissionMatrix } from "@/features/roles/components/permission-matrix";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield } from "lucide-react";

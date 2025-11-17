@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/shared/icons';
 import { CustomFieldDialog } from './CustomFieldDialog';
-import { deleteCustomFieldDefinition } from '@/server/actions/custom-field-definition-actions';
+import { deleteCustomFieldDefinition } from '@/features/custom-fields/actions/definition-actions';
 import { toast } from 'sonner';
 import type { CustomFieldDefinition, EntityType } from '@/lib/types';
 import {

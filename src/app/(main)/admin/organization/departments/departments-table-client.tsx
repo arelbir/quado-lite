@@ -7,8 +7,8 @@ import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar"
 import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableFilterField } from "@/types/data-table";
 import { createColumns, type Department } from "./columns";
-import { DepartmentDialog } from "@/components/admin/department-dialog";
-import { deleteDepartment } from "@/server/actions/department-actions";
+import { DepartmentDialog } from "@/features/organization/components/department-dialog";
+import { deleteDepartment } from "@/features/organization/actions/department-actions";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";

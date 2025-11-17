@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { createCustomFieldDefinition, updateCustomFieldDefinition } from '@/server/actions/custom-field-definition-actions';
+import { createCustomFieldDefinition, updateCustomFieldDefinition } from '@/features/custom-fields/actions/definition-actions';
 import { toast } from 'sonner';
 import type { CustomFieldDefinition, EntityType } from '@/lib/types';
 

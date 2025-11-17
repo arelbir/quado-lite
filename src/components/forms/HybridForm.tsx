@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCustomFieldDefinitions } from '@/server/actions/custom-field-definition-actions';
-import { getCustomFieldValues } from '@/server/actions/custom-field-value-actions';
+import { getCustomFieldDefinitions } from '@/features/custom-fields/actions/definition-actions';
+import { getCustomFieldValues } from '@/features/custom-fields/actions/value-actions';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import type { CustomFieldDefinition, EntityType } from '@/lib/types';
 

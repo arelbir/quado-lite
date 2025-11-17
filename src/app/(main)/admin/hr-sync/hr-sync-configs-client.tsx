@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Settings, Plus, Edit, Trash, Play, Power } from "lucide-react";
 import { toast } from "sonner";
-import { HRSyncConfigDialog } from "@/components/admin/hr-sync-config-dialog";
+import { HRSyncConfigDialog } from "@/features/hr-sync/components/hr-sync-config-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +28,7 @@ import {
   deleteHRSyncConfig,
   toggleConfigStatus,
   triggerManualSync,
-} from "@/server/actions/hr-sync-actions";
+} from "@/features/hr-sync/actions/hr-sync-actions";
 
 interface HRSyncConfig {
   id: string;

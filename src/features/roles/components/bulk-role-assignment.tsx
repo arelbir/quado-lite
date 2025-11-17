@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { assignRoleToUser } from "@/server/actions/user-actions";
+import { assignRoleToUser } from "@/features/users/actions/user-actions";
 import {
   Dialog,
   DialogContent,
