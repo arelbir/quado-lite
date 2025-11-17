@@ -20,10 +20,12 @@
  * Week 7-8: Day 2
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from 'zod';
 import { syncFromRESTAPI } from "@/features/hr-sync/lib/rest-api-service";
 import { currentUser } from "@/lib/auth/server";
+import { sendSuccess, sendUnauthorized, sendValidationError, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 
 const restApiSyncSchema = z.object({
   configId: z.string().uuid(),
@@ -35,10 +37,7 @@ export async function POST(request: NextRequest) {
     const user = await currentUser();
     
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+      return sendUnauthorized();
     }
 
     // 2. Parse request with validation
@@ -46,38 +45,26 @@ export async function POST(request: NextRequest) {
     const validation = restApiSyncSchema.safeParse(body);
     
     if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.errors },
-        { status: 400 }
-      );
+      return sendValidationError(validation.error.errors);
     }
     
     const { configId } = validation.data;
 
     // 3. Trigger sync
-    console.log(`🔄 Triggering REST API sync for config: ${configId}`);
+    log.info('Triggering REST API sync', { configId, userId: user.id });
     const result = await syncFromRESTAPI(configId, user.id);
 
     // 4. Return result
-    return NextResponse.json({
-      success: result.success,
-      result: {
-        totalRecords: result.totalRecords,
-        successCount: result.successCount,
-        failedCount: result.failedCount,
-        skippedCount: result.skippedCount,
-        errors: result.errors.length > 0 ? result.errors.slice(0, 10) : []
-      }
+    return sendSuccess({
+      totalRecords: result.totalRecords,
+      successCount: result.successCount,
+      failedCount: result.failedCount,
+      skippedCount: result.skippedCount,
+      errors: result.errors.length > 0 ? result.errors.slice(0, 10) : [],
     });
 
   } catch (error) {
-    console.error("REST API sync API error:", error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
-      },
-      { status: 500 }
-    );
+    log.error("REST API sync error", error as Error);
+    return sendInternalError(error);
   }
 }

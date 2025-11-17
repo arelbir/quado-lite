@@ -27,6 +27,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from 'zod';
 import { importFromCSV } from "@/features/hr-sync/lib/csv-import-service";
 import { currentUser } from "@/lib/auth/server";
+import { sendSuccess, sendUnauthorized, sendValidationError, sendNotFound, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 import { db } from "@/core/database/client";
 import { hrSyncConfigs } from "@/core/database/schema/hr-sync";
 import { eq } from "drizzle-orm";
@@ -55,16 +57,13 @@ export async function POST(request: NextRequest) {
     const validation = csvSyncSchema.safeParse(body);
     
     if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.errors },
-        { status: 400 }
-      );
+      return sendValidationError(validation.error.errors);
     }
     
     const { configId, fileContent, validate, preview } = validation.data;
 
     // 3. Trigger import
-    console.log(`📥 Triggering CSV import for config: ${configId}`);
+    log.info('Triggering CSV import', { configId, userId: user.id });
     const result = await importFromCSV(
       configId, 
       fileContent, 
@@ -73,26 +72,17 @@ export async function POST(request: NextRequest) {
     );
 
     // 4. Return result
-    return NextResponse.json({
-      success: result.success,
-      result: {
-        totalRecords: result.totalRecords,
-        successCount: result.successCount,
-        failedCount: result.failedCount,
-        skippedCount: result.skippedCount,
-        errors: result.errors.length > 0 ? result.errors.slice(0, 10) : []
-      }
+    return sendSuccess({
+      totalRecords: result.totalRecords,
+      successCount: result.successCount,
+      failedCount: result.failedCount,
+      skippedCount: result.skippedCount,
+      errors: result.errors.length > 0 ? result.errors.slice(0, 10) : [],
     });
 
   } catch (error) {
-    console.error("CSV import API error:", error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
-      },
-      { status: 500 }
-    );
+    log.error("CSV import error", error as Error);
+    return sendInternalError(error);
   }
 }
 
@@ -116,10 +106,7 @@ export async function GET(request: NextRequest) {
     const configId = searchParams.get('configId');
 
     if (!configId) {
-      return NextResponse.json(
-        { success: false, error: "configId is required" },
-        { status: 400 }
-      );
+      return sendValidationError({ configId: 'Config ID is required' });
     }
 
     // Generate template based on config field mapping
@@ -128,10 +115,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!config) {
-      return NextResponse.json(
-        { success: false, error: "Config not found" },
-        { status: 404 }
-      );
+      return sendNotFound('Config');
     }
 
     const fieldMapping = config.fieldMapping as any;
@@ -161,9 +145,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: "Failed to generate template" },
-      { status: 500 }
-    );
+    log.error("Error generating CSV template", error as Error);
+    return sendInternalError(error);
   }
 }

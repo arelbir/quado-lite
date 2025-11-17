@@ -21,10 +21,12 @@
  * Week 7-8: Day 1
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from 'zod';
 import { syncFromLDAP } from "@/features/hr-sync/lib/ldap-sync-service";
 import { currentUser } from "@/lib/auth/server";
+import { sendSuccess, sendUnauthorized, sendForbidden, sendValidationError, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 import { db } from "@/core/database/client";
 import { hrSyncLogs } from "@/core/database/schema/hr-sync";
 import { eq } from "drizzle-orm";
@@ -51,10 +53,7 @@ export async function POST(request: NextRequest) {
     const hasPermission = await checker.can({ resource: 'HRSync', action: 'Execute' });
     
     if (!hasPermission.success || !hasPermission.data) {
-      return NextResponse.json(
-        { success: false, error: "Permission denied" },
-        { status: 403 }
-      );
+      return sendForbidden();
     }
 
     // 3. Parse request with validation
@@ -62,39 +61,27 @@ export async function POST(request: NextRequest) {
     const validation = ldapSyncSchema.safeParse(body);
     
     if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.errors },
-        { status: 400 }
-      );
+      return sendValidationError(validation.error.errors);
     }
     
     const { configId } = validation.data;
 
     // 4. Trigger sync
-    console.log(`🔄 Triggering LDAP sync for config: ${configId}`);
+    log.info('Triggering LDAP sync', { configId, userId: user.id });
     const result = await syncFromLDAP(configId, user.id);
 
     // 5. Return result
-    return NextResponse.json({
-      success: result.success,
-      result: {
-        totalRecords: result.totalRecords,
-        successCount: result.successCount,
-        failedCount: result.failedCount,
-        skippedCount: result.skippedCount,
-        errors: result.errors.length > 0 ? result.errors.slice(0, 10) : [] // Limit errors
-      }
+    return sendSuccess({
+      totalRecords: result.totalRecords,
+      successCount: result.successCount,
+      failedCount: result.failedCount,
+      skippedCount: result.skippedCount,
+      errors: result.errors.length > 0 ? result.errors.slice(0, 10) : [],
     });
 
   } catch (error) {
-    console.error("LDAP sync API error:", error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : "Unknown error" 
-      },
-      { status: 500 }
-    );
+    log.error("LDAP sync API error", error as Error);
+    return sendInternalError(error);
   }
 }
 
@@ -118,10 +105,7 @@ export async function GET(request: NextRequest) {
     const configId = searchParams.get('configId');
 
     if (!configId) {
-      return NextResponse.json(
-        { success: false, error: "configId is required" },
-        { status: 400 }
-      );
+      return sendValidationError({ configId: 'Config ID is required' });
     }
 
     // Get sync logs for this config
@@ -131,16 +115,10 @@ export async function GET(request: NextRequest) {
       limit: 50, // Last 50 logs
     });
 
-    return NextResponse.json({
-      success: true,
-      data: logs,
-      count: logs.length
-    });
+    return sendSuccess(logs, { total: logs.length });
 
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: "Failed to get sync logs" },
-      { status: 500 }
-    );
+    log.error("Error getting sync logs", error as Error);
+    return sendInternalError(error);
   }
 }
