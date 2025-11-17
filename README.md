@@ -12,6 +12,8 @@
 
 > Gelişmiş iş akışı motoru, 4 katmanlı RBAC ve kapsamlı CAPA takibi ile kurumsal denetim yönetim sistemi.
 
+**🌐 [Landing Page](/landing)** - Proje hakkında detaylı bilgi ve özelliklere buradan ulaşabilirsiniz.
+
 ---
 
 ## ✨ Özellikler / Features
