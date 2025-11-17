@@ -1,9 +1,15 @@
-import { Redis } from '@upstash/redis'
+import Redis from 'ioredis'
 
-// Redis client for caching
+// Standard Redis client (works with any Redis instance)
 export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  host: process.env.REDIS_HOST || 'localhost',
+  port: parseInt(process.env.REDIS_PORT || '6379'),
+  password: process.env.REDIS_PASSWORD,
+  db: 0,
+  retryStrategy: (times) => {
+    const delay = Math.min(times * 50, 2000)
+    return delay
+  },
 })
 
 // Cache key generator
@@ -29,7 +35,7 @@ export const cache = {
   async get<T>(key: string): Promise<T | null> {
     try {
       const data = await redis.get(key)
-      return data as T | null
+      return data ? (JSON.parse(data) as T) : null
     } catch (error) {
       console.error('Cache get error:', error)
       return null
