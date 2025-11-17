@@ -29,14 +29,13 @@ export async function sendNotification(data: NotificationData) {
     const [notification] = await db
       .insert(notifications)
       .values({
-        id: notificationId,
         userId: data.userId,
-        category: data.type,
+        category: data.type as any,
         title: data.title,
         message: data.message,
         priority: data.priority || 'medium',
         metadata: data.metadata || {},
-        relatedEntityType: data.metadata?.entityType,
+        relatedEntityType: data.metadata?.entityType as any,
         relatedEntityId: data.metadata?.entityId,
         actionUrl: data.actionUrl,
         isRead: false,
