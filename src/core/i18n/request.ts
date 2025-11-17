@@ -20,6 +20,7 @@ export default getRequestConfig(async ({ locale }) => {
       workflow: (await import(`./locales/${validLocale}/workflow.json`)).default,
       teams: (await import(`./locales/${validLocale}/teams.json`)).default,
       groups: (await import(`./locales/${validLocale}/groups.json`)).default,
+      notifications: (await import(`./locales/${validLocale}/notifications.json`)).default,
     },
   };
 });

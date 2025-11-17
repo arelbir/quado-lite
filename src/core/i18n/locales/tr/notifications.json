@@ -1,0 +1,37 @@
+{
+  "title": "Bildirimler",
+  "unread": "okunmamış",
+  "noNotifications": "Henüz bildirim yok",
+  "markAllAsRead": "Tümünü okundu işaretle",
+  "viewAll": "Tümünü Görüntüle",
+  "refresh": "Yenile",
+  
+  "categories": {
+    "workflow_assignment": "İş akışı ataması",
+    "workflow_deadline_approaching": "Son tarih yaklaşıyor",
+    "workflow_escalated": "İş akışı yükseltildi",
+    "workflow_approved": "İş akışı onaylandı",
+    "workflow_rejected": "İş akışı reddedildi",
+    "workflow_completed": "İş akışı tamamlandı",
+    "system_alert": "Sistem uyarısı",
+    "user_mentioned": "Bahsedildiniz",
+    "task_assigned": "Görev atandı",
+    "task_updated": "Görev güncellendi",
+    "task_completed": "Görev tamamlandı",
+    "approval_required": "Onay gerekli",
+    "approval_completed": "Onay tamamlandı"
+  },
+  
+  "timeAgo": {
+    "justNow": "Az önce",
+    "minutesAgo": "{{count}} dakika önce",
+    "hoursAgo": "{{count}} saat önce",
+    "daysAgo": "{{count}} gün önce",
+    "weeksAgo": "{{count}} hafta önce"
+  },
+  
+  "actions": {
+    "markAsRead": "Okundu olarak işaretle",
+    "delete": "Sil"
+  }
+}
