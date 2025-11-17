@@ -59,9 +59,11 @@ export function DataGridField({
 
   const addRow = () => {
     const defaultRow: any = {};
-    Object.entries(itemSchema.properties).forEach(([key, prop]) => {
-      defaultRow[key] = prop.default || '';
-    });
+    if (itemSchema.properties) {
+      Object.entries(itemSchema.properties).forEach(([key, prop]) => {
+        defaultRow[key] = prop.default || '';
+      });
+    }
     append(defaultRow);
   };
 
@@ -83,7 +85,8 @@ export function DataGridField({
 
   const renderFieldInRow = (rowIndex: number, fieldKey: string, fieldSchema: JSONSchemaProperty) => {
     const fieldName = `${name}.${rowIndex}.${fieldKey}`;
-    const fieldError = errors?.[name]?.[rowIndex]?.[fieldKey];
+    const nameErrors = errors?.[name] as any;
+    const fieldError = nameErrors?.[rowIndex]?.[fieldKey];
     const widget = fieldSchema['ui:widget'];
 
     const commonProps = {
@@ -141,7 +144,7 @@ export function DataGridField({
         {fields.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="text-muted-foreground">
-              <Icons.Table className="size-12 mx-auto mb-4 opacity-50" />
+              <Icons.List className="size-12 mx-auto mb-4 opacity-50" />
               <p>No rows yet. Click "Add Row" to get started.</p>
             </div>
           </Card>
@@ -172,7 +175,7 @@ export function DataGridField({
 
                 {/* Fields */}
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(itemSchema.properties).map(([fieldKey, fieldSchema]) => (
+                  {itemSchema.properties && Object.entries(itemSchema.properties).map(([fieldKey, fieldSchema]) => (
                     <div key={fieldKey}>
                       {renderFieldInRow(index, fieldKey, fieldSchema as JSONSchemaProperty)}
                     </div>

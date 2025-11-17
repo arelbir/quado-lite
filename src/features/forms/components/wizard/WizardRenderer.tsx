@@ -97,6 +97,7 @@ export function WizardRenderer({
     // Validate current step if going forward
     if (stepIndex > wizardState.currentStep) {
       const currentStep = steps[wizardState.currentStep];
+      if (!currentStep) return;
       const fieldKeys = currentStep.fields;
       
       const isValid = await trigger(fieldKeys as any);
@@ -142,6 +143,7 @@ export function WizardRenderer({
   const handleFinalSubmit = async (data: Record<string, any>) => {
     // Validate current step
     const currentStep = steps[wizardState.currentStep];
+    if (!currentStep) return;
     const fieldKeys = currentStep.fields;
     const isValid = await trigger(fieldKeys as any);
     

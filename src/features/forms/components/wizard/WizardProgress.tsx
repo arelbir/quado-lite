@@ -7,7 +7,11 @@
 
 import { WizardFormSchema, WizardState } from '../../types/wizard-schema';
 import { Icons } from '@/components/shared/icons';
-import { cn } from '@/lib/utils';
+
+// Simple cn utility
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
 interface WizardProgressProps {
   schema: WizardFormSchema;
