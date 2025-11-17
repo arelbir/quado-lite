@@ -93,6 +93,13 @@ export function revalidateDOFPaths() {
 }
 
 /**
+ * HELPER: Revalidate Finding-related paths
+ */
+export function revalidateFindingPaths() {
+  revalidatePath("/admin/findings");
+}
+
+/**
  * HELPER: Revalidate admin paths
  */
 export function revalidateAdminPaths() {
