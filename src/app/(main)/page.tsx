@@ -1,225 +1,217 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getDashboardStats, getMyTaskCounts } from "@/server/actions/dashboard-actions";
-import { ClipboardCheck, AlertCircle, CheckCircle2, FileText, ArrowRight, Users, Building2 } from "lucide-react";
+import { Users, Building2, Shield, GitBranch, Bell, Workflow, FileText, Settings } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { currentUser } from "@/lib/auth";
 
+/**
+ * FRAMEWORK DASHBOARD
+ * Generic dashboard showcasing core framework features
+ */
 export default async function Dashboard() {
-  const [statsResult, tasksResult] = await Promise.all([
-    getDashboardStats(),
-    getMyTaskCounts(),
-  ]);
-
-  const stats = statsResult.success ? statsResult.data : null;
-  const tasks = tasksResult.success ? tasksResult.data : null;
+  const user = await currentUser();
 
   return (
     <main className="flex flex-1 flex-col gap-6 p-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Kontrol Paneli</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Welcome{user?.name ? `, ${user.name}` : ""}! 👋
+        </h1>
         <p className="text-muted-foreground mt-1">
-          Denetim yönetim sistemi genel bakış ve bekleyen işlemler
+          Enterprise Framework - Core Features Dashboard
         </p>
       </div>
 
-      {/* Pending Tasks Summary - Highlighted */}
-      {tasks && tasks.total > 0 && (
-        <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-900">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-orange-900 dark:text-orange-100 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              Bekleyen İşlerim
-            </CardTitle>
-            <CardDescription className="text-orange-700 dark:text-orange-300">
-              Toplam {tasks.total} adet bekleyen göreviniz var
-            </CardDescription>
+      {/* Framework Features Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Users Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">User Management</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Link href="/denetim/actions" className="group">
-              <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900 group-hover:border-orange-300 dark:group-hover:border-orange-700 transition-colors">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Aksiyonlar</p>
-                  <p className="text-2xl font-bold text-orange-600">{tasks.actions}</p>
-                </div>
-                <CheckCircle2 className="h-8 w-8 text-orange-400" />
-              </div>
-            </Link>
-
-            <Link href="/denetim/dofs" className="group">
-              <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900 group-hover:border-orange-300 dark:group-hover:border-orange-700 transition-colors">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">DÖF'ler</p>
-                  <p className="text-2xl font-bold text-orange-600">{tasks.dofs}</p>
-                </div>
-                <FileText className="h-8 w-8 text-orange-400" />
-              </div>
-            </Link>
-
-            <Link href="/denetim/actions" className="group">
-              <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900 group-hover:border-orange-300 dark:group-hover:border-orange-700 transition-colors">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Onaylar</p>
-                  <p className="text-2xl font-bold text-orange-600">{tasks.approvals}</p>
-                </div>
-                <ClipboardCheck className="h-8 w-8 text-orange-400" />
-              </div>
-            </Link>
-
-            <Link href="/denetim/findings" className="group">
-              <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-lg border border-orange-100 dark:border-orange-900 group-hover:border-orange-300 dark:group-hover:border-orange-700 transition-colors">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Bulgular</p>
-                  <p className="text-2xl font-bold text-orange-600">{tasks.findings}</p>
-                </div>
-                <AlertCircle className="h-8 w-8 text-orange-400" />
-              </div>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mt-1">
+              Manage users, roles and permissions
+            </p>
+            <Link href="/admin/users">
+              <Button variant="link" className="px-0 mt-2 h-auto text-sm">
+                View Users →
+              </Button>
             </Link>
           </CardContent>
         </Card>
-      )}
 
-      {/* Statistics Overview */}
-      {stats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {/* Audits Card */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Denetimler</CardTitle>
-              <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.audits.total}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stats.audits.mine} adet benim denetimim
-              </p>
-              <Link href="/denetim/audits">
-                <Button variant="link" className="px-0 mt-2 h-auto">
-                  Denetimleri Görüntüle <ArrowRight className="ml-1 h-3 w-3" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+        {/* Organization Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Organization</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mt-1">
+              Hierarchy: Companies, Branches, Departments
+            </p>
+            <Link href="/admin/organization/companies">
+              <Button variant="link" className="px-0 mt-2 h-auto text-sm">
+                Manage Organization →
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
 
-          {/* Findings Card */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bulgular</CardTitle>
-              <AlertCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.findings.total}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stats.findings.mine} adet bekleyen bulgum
-              </p>
-              <Link href="/denetim/findings">
-                <Button variant="link" className="px-0 mt-2 h-auto">
-                  Bulguları Görüntüle <ArrowRight className="ml-1 h-3 w-3" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+        {/* Roles Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Roles & Permissions</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mt-1">
+              Multi-role RBAC system
+            </p>
+            <Link href="/admin/roles">
+              <Button variant="link" className="px-0 mt-2 h-auto text-sm">
+                Manage Roles →
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
 
-          {/* Actions Card */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Aksiyonlar</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.actions.total}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stats.actions.mine} adet bekleyen aksiyonum
-              </p>
-              <Link href="/denetim/actions">
-                <Button variant="link" className="px-0 mt-2 h-auto">
-                  Aksiyonları Görüntüle <ArrowRight className="ml-1 h-3 w-3" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* DOFs Card */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">DÖF'ler</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.dofs.total}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stats.dofs.mine} adet bekleyen DÖF'üm
-              </p>
-              <Link href="/denetim/dofs">
-                <Button variant="link" className="px-0 mt-2 h-auto">
-                  DÖF'leri Görüntüle <ArrowRight className="ml-1 h-3 w-3" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+        {/* Workflows Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Workflows</CardTitle>
+            <GitBranch className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mt-1">
+              Visual workflow designer & engine
+            </p>
+            <Link href="/admin/workflows">
+              <Button variant="link" className="px-0 mt-2 h-auto text-sm">
+                Design Workflows →
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Hızlı Erişim - Denetim</CardTitle>
+            <CardTitle>Core Administration</CardTitle>
             <CardDescription>
-              Sık kullanılan denetim işlemleri
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-2">
-            <Link href="/denetim/audits">
-              <Button variant="outline" className="w-full justify-start">
-                <ClipboardCheck className="mr-2 h-4 w-4" />
-                Tüm Denetimler
-              </Button>
-            </Link>
-            <Link href="/denetim/my-audits">
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="mr-2 h-4 w-4" />
-                Benim Denetimlerim
-              </Button>
-            </Link>
-            <Link href="/denetim/findings">
-              <Button variant="outline" className="w-full justify-start">
-                <AlertCircle className="mr-2 h-4 w-4" />
-                Tüm Bulgular
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Hızlı Erişim - Yönetim</CardTitle>
-            <CardDescription>
-              Admin ve organizasyon işlemleri
+              Framework administration features
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">
             <Link href="/admin/users">
               <Button variant="outline" className="w-full justify-start">
                 <Users className="mr-2 h-4 w-4" />
-                Kullanıcı Yönetimi
+                User Management
+              </Button>
+            </Link>
+            <Link href="/admin/roles">
+              <Button variant="outline" className="w-full justify-start">
+                <Shield className="mr-2 h-4 w-4" />
+                Role Management
               </Button>
             </Link>
             <Link href="/admin/organization/companies">
               <Button variant="outline" className="w-full justify-start">
                 <Building2 className="mr-2 h-4 w-4" />
-                Organizasyon Yönetimi
+                Organization Structure
               </Button>
             </Link>
             <Link href="/admin/workflows">
               <Button variant="outline" className="w-full justify-start">
+                <Workflow className="mr-2 h-4 w-4" />
+                Workflow Designer
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>System Features</CardTitle>
+            <CardDescription>
+              Advanced framework capabilities
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-2">
+            <Link href="/admin/custom-fields">
+              <Button variant="outline" className="w-full justify-start">
                 <FileText className="mr-2 h-4 w-4" />
-                İş Akışları
+                Custom Fields
+              </Button>
+            </Link>
+            <Link href="/admin/hr-sync">
+              <Button variant="outline" className="w-full justify-start">
+                <Users className="mr-2 h-4 w-4" />
+                HR Integration
+              </Button>
+            </Link>
+            <Link href="/system/menus">
+              <Button variant="outline" className="w-full justify-start">
+                <FileText className="mr-2 h-4 w-4" />
+                Menu Management
+              </Button>
+            </Link>
+            <Link href="/settings">
+              <Button variant="outline" className="w-full justify-start">
+                <Settings className="mr-2 h-4 w-4" />
+                User Settings
               </Button>
             </Link>
           </CardContent>
         </Card>
       </div>
+
+      {/* Framework Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle>🏗️ Enterprise Framework Core</CardTitle>
+          <CardDescription>
+            A modern, production-ready Next.js framework for building enterprise applications
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 text-sm">
+            <div className="flex items-start gap-2">
+              <Shield className="h-4 w-4 mt-0.5 text-green-600" />
+              <div>
+                <p className="font-medium">Authentication & Authorization</p>
+                <p className="text-muted-foreground">Multi-role RBAC, context-based permissions, menu access control</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <Building2 className="h-4 w-4 mt-0.5 text-blue-600" />
+              <div>
+                <p className="font-medium">Organization Management</p>
+                <p className="text-muted-foreground">Hierarchical structure, teams & groups, position management</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <GitBranch className="h-4 w-4 mt-0.5 text-purple-600" />
+              <div>
+                <p className="font-medium">Workflow Engine</p>
+                <p className="text-muted-foreground">Visual designer, approval flows, delegation, deadline tracking</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <Bell className="h-4 w-4 mt-0.5 text-orange-600" />
+              <div>
+                <p className="font-medium">Notification System</p>
+                <p className="text-muted-foreground">Multi-channel alerts, priority levels, category filtering</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }

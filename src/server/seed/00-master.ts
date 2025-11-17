@@ -1,6 +1,6 @@
 /**
- * MASTER SEED ORCHESTRATOR
- * 150-person company with all modules
+ * MASTER SEED ORCHESTRATOR - FRAMEWORK CORE
+ * Sample company structure with core modules only
  * 
  * Usage: npx tsx src/server/seed/00-master.ts
  * 
@@ -10,11 +10,8 @@
  * 2. Users
  * 3. Roles & Permissions
  * 4. Menus
- * 5. Question Banks
- * 6. Teams & Groups
- * 7. Manager & Leader Assignments ✨
- * 8. Sample Data
- * 9. Workflow Definitions ✨ NEW
+ * 5. Teams & Groups
+ * 6. Role-Menu Mappings
  */
 
 import { seedAdmin, assignAdminRole } from "./00-admin";
@@ -22,14 +19,8 @@ import { seedOrganization } from "./01-organization";
 import { seedUsers } from "./02-users";
 import { seedRoleSystem } from "./03-roles";
 import { seedMenus } from "./04-menus";
-import { seedQuestionBanks } from "./05-question-banks";
 import { seedTeamsAndGroups } from "./06-teams-groups";
-import { seedSampleData } from "./07-sample-data";
-import { seedAssignments } from "./08-assignments";
-import { seedWorkflows } from "./09-workflows";
 import { seedRoleMenus } from "./10-role-menus";
-import { seedUnifiedPermissions } from "./11-unified-permissions";
-import { seedWorkflows as seedVisualWorkflows } from "./11-workflows";
 
 async function masterSeed() {
   console.log("\n");
@@ -56,53 +47,28 @@ async function masterSeed() {
     // 4. Menus (with adminId)
     await seedMenus(adminId);
     
-    // 5. Question Banks (with adminId)
-    console.log("\n📚 SEEDING: Question Banks...");
-    await seedQuestionBanks(adminId);
-    
-    // 6. Teams & Groups (with adminId)
+    // 5. Teams & Groups (with adminId)
     console.log("\n👥 SEEDING: Teams & Groups...");
     await seedTeamsAndGroups(adminId);
     
-    // 7. Manager & Leader Assignments (AFTER users & teams)
-    await seedAssignments(adminId);
-    
-    // 8. Sample Data (with adminId)
-    console.log("\n📊 SEEDING: Sample Data...");
-    await seedSampleData(adminId);
-    
-    // 9. Workflow Definitions (with adminId)
-    await seedWorkflows(adminId);
-    
-    // 10. Role-Menu Mappings (AFTER roles & menus)
+    // 6. Role-Menu Mappings (AFTER roles & menus)
     await seedRoleMenus(adminId);
-    
-    // 11. Unified Permissions (AFTER roles) ✨ NEW
-    await seedUnifiedPermissions();
-    
-    // 12. Visual Workflow Definitions (with adminId)
-    console.log("\n🎨 SEEDING: Visual Workflows...");
-    await seedVisualWorkflows();
 
     console.log("\n");
     console.log("═══════════════════════════════════════════════════");
     console.log("✅ SEED COMPLETED SUCCESSFULLY");
     console.log("═══════════════════════════════════════════════════");
-    console.log("\n📊 SUMMARY:");
+    console.log("\n📊 FRAMEWORK CORE SEEDED:");
     console.log("  ✅ 1 Company (ABC Teknoloji A.Ş.)");
-    console.log("  ✅ 5 Branches (with managers ✨)");
-    console.log("  ✅ 12 Departments (with managers ✨)");
+    console.log("  ✅ 5 Branches (with managers)");
+    console.log("  ✅ 12 Departments (with managers)");
     console.log("  ✅ 15 Positions (Hierarchical)");
     console.log("  ✅ 150 Users (Realistic distribution)");
-    console.log("  ✅ 4 System Roles");
-    console.log("  ✅ Menu Items");
-    console.log("  ✅ Question Banks");
-    console.log("  ✅ 10 Teams (with leaders ✨)");
+    console.log("  ✅ 4 System Roles (RBAC)");
+    console.log("  ✅ Core Menu Items");
+    console.log("  ✅ 10 Teams (with leaders)");
     console.log("  ✅ 10 Groups (with owners)");
-    console.log("  ✅ 8 Workflow Definitions");
-    console.log("  ✅ 4 Visual Workflows (Designer) ✨ NEW");
     console.log("  ✅ Role-Menu Mappings");
-    console.log("  ✅ Unified Permissions (68 permissions) ✨ 146 FUNCTIONS");
     console.log("\n🔑 LOGIN:");
     console.log("  📧 Any user: [firstname].[lastname]@abcteknoloji.com");
     console.log("  ℹ️  Turkish chars → ASCII (ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u)");
