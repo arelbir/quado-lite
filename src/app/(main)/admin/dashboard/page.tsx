@@ -5,6 +5,9 @@ import { Users, Building2, UserCog, Shield } from 'lucide-react'
 import { db } from '@/core/database/client'
 import { user, companies, roles } from '@/core/database/schema'
 import { count } from 'drizzle-orm'
+import { UserActivityChart } from '@/components/dashboard/user-activity-chart'
+import { WorkflowStatusChart } from '@/components/dashboard/workflow-status-chart'
+import { RecentActivity } from '@/components/dashboard/recent-activity'
 
 export const metadata = {
   title: 'Dashboard',
@@ -80,7 +83,15 @@ export default async function DashboardPage() {
         <DashboardStats />
       </Suspense>
 
+      {/* Charts */}
+      <div className="grid gap-4 md:grid-cols-7">
+        <UserActivityChart />
+        <WorkflowStatusChart />
+      </div>
+
+      {/* Recent Activity & Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <RecentActivity />
         <Card className="col-span-4">
           <CardHeader>
             <CardTitle>Framework Overview</CardTitle>
