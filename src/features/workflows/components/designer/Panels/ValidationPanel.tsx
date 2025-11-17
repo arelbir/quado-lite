@@ -66,7 +66,7 @@ export function ValidationPanel() {
                 <CollapsibleTrigger className="w-full">
                   <div className="flex items-center justify-between text-xs font-medium hover:bg-accent p-2 rounded">
                     <div className="flex items-center gap-2">
-                      <Icons.CircleX className="size-3 text-red-500" />
+                      <Icons.AlertCircle className="size-3 text-red-500" />
                       <span>Errors ({validation.errors.length})</span>
                     </div>
                     <Icons.ChevronDown className={`size-3 transition-transform ${showErrors ? 'rotate-180' : ''}`} />

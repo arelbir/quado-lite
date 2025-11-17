@@ -169,7 +169,10 @@ export function validateWorkflow(nodes: Node[], edges: Edge[]): ValidationResult
 
   // 10. Check reachability from start to end
   if (startNodes.length > 0 && endNodes.length > 0) {
-    const reachableFromStart = getReachableNodes(startNodes[0].id, nodes, edges);
+    const startNode = startNodes[0];
+    if (!startNode) return { isValid: false, errors, warnings, info };
+    
+    const reachableFromStart = getReachableNodes(startNode.id, nodes, edges);
     const unreachableNodes = nodes.filter(n => !reachableFromStart.has(n.id) && n.type !== 'start');
     
     unreachableNodes.forEach(node => {
