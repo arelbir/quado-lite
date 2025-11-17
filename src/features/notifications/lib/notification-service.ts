@@ -43,6 +43,10 @@ export async function sendNotification(data: NotificationData) {
       })
       .returning();
 
+    if (!notification) {
+      throw new Error('Failed to create notification');
+    }
+
     // Broadcast to user via WebSocket
     try {
       realtime.send('notification', {
