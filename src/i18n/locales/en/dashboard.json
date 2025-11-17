@@ -1,30 +1,18 @@
 {
-  "title": "Audit System",
-  "description": "Findings, Actions and CAPA tracking system",
+  "title": "Enterprise Framework",
+  "description": "Core framework dashboard",
   
+  "welcome": "Welcome",
   "stats": {
-    "totalFindings": "Total Findings",
-    "activeFindings": "Active findings",
-    "pendingActions": "Pending Actions",
-    "waitingCompletion": "Waiting for completion",
-    "activeDofs": "Active CAPAs",
-    "dofsInProgress": "CAPAs in progress",
-    "completed": "Completed",
-    "closedFindings": "Closed findings"
+    "users": "Users",
+    "roles": "Roles",
+    "workflows": "Workflows",
+    "active": "Active"
   },
   
-  "recentFindings": {
-    "title": "Recent Findings",
-    "description": "Latest added findings",
-    "noData": "No findings yet",
-    "audit": "Audit"
-  },
-  
-  "myTasks": {
-    "title": "My Tasks",
-    "description": "Pending actions and approvals",
-    "noTasks": "🎉 No pending tasks!",
-    "responsible": "Responsible",
-    "waitingApproval": "Waiting Approval"
+  "quickAccess": {
+    "title": "Quick Access",
+    "description": "Core framework features",
+    "noData": "No data yet"
   }
 }

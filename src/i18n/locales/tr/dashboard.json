@@ -1,30 +1,18 @@
 {
-  "title": "Denetim Sistemi",
-  "description": "Bulgular, Aksiyonlar ve DÖF takip sistemi",
+  "title": "Enterprise Framework",
+  "description": "Core framework dashboard",
   
+  "welcome": "Welcome",
   "stats": {
-    "totalFindings": "Toplam Bulgu",
-    "activeFindings": "Aktif bulgular",
-    "pendingActions": "Bekleyen Aksiyonlar",
-    "waitingCompletion": "Tamamlanmayı bekliyor",
-    "activeDofs": "Aktif DÖF",
-    "dofsInProgress": "İşlemde olan DÖF'ler",
-    "completed": "Tamamlanan",
-    "closedFindings": "Kapatılan bulgular"
+    "users": "Users",
+    "roles": "Roles",
+    "workflows": "Workflows",
+    "active": "Active"
   },
   
-  "recentFindings": {
-    "title": "Son Bulgular",
-    "description": "En son eklenen bulgular",
-    "noData": "Henüz bulgu yok",
-    "audit": "Denetim"
-  },
-  
-  "myTasks": {
-    "title": "Görevlerim",
-    "description": "Bekleyen aksiyon ve onaylar",
-    "noTasks": "🎉 Bekleyen görev yok!",
-    "responsible": "Sorumlu",
-    "waitingApproval": "Onay Bekliyor"
+  "quickAccess": {
+    "title": "Quick Access",
+    "description": "Core framework features",
+    "noData": "No data yet"
   }
 }
