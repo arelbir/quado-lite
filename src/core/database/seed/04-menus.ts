@@ -13,7 +13,9 @@ export async function seedMenus(adminId: string) {
     { path: "/admin/organization/departments", label: "departments", icon: "FolderTree", parentId: null, status: "active" as const, createBy: adminId, type: "menu" as const },
     { path: "/admin/organization/positions", label: "positions", icon: "Briefcase", parentId: null, status: "active" as const, createBy: adminId, type: "menu" as const },
     { path: "/admin/teams", label: "teams", icon: "Users", parentId: null, status: "active" as const, createBy: adminId, type: "menu" as const },
+    { path: "/admin/groups", label: "groups", icon: "UsersRound", parentId: null, status: "active" as const, createBy: adminId, type: "menu" as const },
     { path: "/admin/workflows", label: "workflows", icon: "Workflow", parentId: null, status: "active" as const, createBy: adminId, type: "menu" as const },
+    { path: "/admin/system/menus", label: "systemMenus", icon: "Menu", parentId: null, status: "active" as const, createBy: adminId, type: "menu" as const },
     { path: "/admin/settings", label: "settings", icon: "Settings", parentId: null, status: "active" as const, createBy: adminId, type: "menu" as const },
   ];
 
