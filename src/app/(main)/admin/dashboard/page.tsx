@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { currentUser } from '@/lib/auth/server'
 import { Users, Building2, UserCog, Shield } from 'lucide-react'
 import { db } from '@/core/database/client'
-import { users, companies, roles } from '@/core/database/schema'
+import { user, companies, roles } from '@/core/database/schema'
 import { count } from 'drizzle-orm'
 
 export const metadata = {
@@ -13,26 +13,26 @@ export const metadata = {
 
 async function DashboardStats() {
   // Get counts
-  const [userCount] = await db.select({ count: count() }).from(users)
+  const [userCount] = await db.select({ count: count() }).from(user)
   const [companyCount] = await db.select({ count: count() }).from(companies)
   const [roleCount] = await db.select({ count: count() }).from(roles)
 
   const stats = [
     {
       title: 'Total Users',
-      value: userCount.count,
+      value: userCount?.count ?? 0,
       icon: Users,
       description: 'Active users in the system',
     },
     {
       title: 'Companies',
-      value: companyCount.count,
+      value: companyCount?.count ?? 0,
       icon: Building2,
       description: 'Organizations',
     },
     {
       title: 'Roles',
-      value: roleCount.count,
+      value: roleCount?.count ?? 0,
       icon: UserCog,
       description: 'System roles',
     },
