@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/core/database/client";
 import { notifications } from "@/core/database/schema";
 import { eq, and } from "drizzle-orm";
+
+const markAllReadSchema = z.object({
+  userId: z.string().uuid(),
+});
 
 /**
  * PATCH /api/notifications/mark-all-read
@@ -9,15 +14,17 @@ import { eq, and } from "drizzle-orm";
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const body = await request.json() as { userId: string };
-    const { userId } = body;
-
-    if (!userId) {
+    const body = await request.json();
+    const validation = markAllReadSchema.safeParse(body);
+    
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "User ID is required" },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
+    
+    const { userId } = validation.data;
 
     await db
       .update(notifications)

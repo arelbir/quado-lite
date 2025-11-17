@@ -22,11 +22,16 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { z } from 'zod';
 import { syncFromLDAP } from "@/features/hr-sync/lib/ldap-sync-service";
 import { currentUser } from "@/lib/auth/server";
 import { db } from "@/core/database/client";
 import { hrSyncLogs } from "@/core/database/schema/hr-sync";
 import { eq } from "drizzle-orm";
+
+const ldapSyncSchema = z.object({
+  configId: z.string().uuid(),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,16 +55,18 @@ export async function POST(request: NextRequest) {
     //   );
     // }
 
-    // 3. Parse request
-    const body = await request.json() as { configId?: string };
-    const { configId } = body;
-
-    if (!configId) {
+    // 3. Parse request with validation
+    const body = await request.json();
+    const validation = ldapSyncSchema.safeParse(body);
+    
+    if (!validation.success) {
       return NextResponse.json(
-        { success: false, error: "configId is required" },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
+    
+    const { configId } = validation.data;
 
     // 4. Trigger sync
     console.log(`🔄 Triggering LDAP sync for config: ${configId}`);

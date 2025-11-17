@@ -4,8 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getLatestUser } from '@/lib/auth/server';
 import { deleteFile } from '@/lib/storage/upload-helpers';
+
+const deleteFileSchema = z.object({
+  key: z.string().min(1, 'File key is required'),
+});
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -18,16 +23,18 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Get key from body
-    const body = await request.json() as { key?: string };
-    const { key } = body;
-
-    if (!key) {
+    // Get key from body with validation
+    const body = await request.json();
+    const validation = deleteFileSchema.safeParse(body);
+    
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'No file key provided' },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
+
+    const { key } = validation.data;
 
     // Delete from MinIO
     await deleteFile(key);

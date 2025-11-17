@@ -1,7 +1,12 @@
 /**
  * NOTIFICATION SERVICE
- * Core notification sending service
+ * Core notification sending service with Database + Real-time support
  */
+
+import { db } from '@/core/database/client';
+import { notifications } from '@/core/database/schema';
+import { nanoid } from 'nanoid';
+import { realtimeService } from '@/lib/realtime/realtime-service';
 
 export interface NotificationData {
   userId: string;
@@ -13,24 +18,121 @@ export interface NotificationData {
   actionUrl?: string;
 }
 
+/**
+ * Send notification - Save to DB and broadcast via WebSocket
+ */
 export async function sendNotification(data: NotificationData) {
-  // TODO: Implement actual notification sending
-  // This would integrate with the notifications system
-  console.log('Notification sent:', data);
-  return { success: true, notificationId: `notif-${Date.now()}` };
+  try {
+    const notificationId = nanoid();
+    
+    // Save to database
+    const [notification] = await db
+      .insert(notifications)
+      .values({
+        id: notificationId,
+        userId: data.userId,
+        category: data.type,
+        title: data.title,
+        message: data.message,
+        priority: data.priority || 'medium',
+        metadata: data.metadata || {},
+        relatedEntityType: data.metadata?.entityType,
+        relatedEntityId: data.metadata?.entityId,
+        actionUrl: data.actionUrl,
+        isRead: false,
+        createdAt: new Date(),
+      })
+      .returning();
+
+    // Broadcast to user via WebSocket
+    try {
+      realtimeService.sendToUser(data.userId, 'notification', {
+        id: notification.id,
+        title: notification.title,
+        message: notification.message,
+        priority: notification.priority,
+        createdAt: notification.createdAt,
+      });
+    } catch (wsError) {
+      // WebSocket error shouldn't fail the notification
+      console.warn('WebSocket broadcast failed:', wsError);
+    }
+
+    return { 
+      success: true, 
+      notificationId: notification.id 
+    };
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    throw error;
+  }
 }
 
+/**
+ * Send bulk notifications
+ */
 export async function sendBulkNotifications(notifications: NotificationData[]) {
-  // TODO: Implement bulk notification sending
-  console.log('Bulk notifications sent:', notifications.length);
-  return { success: true, sent: notifications.length };
+  try {
+    const results = await Promise.allSettled(
+      notifications.map(notification => sendNotification(notification))
+    );
+
+    const successful = results.filter(r => r.status === 'fulfilled').length;
+    const failed = results.filter(r => r.status === 'rejected').length;
+
+    return { 
+      success: true, 
+      sent: successful,
+      failed,
+      total: notifications.length 
+    };
+  } catch (error) {
+    console.error('Error sending bulk notifications:', error);
+    throw error;
+  }
 }
 
+/**
+ * Schedule notification for later delivery
+ * Note: This requires a job queue implementation
+ */
 export async function scheduleNotification(
   data: NotificationData,
   scheduleAt: Date
 ) {
-  // TODO: Implement scheduled notifications
-  console.log('Notification scheduled:', data, scheduleAt);
-  return { success: true, scheduledId: `sched-${Date.now()}` };
+  try {
+    // For now, save with scheduled flag
+    // TODO: Integrate with BullMQ for scheduled jobs
+    const notificationId = nanoid();
+    
+    await db
+      .insert(notifications)
+      .values({
+        id: notificationId,
+        userId: data.userId,
+        category: data.type,
+        title: data.title,
+        message: data.message,
+        priority: data.priority || 'medium',
+        metadata: {
+          ...data.metadata,
+          scheduledFor: scheduleAt.toISOString(),
+          scheduled: true,
+        },
+        relatedEntityType: data.metadata?.entityType,
+        relatedEntityId: data.metadata?.entityId,
+        actionUrl: data.actionUrl,
+        isRead: false,
+        createdAt: new Date(),
+      });
+
+    return { 
+      success: true, 
+      scheduledId: notificationId,
+      scheduledFor: scheduleAt 
+    };
+  } catch (error) {
+    console.error('Error scheduling notification:', error);
+    throw error;
+  }
 }

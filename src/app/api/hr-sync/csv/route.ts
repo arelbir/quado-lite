@@ -24,11 +24,19 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { z } from 'zod';
 import { importFromCSV } from "@/features/hr-sync/lib/csv-import-service";
 import { currentUser } from "@/lib/auth/server";
 import { db } from "@/core/database/client";
 import { hrSyncConfigs } from "@/core/database/schema/hr-sync";
 import { eq } from "drizzle-orm";
+
+const csvSyncSchema = z.object({
+  configId: z.string().uuid(),
+  fileContent: z.string().min(1),
+  validate: z.boolean().optional(),
+  preview: z.boolean().optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,29 +50,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Parse request
-    const body = await request.json() as { 
-      configId?: string;
-      fileContent?: string;
-      validate?: boolean;
-      preview?: boolean;
-    };
+    // 2. Parse request with validation
+    const body = await request.json();
+    const validation = csvSyncSchema.safeParse(body);
     
-    const { configId, fileContent, validate, preview } = body;
-
-    if (!configId) {
+    if (!validation.success) {
       return NextResponse.json(
-        { success: false, error: "configId is required" },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
-
-    if (!fileContent) {
-      return NextResponse.json(
-        { success: false, error: "fileContent is required" },
-        { status: 400 }
-      );
-    }
+    
+    const { configId, fileContent, validate, preview } = validation.data;
 
     // 3. Trigger import
     console.log(`📥 Triggering CSV import for config: ${configId}`);

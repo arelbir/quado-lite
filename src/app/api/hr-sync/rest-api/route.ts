@@ -21,8 +21,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { z } from 'zod';
 import { syncFromRESTAPI } from "@/features/hr-sync/lib/rest-api-service";
 import { currentUser } from "@/lib/auth/server";
+
+const restApiSyncSchema = z.object({
+  configId: z.string().uuid(),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,16 +41,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Parse request
-    const body = await request.json() as { configId?: string };
-    const { configId } = body;
-
-    if (!configId) {
+    // 2. Parse request with validation
+    const body = await request.json();
+    const validation = restApiSyncSchema.safeParse(body);
+    
+    if (!validation.success) {
       return NextResponse.json(
-        { success: false, error: "configId is required" },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
+    
+    const { configId } = validation.data;
 
     // 3. Trigger sync
     console.log(`🔄 Triggering REST API sync for config: ${configId}`);
