@@ -1,6 +1,8 @@
 import { Provider } from "@/components/provider";
 import { TailwindIndicator } from "@/components/shared/tailwind-indicator";
 import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { WebVitals } from "./web-vitals";
 import { ViewTransitions } from 'next-view-transitions'
 import HolyLoader from "holy-loader";
 import "@/styles/globals.css";
@@ -46,9 +48,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <html lang={locale} suppressHydrationWarning>
         <body vaul-drawer-wrapper="" className={`font-sans ${inter.variable}`}>
           <HolyLoader />
+          <WebVitals />
           <NextIntlClientProvider messages={messages}>
             <Provider>
-              {children}
+              <ErrorBoundary>
+                {children}
+              </ErrorBoundary>
               <TailwindIndicator />
               <Toaster richColors />
             </Provider>
