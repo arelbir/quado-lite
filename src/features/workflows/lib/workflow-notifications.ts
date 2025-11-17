@@ -59,14 +59,16 @@ export async function notifyEscalation(data: {
   entityId: string;
   reason?: string;
 }) {
-  await NotificationService.send({
+  await sendNotification({
     userId: data.userId,
-    category: "workflow_escalated",
+    type: "workflow_escalated",
     title: "Workflow Task Escalated to You",
     message: `A workflow task has been escalated to you: ${data.reason || "Overdue"}`,
-    relatedEntityType: data.entityType.toLowerCase() as any,
-    relatedEntityId: data.entityId,
-    sendEmail: true,
+    priority: 'urgent',
+    metadata: {
+      entityType: data.entityType,
+      entityId: data.entityId,
+    },
   });
 }
 

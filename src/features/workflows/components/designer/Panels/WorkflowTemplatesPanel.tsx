@@ -66,7 +66,7 @@ export function WorkflowTemplatesPanel() {
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full" size="sm">
-          <Icons.FileStack className="size-4 mr-2" />
+          <Icons.FileText className="size-4 mr-2" />
           Load Workflow Template
         </Button>
       </DialogTrigger>
@@ -82,7 +82,7 @@ export function WorkflowTemplatesPanel() {
           <div className="space-y-6">
             {workflowTemplateCategories.map((category) => {
               const categoryTemplates = workflowTemplates.filter(t => t.category === category.id);
-              const IconComponent = Icons[category.icon as keyof typeof Icons];
+              const IconComponent = (Icons as any)[category.icon] || Icons.File;
               
               return (
                 <div key={category.id} className="space-y-3">
@@ -96,7 +96,7 @@ export function WorkflowTemplatesPanel() {
                   
                   <div className="grid gap-3">
                     {categoryTemplates.map((template) => {
-                      const TemplateIcon = Icons[template.icon as keyof typeof Icons];
+                      const TemplateIcon = (Icons as any)[template.icon] || Icons.File;
                       
                       return (
                         <Card 
@@ -109,7 +109,7 @@ export function WorkflowTemplatesPanel() {
                           <CardContent className="p-4">
                             <div className="flex items-start gap-3">
                               <div className="mt-1">
-                                {TemplateIcon && <TemplateIcon className="size-5 text-primary" />}
+                                {typeof TemplateIcon === 'function' && <TemplateIcon className="size-5 text-muted-foreground" />}
                               </div>
                               <div className="flex-1 space-y-2">
                                 <div className="flex items-start justify-between">
@@ -123,7 +123,7 @@ export function WorkflowTemplatesPanel() {
                                 
                                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                   <div className="flex items-center gap-1">
-                                    <Icons.Box className="size-3" />
+                                    {typeof IconComponent === 'function' && <IconComponent className="size-6" />}
                                     <span>{template.nodes.length} nodes</span>
                                   </div>
                                   <div className="flex items-center gap-1">
@@ -145,7 +145,7 @@ export function WorkflowTemplatesPanel() {
                                     handleLoadTemplate(template.id);
                                   }}
                                 >
-                                  <Icons.Download className="size-3 mr-1" />
+                                  <Icons.FileText className="size-4 mr-2" />
                                   Load Template
                                 </Button>
                               </div>

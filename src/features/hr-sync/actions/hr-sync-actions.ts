@@ -240,21 +240,22 @@ export async function triggerManualSync(
       }
 
       // Add sync job to background queue
-      const job = await addHRSyncJob({
+      const job = await addHRSyncJob(configId, {
         syncLogId: syncLog.id,
-        configId: config.id,
         triggeredBy: user.id,
         syncType: config.sourceType,
       });
 
-      console.log(`📋 HR sync job queued: ${job.id}`);
+      await db.update(hrSyncLogs).set({
+        queueJobId: job.jobId,
+      }).where(eq(hrSyncLogs.id, syncLog.id));
 
       revalidatePath("/admin/hr-sync");
 
       return {
         success: true,
-        message: "Sync triggered successfully. Processing in background...",
-        data: { syncLog, jobId: job.id },
+        message: "Sync job queued successfully",
+        data: { syncLogId: syncLog.id, jobId: job.jobId },
       };
     }
   );
