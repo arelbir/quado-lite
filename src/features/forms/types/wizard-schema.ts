@@ -91,7 +91,7 @@ export interface WizardNavigation {
  * Helper: Check if form is wizard
  */
 export function isWizardForm(schema: FormSchema): schema is WizardFormSchema {
-  return 'ui:wizard' in schema && schema['ui:wizard']?.enabled === true;
+  return 'ui:wizard' in schema && (schema as any)['ui:wizard']?.enabled === true;
 }
 
 /**
