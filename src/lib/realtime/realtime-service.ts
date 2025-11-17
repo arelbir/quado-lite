@@ -43,8 +43,16 @@ export class RealtimeService {
 
       this.ws.onmessage = (event) => {
         try {
-          const message = JSON.parse(event.data) as { type: string; data: any };
-          this.emit(message.type, message.data);
+          const parsed = JSON.parse(event.data);
+          
+          // Validate message structure
+          if (typeof parsed === 'object' && parsed !== null && 
+              'type' in parsed && typeof parsed.type === 'string' &&
+              'data' in parsed) {
+            this.emit(parsed.type, parsed.data);
+          } else {
+            console.error('[Realtime] Invalid message format:', parsed);
+          }
         } catch (error) {
           console.error('[Realtime] Message parse error:', error);
         }

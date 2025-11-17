@@ -89,10 +89,10 @@ export async function POST(request: NextRequest) {
         title: data.title,
         message: data.message,
         priority: data.priority || "medium",
+        metadata: data.metadata || {},
         relatedEntityType: data.relatedEntityType as any,
         relatedEntityId: data.relatedEntityId,
         actionUrl: data.actionUrl,
-        metadata: data.metadata || {},
         isRead: false,
         createdAt: new Date(),
       })

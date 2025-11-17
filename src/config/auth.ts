@@ -11,6 +11,14 @@ import { env } from "@/env";
 import { NextResponse } from "next/server";
 import { authRoutes, publicPages } from "./routes";
 import { getMatchMenus } from "@/lib/core/compare";
+import { z } from "zod";
+
+const userPermissionResponseSchema = z.object({
+  menus: z.array(z.any()),
+  role: z.any(),
+  superAdmin: z.boolean(),
+});
+
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -62,8 +70,23 @@ export const authConfig = {
       if (isPublicRoute || pathname.startsWith("/api")) return true
 
       if (!auth?.user) return false
+      
       const res = await fetch(`${env.NEXT_PUBLIC_APP_URL}/api/get-user-permission?email=${auth?.user.email}`)
-      const data = await res.json() as { menus: MenuWithChildren[], role: UserRole, superAdmin: boolean }
+      
+      if (!res.ok) {
+        console.error('Failed to fetch user permissions');
+        return false;
+      }
+      
+      const jsonData = await res.json();
+      const validation = userPermissionResponseSchema.safeParse(jsonData);
+      
+      if (!validation.success) {
+        console.error('Invalid permission response:', validation.error);
+        return false;
+      }
+      
+      const data = validation.data;
 
       if (data.superAdmin) return true
 

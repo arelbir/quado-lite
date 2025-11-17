@@ -14,13 +14,27 @@
 
 "use client";
 
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { RefreshCw, Database, Play, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
-import { toast } from "sonner";
-import { useTranslations } from 'next-intl';
+
+const syncResponseSchema = z.object({
+  success: z.boolean(),
+  error: z.string().optional(),
+  result: z.object({
+    totalRecords: z.number(),
+    successCount: z.number(),
+    failedCount: z.number(),
+    skippedCount: z.number(),
+  }).optional(),
+});
 
 interface HRSyncConfig {
   id: string;
@@ -69,7 +83,18 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
         body: JSON.stringify({ configId }),
       });
 
-      const data = await response.json() as { success: boolean; error?: string };
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const jsonData = await response.json();
+      const validation = syncResponseSchema.safeParse(jsonData);
+      
+      if (!validation.success) {
+        throw new Error('Invalid response format');
+      }
+      
+      const data = validation.data;
       
       if (data.success) {
         toast.success(t('dashboard.syncCompleted'));

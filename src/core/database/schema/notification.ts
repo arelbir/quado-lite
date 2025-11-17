@@ -1,6 +1,16 @@
-import { pgTable, uuid, text, timestamp, pgEnum, boolean } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, pgEnum, boolean, json } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
+
+/**
+ * NOTIFICATION PRIORITY
+ */
+export const notificationPriorityEnum = pgEnum("notification_priority", [
+  "low",
+  "medium",
+  "high",
+  "urgent",
+]);
 
 /**
  * GENERIC NOTIFICATION CATEGORIES - Framework Core
@@ -51,10 +61,15 @@ export const notifications = pgTable("notifications", {
   category: notificationCategoryEnum("category").notNull(),
   title: text("title").notNull(),
   message: text("message").notNull(),
+  priority: notificationPriorityEnum("priority").default("medium").notNull(),
   
   // İlişkili entity
   relatedEntityType: relatedEntityTypeEnum("related_entity_type"),
   relatedEntityId: uuid("related_entity_id"),
+  
+  // İlave bilgiler
+  metadata: json("metadata").default({}).notNull(),
+  actionUrl: text("action_url"),
   
   // Durum
   isRead: boolean("is_read").default(false).notNull(),

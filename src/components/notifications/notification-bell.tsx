@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
+
+const notificationsResponseSchema = z.object({
+  notifications: z.array(z.any()),
+  unreadCount: z.number(),
+  total: z.number().optional(),
+});
 import {
   Popover,
   PopoverContent,
@@ -26,16 +33,23 @@ export function NotificationBell({ userId }: NotificationBellProps) {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/notifications?userId=${userId}`);
-      if (response.ok) {
-        const data = await response.json() as {
-          notifications: any[];
-          unreadCount: number;
-        };
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const jsonData = await response.json();
+      const validation = notificationsResponseSchema.safeParse(jsonData);
+      
+      if (!validation.success) {
+        console.error('Invalid response format:', validation.error);
+        throw new Error('Invalid response format');
+      }
+      
+      const data = validation.data;
+      setNotifications(data.notifications);
+      setUnreadCount(data.unreadCount);
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      console.error("Failed to fetch notifications:", error);
     } finally {
       setIsLoading(false);
     }

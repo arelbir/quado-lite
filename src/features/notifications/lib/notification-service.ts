@@ -33,10 +33,8 @@ export async function sendNotification(data: NotificationData) {
         category: data.type as any,
         title: data.title,
         message: data.message,
-        metadata: {
-          ...(data.metadata || {}),
-          priority: data.priority || 'medium',
-        },
+        priority: data.priority || 'medium',
+        metadata: data.metadata || {},
         relatedEntityType: data.metadata?.entityType as any,
         relatedEntityId: data.metadata?.entityId,
         actionUrl: data.actionUrl,
@@ -114,9 +112,9 @@ export async function scheduleNotification(
         category: data.type as any,
         title: data.title,
         message: data.message,
+        priority: data.priority || 'medium',
         metadata: {
           ...(data.metadata || {}),
-          priority: data.priority || 'medium',
           scheduledFor: scheduleAt.toISOString(),
           scheduled: true,
         },

@@ -69,11 +69,18 @@ export function ImageUploadMinio({ onChange }: ImageUploadProps) {
     });
 
     if (!response.ok) {
-      throw new Error('Upload failed');
+      const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
+      throw new Error(errorData.error || 'Upload failed');
     }
 
-    const data = await response.json() as { success: boolean; url: string; key: string };
-    return data;
+    const data = await response.json();
+    
+    // Validate response structure
+    if (!data.success || !data.url || !data.key) {
+      throw new Error('Invalid response from server');
+    }
+    
+    return { url: data.url, key: data.key };
   };
 
   const handleUpload = async () => {
