@@ -267,7 +267,7 @@ export function getRecentSearches(): string[] {
 
   try {
     const stored = localStorage.getItem('recentSearches');
-    return stored ? JSON.parse(stored) : [];
+    return stored ? (JSON.parse(stored) as string[]) : [];
   } catch (error) {
     return [];
   }

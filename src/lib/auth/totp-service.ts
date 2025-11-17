@@ -96,17 +96,17 @@ function generateHOTP(secret: string, counter: number): string {
   buffer.writeBigInt64BE(BigInt(counter));
   
   // Generate HMAC
-  const hmac = crypto.createHmac('sha1', Buffer.from(decodedSecret));
-  hmac.update(buffer);
+  const hmac = crypto.createHmac('sha1', Buffer.from(decodedSecret) as any);
+  hmac.update(buffer as any);
   const hash = hmac.digest();
   
   // Dynamic truncation
-  const offset = hash[hash.length - 1] & 0xf;
+  const offset = (hash[hash.length - 1] || 0) & 0xf;
   const binary =
-    ((hash[offset] & 0x7f) << 24) |
-    ((hash[offset + 1] & 0xff) << 16) |
-    ((hash[offset + 2] & 0xff) << 8) |
-    (hash[offset + 3] & 0xff);
+    (((hash[offset] || 0) & 0x7f) << 24) |
+    (((hash[offset + 1] || 0) & 0xff) << 16) |
+    (((hash[offset + 2] || 0) & 0xff) << 8) |
+    ((hash[offset + 3] || 0) & 0xff);
   
   const otp = binary % Math.pow(10, TOTP_DIGITS);
   return otp.toString().padStart(TOTP_DIGITS, '0');
@@ -151,7 +151,10 @@ function base32Decode(encoded: string): Uint8Array {
   const output = new Uint8Array(Math.ceil((cleanEncoded.length * 5) / 8));
 
   for (let i = 0; i < cleanEncoded.length; i++) {
-    const idx = alphabet.indexOf(cleanEncoded[i]);
+    const char = cleanEncoded[i];
+    if (!char) continue;
+    
+    const idx = alphabet.indexOf(char);
     if (idx === -1) throw new Error('Invalid base32 character');
 
     value = (value << 5) | idx;

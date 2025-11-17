@@ -70,7 +70,7 @@ export function CreateGroupDialog({ open, onOpenChange, onSuccess }: CreateGroup
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Icons.Users2 className="size-5" />
+            <Icons.Users className="size-5" />
             Create New Group
           </DialogTitle>
         </DialogHeader>

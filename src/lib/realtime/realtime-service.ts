@@ -43,7 +43,7 @@ export class RealtimeService {
 
       this.ws.onmessage = (event) => {
         try {
-          const message = JSON.parse(event.data);
+          const message = JSON.parse(event.data) as { type: string; data: any };
           this.emit(message.type, message.data);
         } catch (error) {
           console.error('[Realtime] Message parse error:', error);

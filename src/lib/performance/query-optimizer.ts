@@ -172,9 +172,9 @@ export class PerformanceMonitor {
     return {
       count: sorted.length,
       avg: sum / sorted.length,
-      min: sorted[0],
-      max: sorted[sorted.length - 1],
-      p95: sorted[p95Index],
+      min: sorted[0] || 0,
+      max: sorted[sorted.length - 1] || 0,
+      p95: sorted[p95Index] || 0,
     };
   }
 
