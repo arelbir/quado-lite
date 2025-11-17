@@ -1,22 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from "next/server";
 import { getRoleById } from "@/features/roles/actions/role-actions";
+import { sendSuccess, sendNotFound, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
-    console.log("🔍 [API Roles] Fetching ID:", id);
+    console.log(" [API Roles] Fetching ID:", id);
     
     const result = await getRoleById(id);
     
     if (!result.success || !result.data) {
-      console.log("❌ [API Roles] Not found:", id);
-      return NextResponse.json({ error: result.error || 'Role not found' }, { status: 404 });
+      log.warn('Role not found', { roleId: id });
+      return sendNotFound('Role');
     }
     
-    console.log("✅ [API Roles] Found:", result.data.name);
-    return NextResponse.json(result.data);
+    log.info('Role retrieved', { roleId: id, roleName: result.data.name });
+    return sendSuccess(result.data);
   } catch (error) {
-    console.error("❌ [API Roles] Error:", error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    log.error('Error getting role', error as Error);
+    return sendInternalError(error);
   }
 }

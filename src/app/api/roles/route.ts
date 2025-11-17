@@ -1,20 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from "next/server";
+import { currentUser } from "@/lib/auth/server";
 import { db } from "@/core/database/client";
-import { roles } from "@/core/database/schema";
+import { role } from "@/core/database/schema";
+import { sendSuccess, sendUnauthorized, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 import { eq } from "drizzle-orm";
 import { currentUser } from "@/lib/auth/server";
 
 export async function GET() {
   try {
-    console.log("🔍 [API Roles] Fetching all roles");
+    console.log(" [API Roles] Fetching all roles");
     
     // Simple auth check - no permission system needed for dropdown
     const user = await currentUser();
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return sendUnauthorized();
     }
     
     // Fetch active roles directly
@@ -31,13 +31,10 @@ export async function GET() {
       },
     });
     
-    console.log("✅ [API Roles] Found:", rolesList.length, "roles");
-    return NextResponse.json(rolesList);
+    log.info('Roles list retrieved', { count: rolesList.length });
+    return sendSuccess(rolesList, { total: rolesList.length });
   } catch (error: any) {
-    console.error("❌ [API Roles] Error:", error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    log.error('Error fetching roles', error);
+    return sendInternalError(error);
   }
 }

@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from "next/server";
 import { getUserRoles } from "@/features/users/actions/user-actions";
+import { sendSuccess, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 
 export async function GET(
   request: Request,
@@ -12,20 +14,14 @@ export async function GET(
     const result = await getUserRoles(id);
     
     if (!result.success) {
-      console.log("❌ [API User Roles] Failed:", result.message);
-      return NextResponse.json(
-        { error: result.message || 'Failed to fetch user roles' },
-        { status: 500 }
-      );
+      log.warn('Failed to fetch user roles', { userId: id, message: result.message });
+      return sendInternalError(result.message);
     }
     
-    console.log("✅ [API User Roles] Found:", result.data?.length || 0, "roles");
-    return NextResponse.json(result.data);
+    log.info('User roles retrieved', { userId: id, count: result.data?.length || 0 });
+    return sendSuccess(result.data, { total: result.data?.length || 0 });
   } catch (error: any) {
-    console.error("❌ [API User Roles] Error:", error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    log.error('Error getting user roles', error);
+    return sendInternalError(error);
   }
 }
