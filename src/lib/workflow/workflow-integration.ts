@@ -63,7 +63,7 @@ export async function getWorkflowDefinitionId(name: string): Promise<string | nu
 export async function getWorkflowByEntityType(entityType: string): Promise<string | null> {
   const definition = await db.query.workflowDefinitions.findFirst({
     where: and(
-      eq(workflowDefinitions.entityType, entityType),
+      eq(workflowDefinitions.entityType, entityType as any), // Generic - works with any entity type
       eq(workflowDefinitions.isActive, true)
     ),
   });
@@ -95,7 +95,7 @@ export async function buildEntityMetadata(
   // Load custom fields if defined for this entity
   let customFields = {};
   try {
-    const customFieldsResult = await getCustomFieldValues(entityType, entityId);
+    const customFieldsResult = await getCustomFieldValues(entityType as any, entityId);
     if (customFieldsResult.success && customFieldsResult.data) {
       customFields = customFieldsResult.data;
     }

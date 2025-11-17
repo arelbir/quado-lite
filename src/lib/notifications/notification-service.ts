@@ -84,10 +84,10 @@ export class NotificationService {
   ): Promise<void> {
     await db.insert(notifications).values({
       userId: data.userId,
-      category: data.category,
+      category: data.category as any, // Generic category support
       title: data.title,
       message: data.message,
-      relatedEntityType: data.relatedEntityType,
+      relatedEntityType: data.relatedEntityType as any, // Generic entity support
       relatedEntityId: data.relatedEntityId,
       isRead: false,
       emailSent: false,

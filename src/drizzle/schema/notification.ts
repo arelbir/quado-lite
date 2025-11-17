@@ -3,9 +3,26 @@ import { relations } from "drizzle-orm";
 import { user } from "./user";
 
 /**
- * Bildirim Kategorileri
+ * GENERIC NOTIFICATION CATEGORIES - Framework Core
+ * Domain modules can extend these categories
  */
 export const notificationCategoryEnum = pgEnum("notification_category", [
+  // Core workflow notifications
+  "workflow_assignment",
+  "workflow_deadline_approaching",
+  "workflow_escalated",
+  "workflow_approved",
+  "workflow_rejected",
+  "workflow_completed",
+  // Generic system notifications
+  "system_alert",
+  "user_mentioned",
+  "task_assigned",
+  "task_updated",
+  "task_completed",
+  "approval_required",
+  "approval_completed",
+  // Legacy domain categories (for backward compatibility - will be migrated)
   "finding_assigned",
   "finding_updated",
   "action_assigned",
@@ -19,22 +36,24 @@ export const notificationCategoryEnum = pgEnum("notification_category", [
   "plan_created",
   "audit_completed",
   "audit_reminder",
-  "workflow_assignment",
-  "workflow_deadline_approaching",
-  "workflow_escalated",
-  "workflow_approved",
-  "workflow_rejected",
 ]);
 
 /**
- * İlişkili Entity Tipleri
+ * GENERIC ENTITY TYPES - Framework Core
+ * Changed to text field to support any entity type
+ * Note: In production, this would be migrated to a text field for full flexibility
  */
 export const relatedEntityTypeEnum = pgEnum("related_entity_type", [
+  // Legacy types (for backward compatibility)
   "finding",
   "action",
   "dof",
   "audit",
   "plan",
+  // Generic types
+  "user",
+  "workflow",
+  "document",
 ]);
 
 /**
