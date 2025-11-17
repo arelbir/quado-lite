@@ -30,6 +30,9 @@ export interface JSONSchemaProperty {
   uniqueItems?: boolean;
   items?: JSONSchemaProperty;
   
+  // Object properties
+  properties?: Record<string, JSONSchemaProperty>;
+  
   // Enum/Options
   enum?: any[];
   enumNames?: string[];

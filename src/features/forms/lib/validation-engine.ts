@@ -33,7 +33,7 @@ export function jsonSchemaPropertyToZod(property: JSONSchemaProperty, fieldName:
       if (property.format === 'email') {
         schema = schema.email('Invalid email address');
       }
-      if (property.format === 'uri' || property.format === 'url') {
+      if (property.format === 'uri') {
         schema = schema.url('Invalid URL');
       }
       if (property.format === 'date') {
@@ -66,7 +66,7 @@ export function jsonSchemaPropertyToZod(property: JSONSchemaProperty, fieldName:
       break;
 
     case 'array':
-      let itemSchema = z.any();
+      let itemSchema: z.ZodType = z.string();
       if (property.items) {
         itemSchema = jsonSchemaPropertyToZod(property.items, `${fieldName}_item`);
       }
