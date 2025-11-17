@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "Denetim Yönetim Sistemi",
-    "description": "ISO Denetim ve CAPA Yönetimi"
+    "name": "Kurumsal Yönetim Sistemi",
+    "description": "Kullanıcı, Rol ve İş Akışı Yönetimi"
   },
   "actions": {
     "create": "Oluştur",

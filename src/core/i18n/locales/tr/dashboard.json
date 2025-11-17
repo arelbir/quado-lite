@@ -1,18 +1,18 @@
 {
-  "title": "Enterprise Framework",
-  "description": "Core framework dashboard",
+  "title": "Kurumsal Framework",
+  "description": "Ana framework kontrol paneli",
   
-  "welcome": "Welcome",
+  "welcome": "Hoş Geldiniz",
   "stats": {
-    "users": "Users",
-    "roles": "Roles",
-    "workflows": "Workflows",
-    "active": "Active"
+    "users": "Kullanıcılar",
+    "roles": "Roller",
+    "workflows": "İş Akışları",
+    "active": "Aktif"
   },
   
   "quickAccess": {
-    "title": "Quick Access",
-    "description": "Core framework features",
-    "noData": "No data yet"
+    "title": "Hızlı Erişim",
+    "description": "Temel framework özellikleri",
+    "noData": "Henüz veri yok"
   }
 }
