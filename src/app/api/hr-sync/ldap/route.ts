@@ -94,10 +94,7 @@ export async function GET(request: NextRequest) {
     const user = await currentUser();
     
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+      return sendUnauthorized();
     }
 
     // Get configId from query params
