@@ -104,7 +104,7 @@ export const authConfig = {
         return NextResponse.redirect(new URL("/not-found", request.url))
       }
 
-      const hasPermission = getMatchMenus(data.menus, pathname)
+      const hasPermission = getMatchMenus(data.menus as MenuWithChildren[], pathname)
 
       if (!hasPermission) {
         return NextResponse.redirect(new URL("/not-found", request.url))
