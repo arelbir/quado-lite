@@ -225,7 +225,43 @@ export async function escalateAssignment(assignmentId: string): Promise<Escalati
       createdAt: new Date(),
     });
 
-    // TODO: Send notification to escalation target
+    // Save escalation log
+    await db.insert(workflowEscalationLog).values({
+      assignmentId,
+      escalatedFrom: assignment.assignedUserId,
+      escalatedTo: escalationTarget,
+      reason: 'DEADLINE_EXCEEDED',
+      metadata: {
+        originalDeadline: assignment.deadline?.toISOString(),
+        escalationDate: new Date().toISOString(),
+      },
+      createdBy: 'SYSTEM',
+      createdAt: new Date(),
+    });
+
+    // Send notification to escalation target
+    try {
+      const { sendNotification } = await import('@/features/notifications');
+      
+      await sendNotification({
+        userId: escalationTarget,
+        type: 'workflow_escalated',
+        title: 'Workflow Escalated to You',
+        message: `A workflow task has been escalated to you from ${assignment.assignedUserId} due to deadline exceeded.`,
+        priority: 'urgent',
+        metadata: {
+          entityType: 'workflow',
+          entityId: assignment.workflowInstanceId,
+          assignmentId,
+          originalAssignee: assignment.assignedUserId,
+          escalationReason: 'DEADLINE_EXCEEDED',
+        },
+        actionUrl: `/admin/workflows/instance/${assignment.workflowInstanceId}`,
+      });
+    } catch (notifError) {
+      console.error('Failed to send escalation notification:', notifError);
+      // Don't fail the escalation if notification fails
+    }
 
     return {
       assignmentId,

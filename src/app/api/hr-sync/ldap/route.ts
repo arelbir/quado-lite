@@ -46,14 +46,16 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Check admin permission
-    // TODO: Use permission checker
-    // const checker = createPermissionChecker(user.id);
-    // if (!await checker.can({ resource: 'HRSync', action: 'Execute' })) {
-    //   return NextResponse.json(
-    //     { success: false, error: "Permission denied" },
-    //     { status: 403 }
-    //   );
-    // }
+    const { createPermissionChecker } = await import('@/lib/helpers/auth-helpers');
+    const checker = createPermissionChecker(user.id);
+    const hasPermission = await checker.can({ resource: 'HRSync', action: 'Execute' });
+    
+    if (!hasPermission.success || !hasPermission.data) {
+      return NextResponse.json(
+        { success: false, error: "Permission denied" },
+        { status: 403 }
+      );
+    }
 
     // 3. Parse request with validation
     const body = await request.json();

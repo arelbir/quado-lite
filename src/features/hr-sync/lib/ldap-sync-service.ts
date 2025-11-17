@@ -466,7 +466,13 @@ export class LDAPSyncService {
     if (!this.syncLogId) return;
 
     const now = new Date();
-    const startedAt = new Date(); // TODO: Get from log
+    
+    // Get startedAt from log
+    const syncLog = await db.query.hrSyncLogs.findFirst({
+      where: eq(hrSyncLogs.id, this.syncLogId),
+    });
+    
+    const startedAt = syncLog?.startedAt || new Date();
 
     await db.update(hrSyncLogs)
       .set({

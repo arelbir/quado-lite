@@ -97,41 +97,36 @@ export async function sendBulkNotifications(notifications: NotificationData[]) {
 }
 
 /**
- * Schedule notification for later delivery
- * Note: This requires a job queue implementation
+ * Schedule notification for later delivery using BullMQ
  */
 export async function scheduleNotification(
   data: NotificationData,
   scheduleAt: Date
 ) {
   try {
-    // For now, save with scheduled flag
-    // TODO: Integrate with BullMQ for scheduled jobs
-    const notificationId = nanoid();
+    // Use BullMQ for scheduled notifications
+    const { scheduleNotification: scheduleNotificationJob } = await import('@/lib/queue/notification-queue');
     
-    await db
-      .insert(notifications)
-      .values({
+    const result = await scheduleNotificationJob(
+      {
         userId: data.userId,
-        category: data.type as any,
+        category: data.type,
         title: data.title,
         message: data.message,
-        priority: data.priority || 'medium',
-        metadata: {
-          ...(data.metadata || {}),
-          scheduledFor: scheduleAt.toISOString(),
-          scheduled: true,
-        },
-        relatedEntityType: data.metadata?.entityType as any,
-        relatedEntityId: data.metadata?.entityId,
+        priority: data.priority,
+        metadata: data.metadata,
         actionUrl: data.actionUrl,
-        isRead: false,
-        createdAt: new Date(),
-      });
+      },
+      scheduleAt
+    );
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to schedule notification');
+    }
 
     return { 
       success: true, 
-      scheduledId: notificationId,
+      scheduledId: result.jobId,
       scheduledFor: scheduleAt 
     };
   } catch (error) {
