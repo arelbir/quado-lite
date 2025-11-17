@@ -1,33 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from "next/server";
 import { getUserById } from "@/features/users/actions/user-actions";
+import { sendSuccess, sendNotFound, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 
 export async function GET(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params;
-    
-    console.log("🔍 [API Users] Fetching ID:", id);
-    
+    const { id } = params;
     const result = await getUserById(id);
 
     if (!result.success || !result.data) {
-      console.log("❌ [API Users] Not found:", id);
-      return NextResponse.json(
-        { error: result.message || 'User not found' },
-        { status: 404 }
-      );
+      log.warn("User not found", { userId: id });
+      return sendNotFound("User");
     }
 
-    console.log("✅ [API Users] Found:", result.data.name);
+    log.info("User retrieved", { userId: id, userName: result.data.name });
     
-    return NextResponse.json(result.data);
+    return sendSuccess(result.data);
   } catch (error) {
-    console.error("❌ [API Users] Error:", error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    log.error("Error getting user", error as Error);
+    return sendInternalError(error);
   }
 }
