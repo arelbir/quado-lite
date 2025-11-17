@@ -84,8 +84,14 @@ export function ImageUploadMinio({ onChange }: ImageUploadProps) {
     const data = await response.json();
     
     // Validate response structure
-    if (!data.success || !data.url || !data.key) {
+    if (!data || typeof data !== 'object') {
       throw new Error('Invalid response from server');
+    }
+    
+    if (!('success' in data) || !data.success || 
+        !('url' in data) || typeof data.url !== 'string' ||
+        !('key' in data) || typeof data.key !== 'string') {
+      throw new Error('Invalid response structure from server');
     }
     
     return { url: data.url, key: data.key };
