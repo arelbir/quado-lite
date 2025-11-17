@@ -5,6 +5,7 @@
 
 import { Queue, QueueEvents } from 'bullmq';
 import { createRedisConnection } from '@/lib/queue/redis-connection';
+import { log } from '@/lib/monitoring/logger';
 
 export interface QueueStatus {
   active: number;
@@ -44,11 +45,11 @@ const queueEvents = new QueueEvents('hr-sync', {
 });
 
 queueEvents.on('completed', ({ jobId }) => {
-  console.log(`✅ HR Sync job completed: ${jobId}`);
+  log.queue('HR Sync job completed', { jobId, queue: 'hr-sync' });
 });
 
 queueEvents.on('failed', ({ jobId, failedReason }) => {
-  console.error(`❌ HR Sync job failed: ${jobId}`, failedReason);
+  log.error('HR Sync job failed', { jobId, reason: failedReason });
 });
 
 /**
@@ -73,7 +74,7 @@ export async function addHRSyncJob(
 
     return { jobId: job.id as string };
   } catch (error) {
-    console.error('Error adding HR sync job:', error);
+    log.error('Error adding HR sync job', error as Error);
     throw error;
   }
 }
@@ -97,7 +98,7 @@ export async function getQueueStatus(): Promise<QueueStatus> {
       failed,
     };
   } catch (error) {
-    console.error('Error getting queue status:', error);
+    log.error('Error getting queue status', error as Error);
     return {
       active: 0,
       waiting: 0,
@@ -123,7 +124,7 @@ export async function cancelSyncJob(jobId: string) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error cancelling sync job:', error);
+    log.error('Error cancelling sync job', error as Error);
     return { success: false, error: 'Failed to cancel job' };
   }
 }
@@ -150,7 +151,7 @@ export async function getJobDetails(jobId: string) {
       failedReason: job.failedReason,
     };
   } catch (error) {
-    console.error('Error getting job details:', error);
+    log.error('Error getting job details', error as Error);
     return null;
   }
 }

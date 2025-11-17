@@ -12,6 +12,7 @@
  */
 
 import { Client } from 'minio';
+import { log } from '@/lib/monitoring/logger';
 
 // Initialize MinIO client
 export const minioClient = new Client({
@@ -47,10 +48,10 @@ export async function ensureBucketExists() {
       };
       
       await minioClient.setBucketPolicy(BUCKET_NAME, JSON.stringify(policy));
-      console.log(`✅ MinIO bucket "${BUCKET_NAME}" created and configured`);
+      log.info('MinIO bucket created and configured', { bucket: BUCKET_NAME });
     }
   } catch (error) {
-    console.error('❌ MinIO bucket initialization error:', error);
+    log.error('MinIO bucket initialization error', error as Error);
     throw error;
   }
 }

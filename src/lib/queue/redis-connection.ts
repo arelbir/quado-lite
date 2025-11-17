@@ -4,6 +4,7 @@
  */
 
 import { Redis } from 'ioredis';
+import { log } from '@/lib/monitoring/logger';
 
 // Redis connection configuration from environment
 const redisConfig = {
@@ -26,11 +27,11 @@ export const redis = createRedisConnection();
 
 // Log connection status
 redis.on('connect', () => {
-  console.log('✅ Redis connected');
+  log.info('Redis connected successfully');
 });
 
 redis.on('error', (err) => {
-  console.error('❌ Redis connection error:', err);
+  log.error('Redis connection error', err);
 });
 
 // Graceful shutdown

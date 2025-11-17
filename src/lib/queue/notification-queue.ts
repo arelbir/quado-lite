@@ -5,6 +5,7 @@
 
 import { Queue, QueueEvents, Worker } from 'bullmq';
 import { createRedisConnection } from './redis-connection';
+import { log } from '@/lib/monitoring/logger';
 import { db } from '@/core/database/client';
 import { notifications } from '@/core/database/schema';
 import { realtime } from '@/lib/realtime/realtime-service';
@@ -45,11 +46,11 @@ const queueEvents = new QueueEvents('notifications', {
 });
 
 queueEvents.on('completed', ({ jobId }) => {
-  console.log(`✅ Notification sent: ${jobId}`);
+  log.queue('Notification sent', { jobId, queue: 'notifications' });
 });
 
 queueEvents.on('failed', ({ jobId, failedReason }) => {
-  console.error(`❌ Notification failed: ${jobId}`, failedReason);
+  log.error('Notification failed', { jobId, reason: failedReason });
 });
 
 /**
@@ -77,7 +78,7 @@ export async function scheduleNotification(
 
     return { success: true, jobId: job.id as string };
   } catch (error) {
-    console.error('Error scheduling notification:', error);
+    log.error('Error scheduling notification', error as Error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error' 
@@ -118,7 +119,7 @@ export async function cancelScheduledNotification(jobId: string): Promise<boolea
     }
     return false;
   } catch (error) {
-    console.error('Error cancelling scheduled notification:', error);
+    log.error('Error cancelling scheduled notification', error as Error);
     return false;
   }
 }
@@ -165,12 +166,12 @@ export function startNotificationWorker() {
             createdAt: notification.createdAt,
           });
         } catch (wsError) {
-          console.warn('WebSocket broadcast failed:', wsError);
+          log.warn('WebSocket broadcast failed', { error: wsError });
         }
 
         return { success: true, notificationId: notification.id };
       } catch (error) {
-        console.error('Error processing notification:', error);
+        log.error('Error processing notification', error as Error);
         throw error;
       }
     },
@@ -181,11 +182,11 @@ export function startNotificationWorker() {
   );
 
   worker.on('completed', (job) => {
-    console.log(`✅ Notification processed: ${job.id}`);
+    log.queue('Notification processed', { jobId: job.id });
   });
 
   worker.on('failed', (job, err) => {
-    console.error(`❌ Notification processing failed: ${job?.id}`, err);
+    log.error('Notification processing failed', { jobId: job?.id, error: err });
   });
 
   return worker;
