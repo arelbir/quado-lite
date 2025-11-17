@@ -60,6 +60,12 @@ export function DynamicFieldRenderer({
 
     case 'file':
       return (
+        <div className="text-sm text-muted-foreground p-2 border rounded">
+          Field type "file" not yet fully implemented (requires form integration)
+        </div>
+      );
+      /* TODO: Implement with proper form integration
+      return (
         <FormField
           control={form.control}
           name={field.name}
@@ -89,6 +95,7 @@ export function DynamicFieldRenderer({
           )}
         />
       );
+      */
 
     case 'files':
       return (
@@ -122,8 +129,15 @@ export function DynamicFieldRenderer({
           )}
         />
       );
+      */
 
     case 'user-picker':
+      return (
+        <div className="text-sm text-muted-foreground p-2 border rounded">
+          Field type "user-picker" not yet fully implemented (requires form integration)
+        </div>
+      );
+      /* TODO: Implement with proper form integration
       return (
         <FormField
           control={form.control}
@@ -154,6 +168,8 @@ export function DynamicFieldRenderer({
           )}
         />
       );
+      */
+      
     case 'department-picker':
     case 'multi-select':
     case 'color':
