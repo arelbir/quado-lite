@@ -257,15 +257,17 @@ function detectCycles(nodes: Node[], edges: Edge[]): string[][] {
     recursionStack.add(nodeId);
     path.push(nodeId);
 
-    const neighbors = graph.get(nodeId) || [];
-    for (const neighbor of neighbors) {
-      if (!visited.has(neighbor)) {
-        if (dfs(neighbor, [...path])) {
+    const neighbors = graph.get(nodeId);
+    if (neighbors) {
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor)) {
+          if (dfs(neighbor, [...path])) {
+            return true;
+          }
+        } else if (recursionStack.has(neighbor)) {
+          cycles.push([...path, neighbor]);
           return true;
         }
-      } else if (recursionStack.has(neighbor)) {
-        cycles.push([...path, neighbor]);
-        return true;
       }
     }
 

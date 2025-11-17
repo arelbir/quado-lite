@@ -72,7 +72,7 @@ export function NodeTemplatesPanel() {
               <ScrollArea className="h-[400px] px-4">
                 <div className="space-y-2 pb-4">
                   {getTemplatesByCategory(category.id as any).map(template => {
-                    const IconComponent = Icons[template.icon as keyof typeof Icons];
+                    const IconComponent = Icons[template.icon as keyof typeof Icons] as any;
                     
                     return (
                       <div
