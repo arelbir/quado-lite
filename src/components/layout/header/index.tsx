@@ -10,7 +10,7 @@ import { Icons } from '@/components/shared/icons'
 import { HeaderBreadcrumb } from './breadcrumb'
 import { getLatestUser } from '@/lib/auth/server'
 import { cn } from '@/lib/utils/cn'
-import { getGithubStar } from '@/server/other'
+// GitHub star feature removed
 import { Skeleton } from '@/components/ui/skeleton'
 import { NotificationBell } from '@/features/notifications/components/notification-bell'
 import { getUnreadCount } from '@/features/notifications/actions/notification-actions'
@@ -105,19 +105,6 @@ export const Header = async () => {
       <div className="w-full flex-1">
         <HeaderBreadcrumb />
       </div>
-      <Link href="https://github.com/arelbir/quado-lite"
-        className={cn(buttonVariants({
-          variant: 'ghost',
-        }),
-          'space-x-2'
-        )}
-      >
-        <Icons.Star className="size-4" />
-        <span className='text-base'>Star on Github</span>
-        <Suspense fallback={<Skeleton className='w-6 h-4' />}>
-          <GithubStar />
-        </Suspense>
-      </Link>
 
       <NotificationBell initialUnreadCount={unreadCount} />
       <LanguageSwitcher />
@@ -128,12 +115,7 @@ export const Header = async () => {
 }
 
 
-export const GithubStar = async () => {
-  const star = await getGithubStar()
-  return (
-    <span className='text-base bg-primary/10 px-1  rounded-sm'>{star}</span>
-  )
-}
+// GitHub star feature removed - can be re-added if needed
 
 export const HeaderSkeleton = () => {
   return (

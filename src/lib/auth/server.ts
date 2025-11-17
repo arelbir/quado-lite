@@ -1,6 +1,6 @@
 import "server-only"
 
-import { auth } from "@/server/auth"
+import { auth } from "@/lib/auth/nextauth"
 import { getUserById } from "@/core/database/queries/user"
 import { cache } from 'react'
 

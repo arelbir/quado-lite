@@ -1,6 +1,6 @@
 "use server"
 
-import { utapi } from "@/server/uploadthing"
+import { utapi } from "@/config/uploadthing"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { getLatestUser } from "@/features/auth";

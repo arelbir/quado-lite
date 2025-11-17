@@ -1,4 +1,4 @@
-import { POST, GET } from "@/server/auth";
+import { POST, GET } from "@/lib/auth/nextauth";
 
 
 export {  GET,  POST };

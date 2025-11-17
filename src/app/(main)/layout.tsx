@@ -1,6 +1,6 @@
 import { Header, HeaderSkeleton } from '@/components/layout/header'
 import { Sidebar, SidebarSkeleton } from '@/components/layout/sidebar'
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth/nextauth';
 import { SessionProvider } from 'next-auth/react';
 import React, { Suspense } from 'react'
 import { cookies } from 'next/headers';

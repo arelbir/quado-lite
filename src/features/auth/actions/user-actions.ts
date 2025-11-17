@@ -9,7 +9,7 @@ import { DeleteManyScheme, getUsersSchema } from "@/schema/data/users"
 import { AppearanceSchema, EmailSchema, ProfileSchema } from "@/schema/settings"
 import { UserSchema, user } from "@/core/database/schema"
 import { deleteUserById, deleteUsersByIds, getUserByEmail, updateUser } from "@/core/database/queries/user"
-import { sendVerificationEmail } from "@/server/mail/send-email"
+import { sendVerificationEmail } from "@/core/email/service/send-email"
 import { ActionReturnValue, AuthResponse } from "@/types/actions"
 import { type User } from "@/core/database/schema"
 import { User as UserDataType } from '@/types/model/user'

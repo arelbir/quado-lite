@@ -1,6 +1,9 @@
 import { env } from "@/env";
-import { domain, resend } from "./mail";
-import { MagicLinkEmail } from "./templates/magic-link-email";
+import { Resend } from 'resend';
+import { MagicLinkEmail } from "../templates/magic-link-email";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const domain = env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export async function sendVerificationEmail(
   {

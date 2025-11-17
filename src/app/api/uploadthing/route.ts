@@ -1,4 +1,4 @@
-import { ourFileRouter } from "@/server/uploadthing";
+import { ourFileRouter } from "@/config/uploadthing";
 import { createRouteHandler } from "uploadthing/next";
  
  
