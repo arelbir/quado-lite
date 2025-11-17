@@ -1,6 +1,6 @@
 "use client"
 
-import { MenuWithChildren } from "@/drizzle/schema"
+import { MenuWithChildren } from "@/core/database/schema"
 import { DownloadIcon, PlusIcon } from "@radix-ui/react-icons"
 import { type Table } from "@tanstack/react-table"
 

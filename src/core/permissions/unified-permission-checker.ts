@@ -13,14 +13,14 @@
  * Pattern: DRY + SOLID + Type-Safe
  */
 
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { eq, and, inArray } from "drizzle-orm";
 import {
   permissions,
   rolePermissions,
   stepAssignments,
   user,
-} from "@/drizzle/schema";
+} from "@/core/database/schema";
 
 /**
  * TYPES

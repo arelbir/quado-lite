@@ -1,5 +1,5 @@
-import { db } from "@/drizzle/db"
-import { menuTable } from "@/drizzle/schema"
+import { db } from "@/core/database/client"
+import { menuTable } from "@/core/database/schema"
 
 /**
  * MODERN MENU STRUCTURE - 2025

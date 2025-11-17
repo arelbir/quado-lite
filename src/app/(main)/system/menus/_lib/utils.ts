@@ -1,4 +1,4 @@
-import { Menu } from "@/drizzle/schema"
+import { Menu } from "@/core/database/schema"
 import {
   CheckCircledIcon, CrossCircledIcon
 } from "@radix-ui/react-icons"

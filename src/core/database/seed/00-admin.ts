@@ -4,8 +4,8 @@
  * This must run FIRST before any other seeds
  */
 
-import { db } from "@/drizzle/db";
-import { user, roles, userRoles } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { user, roles, userRoles } from "@/core/database/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 

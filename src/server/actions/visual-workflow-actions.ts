@@ -1,11 +1,11 @@
 'use server';
 
-import { db } from '@/drizzle/db';
-import { visualWorkflow, visualWorkflowVersion } from '@/drizzle/schema';
+import { db } from '@/core/database/client';
+import { visualWorkflow, visualWorkflowVersion } from '@/core/database/schema';
 import { eq, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { withAuth, createPermissionError } from '@/lib/helpers';
-import { checkPermission } from '@/lib/permissions/unified-permission-checker';
+import { checkPermission } from '@/core/permissions/unified-permission-checker';
 
 /**
  * Create new visual workflow

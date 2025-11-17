@@ -2,11 +2,11 @@ import { authConfig } from "@/config/auth";
 import { comparePassword } from "@/lib/core/compare";
 import Credentials from "next-auth/providers/credentials";
 import NextAuth from "next-auth";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { eq } from "drizzle-orm";
-import { user } from "@/drizzle/schema";
-import { getUserById } from "./data/user";
-import { getUserRoles } from "./data/role-menu";
+import { user } from "@/core/database/schema";
+import { getUserByEmail, getUserById } from "@/core/database/queries/user";
+import { getUserRoles } from "@/core/database/queries/role-menu";
 import { normalizeEmailForLogin } from "@/lib/utils/email";
 
 export const {

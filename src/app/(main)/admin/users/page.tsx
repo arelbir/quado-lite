@@ -14,8 +14,8 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
-import { user, departments, positions } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { user, departments, positions } from "@/core/database/schema";
 import { count, or, ilike, sql } from "drizzle-orm";
 import { UsersTableClient } from "./users-table-client";
 import { paginate, getPaginationInfo } from "@/lib/core/pagination";

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/tooltip"
 
 import { deleteMenus, updateMenus } from "../_lib/mutations"
-import { MenuWithChildren, menuStatus, type Menu } from "@/drizzle/schema"
+import { MenuWithChildren, menuStatus, type Menu } from "@/core/database/schema"
 import { Kbd } from "@/components/shared/kbd"
 
 interface MenusTableFloatingBarProps {

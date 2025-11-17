@@ -7,8 +7,7 @@ config({ path: resolve(process.cwd(), '.env') });
 process.env.SKIP_ENV_VALIDATION = 'true';
 
 import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { db } from "./db";
-
+import { db } from './client';
 
 const runMigrate = async () => {
   console.log("⏳ Running migrations...");

@@ -1,4 +1,4 @@
-import { Theme } from "@/drizzle/schema/enum";
+import { Theme } from "@/core/database/schema/enum";
 import { z } from "zod";
 
 

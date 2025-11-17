@@ -1,3 +1,3 @@
-import { Menu } from "@/drizzle/schema";
+import { Menu } from "@/core/database/schema";
 
 export type MenuWithValue = Omit<Menu, 'icon'> & { value: string }

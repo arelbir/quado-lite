@@ -14,8 +14,8 @@
 
 "use server";
 
-import { db } from "@/drizzle/db";
-import { companies, branches, departments, positions } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { companies, branches, departments, positions } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { 
   withAuth, 
@@ -24,7 +24,7 @@ import {
   createValidationError,
   createPermissionError
 } from "@/lib/helpers";
-import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { checkPermission } from "@/core/permissions/unified-permission-checker";
 import type { ActionResponse, User, Company, Branch, Department, Position } from "@/lib/types";
 
 // ============================================

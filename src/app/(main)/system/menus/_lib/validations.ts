@@ -1,4 +1,4 @@
-import { menuTable } from "@/drizzle/schema"
+import { menuTable } from "@/core/database/schema"
 import * as z from "zod"
 
 export const searchParamsSchema = z.object({

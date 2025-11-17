@@ -16,7 +16,7 @@
  * Week 7-8: Day 2
  */
 
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { 
   hrSyncConfigs, 
   hrSyncLogs, 
@@ -25,8 +25,8 @@ import {
   type HRSyncConfig,
   type FieldMapping,
   type SyncResult
-} from "@/drizzle/schema/hr-sync";
-import { user } from "@/drizzle/schema";
+} from "@/core/database/schema/hr-sync";
+import { user } from "@/core/database/schema";
 import { eq, and } from "drizzle-orm";
 import Papa from 'papaparse';
 

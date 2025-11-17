@@ -11,8 +11,8 @@
  * Created: 2025-01-25
  */
 
-import { db } from "@/drizzle/db";
-import { stepAssignments, workflowInstances, user, workflowTimeline, notifications } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { stepAssignments, workflowInstances, user, workflowTimeline, notifications } from "@/core/database/schema";
 import { eq, and, lte, isNull, sql } from "drizzle-orm";
 
 /**

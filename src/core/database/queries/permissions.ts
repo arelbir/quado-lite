@@ -1,5 +1,5 @@
-import { db } from "@/drizzle/db";
-import { MenuWithChildren, user } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { MenuWithChildren, user } from "@/core/database/schema";
 import { SQL, eq } from "drizzle-orm";
 import { getMenuHierarchy } from '@/lib/core/array'
 import { getMenusByUserId } from "./menu";

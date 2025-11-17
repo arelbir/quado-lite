@@ -11,9 +11,9 @@
  * - Role auto-assignment
  */
 
-import { db } from "@/drizzle/db";
-import { user } from "@/drizzle/schema/user";
-import { roles, userRoles } from "@/drizzle/schema/role-system";
+import { db } from "@/core/database/client";
+import { user } from "@/core/database/schema/user";
+import { roles, userRoles } from "@/core/database/schema/role-system";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 

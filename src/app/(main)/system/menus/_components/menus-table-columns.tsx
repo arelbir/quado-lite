@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { MenuType, MenuWithChildren, menuTable, } from "@/drizzle/schema"
+import { MenuType, MenuWithChildren, menuTable, } from "@/core/database/schema"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import { type ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"

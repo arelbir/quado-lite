@@ -11,8 +11,8 @@
  * Refactored: 2025-11-17 (Framework Core)
  */
 
-import { db } from "@/drizzle/db";
-import { workflowDefinitions } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { workflowDefinitions } from "@/core/database/schema";
 import { eq, and } from "drizzle-orm";
 import { getCustomFieldValues } from "@/server/actions/custom-field-value-actions";
 

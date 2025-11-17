@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, X, Shield, Minus } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useTranslations } from 'next-intl';
-import type { roles, permissions } from "@/drizzle/schema/role-system";
+import type { roles, permissions } from "@/core/database/schema/role-system";
 
 type Role = typeof roles.$inferSelect;
 type Permission = typeof permissions.$inferSelect;

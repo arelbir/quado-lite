@@ -1,7 +1,7 @@
 'use server';
 
-import { db } from '@/drizzle/db';
-import { customFieldDefinitions, customFieldValues } from '@/drizzle/schema';
+import { db } from '@/core/database/client';
+import { customFieldDefinitions, customFieldValues } from '@/core/database/schema';
 import { withAuth, createValidationError } from '@/lib/helpers';
 import type { ActionResponse, EntityType, CustomFieldWithValue } from '@/lib/types';
 import { eq, and } from 'drizzle-orm';

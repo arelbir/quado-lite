@@ -14,7 +14,7 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { OrgChartView } from "@/components/admin/org-chart-view";
 
 export const metadata: Metadata = {

@@ -13,8 +13,8 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
-import { departments, branches, user } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { departments, branches, user } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Users, BarChart3, FolderTree } from "lucide-react";

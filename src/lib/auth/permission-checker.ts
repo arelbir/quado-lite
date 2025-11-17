@@ -13,9 +13,9 @@
  * Sprint: Week 3 - Permission System Implementation
  */
 
-import { db } from "@/drizzle/db";
-import { userRoles, rolePermissions, permissions } from "@/drizzle/schema/role-system";
-import { user } from "@/drizzle/schema/user";
+import { db } from "@/core/database/client";
+import { userRoles, rolePermissions, permissions } from "@/core/database/schema/role-system";
+import { user } from "@/core/database/schema/user";
 import { eq, and } from "drizzle-orm";
 
 /**

@@ -1,7 +1,7 @@
 "use server"
 
 import { action } from "@/lib/core/safe-action"
-import { assignMenusToUser, getMenusByUserId } from "@/server/data/menu"
+import { assignMenusToUser, getMenusByUserId } from "@/core/database/queries/menu"
 import { MenuWithValue } from "@/types/model/menu"
 import { assignMenusToUserSchema, getMenusByUserIdSchema } from '@/schema/data/menus'
 

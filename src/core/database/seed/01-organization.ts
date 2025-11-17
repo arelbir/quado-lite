@@ -4,8 +4,8 @@
  * 150-person company structure
  */
 
-import { db } from "@/drizzle/db";
-import { companies, branches, departments, positions } from "@/drizzle/schema/organization";
+import { db } from "@/core/database/client";
+import { companies, branches, departments, positions } from "@/core/database/schema/organization";
 
 export async function seedOrganization(adminId: string) {
   console.log("\n📦 SEEDING: Organization...");

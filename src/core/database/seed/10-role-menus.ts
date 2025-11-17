@@ -9,8 +9,8 @@
  * Phase: Role-Menu Integration
  */
 
-import { db } from "@/drizzle/db";
-import { roles, roleMenus, menuTable } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { roles, roleMenus, menuTable } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 
 export async function seedRoleMenus(adminId: string) {

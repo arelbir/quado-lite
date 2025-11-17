@@ -24,8 +24,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { syncFromLDAP } from "@/lib/hr-sync/ldap-sync-service";
 import { currentUser } from "@/lib/auth/server";
-import { db } from "@/drizzle/db";
-import { hrSyncLogs } from "@/drizzle/schema/hr-sync";
+import { db } from "@/core/database/client";
+import { hrSyncLogs } from "@/core/database/schema/hr-sync";
 import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {

@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/drizzle/db";
-import { user } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { user } from "@/core/database/schema";
 import { currentUser } from "@/lib/auth/server";
 
 /**

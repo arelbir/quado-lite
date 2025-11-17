@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { Theme } from "@/drizzle/schema"
+import { Theme } from "@/core/database/schema"
 import { cn } from "@/lib/utils/cn"
 
 

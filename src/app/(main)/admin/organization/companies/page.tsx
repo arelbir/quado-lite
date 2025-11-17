@@ -13,7 +13,7 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { CompaniesTableClient } from "./companies-table-client";
 import type { Company } from "@/lib/types";
 

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog"
 
 import { deleteMenus } from "../_lib/mutations"
-import { MenuWithChildren } from "@/drizzle/schema"
+import { MenuWithChildren } from "@/core/database/schema"
 
 interface DeleteMenusDialogProps
   extends React.ComponentPropsWithoutRef<typeof Dialog> {

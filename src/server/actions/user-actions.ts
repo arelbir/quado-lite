@@ -13,9 +13,9 @@
 
 "use server";
 
-import { db } from "@/drizzle/db";
-import { user } from "@/drizzle/schema";
-import { userRoles, roles } from "@/drizzle/schema/role-system";
+import { db } from "@/core/database/client";
+import { user } from "@/core/database/schema";
+import { userRoles, roles } from "@/core/database/schema/role-system";
 import { getUserWithRoles } from "@/lib/db/query-helpers";
 import { eq, and } from "drizzle-orm";
 import { 
@@ -24,7 +24,7 @@ import {
   createValidationError,
   createPermissionError 
 } from "@/lib/helpers";
-import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { checkPermission } from "@/core/permissions/unified-permission-checker";
 import { revalidatePath } from "next/cache";
 import type { ActionResponse } from "@/lib/types";
 

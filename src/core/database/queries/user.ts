@@ -1,8 +1,8 @@
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { format, toDate } from "date-fns"
 import { eq, inArray, isNotNull } from "drizzle-orm";
-import { user, Theme, UserStatus, userMenuTable } from "@/drizzle/schema";
-import { userRoles as userRolesTable } from "@/drizzle/schema/role-system";
+import { user, Theme, UserStatus, userMenuTable } from "@/core/database/schema";
+import { userRoles as userRolesTable } from "@/core/database/schema/role-system";
 import { currentUser } from "@/lib/auth/server";
 import to from "@/lib/utils/cn";
 import { SignupSchema } from "@/schema/auth";

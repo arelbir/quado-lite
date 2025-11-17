@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import {
   workflowDefinitions,
   workflowInstances,
@@ -12,7 +12,7 @@ import {
   type WorkflowStep,
   type WorkflowTransition,
   type WorkflowCondition,
-} from "@/drizzle/schema";
+} from "@/core/database/schema";
 import { eq, and, lte, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { withAuth } from "@/lib/helpers/auth-helpers";
@@ -21,7 +21,7 @@ import {
   createNotFoundError,
   createPermissionError,
 } from "@/lib/helpers/error-helpers";
-import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { checkPermission } from "@/core/permissions/unified-permission-checker";
 import type { ActionResponse, User } from "@/lib/types/common";
 import { getNextAssignee, type AssignmentStrategy } from "@/lib/workflow/auto-assignment";
 import { escalateAssignment as escalateAssignmentInternal } from "@/lib/workflow/deadline-monitor";

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { menuTable, type Menu } from "@/drizzle/schema"
+import { menuTable, type Menu } from "@/core/database/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusIcon } from "@radix-ui/react-icons"
 import { type Row } from "@tanstack/react-table"

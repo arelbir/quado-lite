@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ShieldCheck, MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import type { roles } from "@/drizzle/schema/role-system";
+import type { roles } from "@/core/database/schema/role-system";
 
 type Role = typeof roles.$inferSelect;
 

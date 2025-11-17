@@ -1,4 +1,4 @@
-import { Menu, MenuWithChildren } from "@/drizzle/schema";
+import { Menu, MenuWithChildren } from "@/core/database/schema";
 import { compare } from "bcryptjs";
 
 export const comparePassword = async (password: string, maybeUserPassword: string) => await compare(password, maybeUserPassword);

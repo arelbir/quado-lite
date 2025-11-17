@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/drizzle/db";
-import { hrSyncConfigs, hrSyncLogs } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { hrSyncConfigs, hrSyncLogs } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { withAuth } from "@/lib/helpers/auth-helpers";
@@ -10,7 +10,7 @@ import {
   createNotFoundError,
   createPermissionError,
 } from "@/lib/helpers/error-helpers";
-import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { checkPermission } from "@/core/permissions/unified-permission-checker";
 import { addHRSyncJob, getQueueStatus, cancelSyncJob } from "@/lib/queue/hr-sync-queue";
 
 interface ActionResponse {

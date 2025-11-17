@@ -14,7 +14,7 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { HRSyncDashboard } from "@/components/admin/hr-sync-dashboard";
 import { HRSyncLogsTableClient } from "./hr-sync-logs-table-client";
 import { HRSyncConfigsClient } from "./hr-sync-configs-client";

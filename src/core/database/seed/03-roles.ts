@@ -8,8 +8,8 @@
  * Sprint: Week 2 - Multi-Role System
  */
 
-import { db } from "@/drizzle/db";
-import { roles, permissions, rolePermissions } from "@/drizzle/schema/role-system";
+import { db } from "@/core/database/client";
+import { roles, permissions, rolePermissions } from "@/core/database/schema/role-system";
 
 /**
  * SYSTEM ROLES

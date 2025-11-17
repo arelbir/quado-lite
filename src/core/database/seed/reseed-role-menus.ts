@@ -3,8 +3,8 @@
  * Clean and re-create role-menu mappings
  */
 
-import { db } from "@/drizzle/db";
-import { roleMenus, user } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { roleMenus, user } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { seedRoleMenus } from "./10-role-menus";
 

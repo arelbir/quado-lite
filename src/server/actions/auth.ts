@@ -4,20 +4,20 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/config/routes";
 import { action } from "@/lib/core/safe-action"
 import { LoginSchema, NewPasswordSchema, RegisterByAdminSchema, ResetSchema, SignupByTokenSchema, SignupSchema } from "@/schema/auth"
 import { signIn, signOut } from "@/server/auth";
-import { getUserByEmail, getUserById, updateUserEmail, updateUserPassword } from "@/server/data/user";
-import { db } from "@/drizzle/db";
-import { user, userRoles, roles } from "@/drizzle/schema";
+import { getUserByEmail, getUserById, updateUserEmail, updateUserPassword } from "@/core/database/queries/user";
+import { db } from "@/core/database/client";
+import { user, userRoles, roles } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { AuthError } from "next-auth";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { generatePasswordResetToken, generateRegisterEmailVerificationToken, generateVerificationToken } from "@/lib/core/tokens";
-import { deletePasswordResetToken, getPasswordResetTokenByToken } from "@/server/data/password-reset-token";
+import { deletePasswordResetToken, getPasswordResetTokenByToken } from "@/core/database/queries/password-reset-token";
 import { sendPasswordResetEmail, sendRegisterEmail, sendVerificationEmail } from "@/server/mail/send-email";
-import { deleteVerificationToken, getVerificationTokenByToken } from "@/server/data/verification-token";
+import { deleteVerificationToken, getVerificationTokenByToken } from "@/core/database/queries/verification-token";
 import { AuthResponse } from "@/types/actions";
-import { deleteNewEmailVerificationToken, getNewEmailVerificationTokenByToken } from "@/server/data/email-verification-token";
-import { deleteRegisterVerificationToken, getRegisterVerificationTokenByToken } from "@/server/data/signup-verification-token";
+import { deleteNewEmailVerificationToken, getNewEmailVerificationTokenByToken } from "@/core/database/queries/email-verification-token";
+import { deleteRegisterVerificationToken, getRegisterVerificationTokenByToken } from "@/core/database/queries/signup-verification-token";
 import { normalizeEmailForLogin } from "@/lib/utils/email";
 
 

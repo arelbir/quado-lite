@@ -4,7 +4,7 @@ import { toast } from "sonner"
 import { getErrorMessage } from "@/lib/core/error"
 
 import { deleteMenusAction, updateMenu } from "./actions"
-import { MenuWithChildren } from "@/drizzle/schema"
+import { MenuWithChildren } from "@/core/database/schema"
 
 
 

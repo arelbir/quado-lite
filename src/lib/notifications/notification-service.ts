@@ -1,5 +1,5 @@
-import { db } from "@/drizzle/db";
-import { notifications, notificationPreferences } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { notifications, notificationPreferences } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 
 /**
@@ -109,7 +109,7 @@ export class NotificationService {
       });
 
       // Email gönderimi burada yapılacak
-      // import { EmailService } from '@/lib/email/email-service';
+      // import { EmailService } from '@/core/email/service/email-service';
       // await EmailService.sendFindingAssigned({...});
       
       // Notification tablosunu email sent olarak güncelle

@@ -1,6 +1,6 @@
 import { Icons } from "@/components/shared/icons";
-import { MenuWithChildren, session } from "@/drizzle/schema";
-import { getUserPermissions } from "@/server/data/permissions";
+import { MenuWithChildren, session } from "@/core/database/schema";
+import { getUserPermissions } from "@/core/database/queries/permissions";
 import { LucideIcon } from "lucide-react";
 import { MenuItem, SidebarContainer } from "./sidebar-container";
 import { Skeleton } from "@/components/ui/skeleton";

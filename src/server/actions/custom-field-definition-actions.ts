@@ -1,9 +1,9 @@
 'use server';
 
-import { db } from '@/drizzle/db';
-import { customFieldDefinitions } from '@/drizzle/schema';
+import { db } from '@/core/database/client';
+import { customFieldDefinitions } from '@/core/database/schema';
 import { withAuth, createValidationError, createNotFoundError, createPermissionError } from '@/lib/helpers';
-import { checkPermission } from '@/lib/permissions/unified-permission-checker';
+import { checkPermission } from '@/core/permissions/unified-permission-checker';
 import { revalidatePath } from 'next/cache';
 import type { ActionResponse, CustomFieldDefinition, EntityType } from '@/lib/types';
 import { eq, and } from 'drizzle-orm';

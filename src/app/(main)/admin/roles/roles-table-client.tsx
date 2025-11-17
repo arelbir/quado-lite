@@ -14,7 +14,7 @@ import { RolesPermissionMatrix } from "@/components/admin/roles-permission-matri
 import { deleteRole } from "@/server/actions/role-actions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Grid3x3 } from "lucide-react";
-import type { roles, permissions } from "@/drizzle/schema/role-system";
+import type { roles, permissions } from "@/core/database/schema/role-system";
 
 type Role = typeof roles.$inferSelect;
 type Permission = typeof permissions.$inferSelect;

@@ -3,10 +3,10 @@ import "server-only"
 import { unstable_noStore as noStore } from "next/cache"
 import { and, asc, count, desc, eq, gte, lte, or } from "drizzle-orm"
 
-import { db } from "@/drizzle/db"
+import { db } from "@/core/database/client"
 import { filterColumn } from "@/lib/core/filter"
 import { GetMenusSchema } from "@/schema/data/menus"
-import { Menu, MenuWithChildren, menuTable } from "@/drizzle/schema"
+import { Menu, MenuWithChildren, menuTable } from "@/core/database/schema"
 import { getMenuHierarchy } from '@/lib/core/array'
 
 

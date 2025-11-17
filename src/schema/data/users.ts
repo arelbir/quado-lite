@@ -1,4 +1,4 @@
-import { UserSchema } from "@/drizzle/schema";
+import { UserSchema } from "@/core/database/schema";
 import { z } from "zod";
 
 export const UpdateUsersSchema = z.object({

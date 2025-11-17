@@ -5,9 +5,9 @@ import { eq, inArray } from "drizzle-orm"
 
 import { getErrorMessage } from "@/lib/core/error"
 
-import { db } from "@/drizzle/db"
+import { db } from "@/core/database/client"
 import type { CreateMenuSchema, UpdateMenuSchema } from "./validations"
-import { menuTable } from "@/drizzle/schema"
+import { menuTable } from "@/core/database/schema"
 import { currentUser } from "@/lib/auth/server"
 
 

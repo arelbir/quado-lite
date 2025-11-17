@@ -1,12 +1,12 @@
 "use server";
 
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { 
   roles, 
   rolePermissions, 
   roleMenus, 
   userRoles 
-} from "@/drizzle/schema";
+} from "@/core/database/schema";
 import { getRoleWithRelations } from "@/lib/db/query-helpers";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -16,7 +16,7 @@ import {
   createNotFoundError, 
   createPermissionError 
 } from "@/lib/helpers/error-helpers";
-import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { checkPermission } from "@/core/permissions/unified-permission-checker";
 import type { User } from "@/lib/types";
 
 interface ActionResponse {

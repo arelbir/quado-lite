@@ -11,8 +11,8 @@
  * Created: 2025-01-25
  */
 
-import { db } from "@/drizzle/db";
-import { user, stepAssignments, workflowDelegations } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { user, stepAssignments, workflowDelegations } from "@/core/database/schema";
 import { eq, and, lte, gte, count } from "drizzle-orm";
 
 /**

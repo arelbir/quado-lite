@@ -5,8 +5,8 @@
  * This replaces the old user_menu table approach
  */
 
-import { db } from "@/drizzle/db";
-import { user, userRoles, roles, roleMenus, menuTable } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { user, userRoles, roles, roleMenus, menuTable } from "@/core/database/schema";
 import { eq, and } from "drizzle-orm";
 
 /**

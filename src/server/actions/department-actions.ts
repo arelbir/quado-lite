@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/drizzle/db";
-import { departments } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { departments } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import type { ActionResponse, User } from "@/lib/types";
@@ -11,7 +11,7 @@ import {
   createValidationError,
   createPermissionError,
 } from "@/lib/helpers";
-import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { checkPermission } from "@/core/permissions/unified-permission-checker";
 import { revalidatePath } from "next/cache";
 
 // Validation schema

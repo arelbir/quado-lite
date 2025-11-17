@@ -8,8 +8,8 @@
  * Sprint: Week 4 - Teams & Groups
  */
 
-import { db } from "@/drizzle/db";
-import { teams, groups, departments } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { teams, groups, departments } from "@/core/database/schema";
 
 /**
  * SEED TEAMS

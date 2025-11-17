@@ -1,4 +1,4 @@
-import { MenuWithChildren } from "@/drizzle/schema";
+import { MenuWithChildren } from "@/core/database/schema";
 interface HasChildren<T> {
   children?: T[];
   id: string;

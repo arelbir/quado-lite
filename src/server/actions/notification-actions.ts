@@ -1,11 +1,11 @@
 "use server";
 
-import { db } from "@/drizzle/db";
-import { notifications, notificationPreferences } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { notifications, notificationPreferences } from "@/core/database/schema";
 import { eq, desc } from "drizzle-orm";
 import type { ActionResponse, User } from "@/lib/types";
 import { withAuth, revalidateCommonPaths, createPermissionError } from "@/lib/helpers";
-import { checkPermission } from "@/lib/permissions/unified-permission-checker";
+import { checkPermission } from "@/core/permissions/unified-permission-checker";
 
 /**
  * Kullanıcının bildirimlerini getir

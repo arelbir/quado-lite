@@ -12,7 +12,7 @@
  * intermediate `any` kullanılır ama return type'lar tamamen type-safe.
  */
 
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { eq, and, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 

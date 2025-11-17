@@ -1,5 +1,5 @@
-import { db } from "@/drizzle/db"
-import { menuTable, userMenuTable } from "@/drizzle/schema/menu"
+import { db } from "@/core/database/client"
+import { menuTable, userMenuTable } from "@/core/database/schema/menu"
 import { eq } from "drizzle-orm"
 
 export const getMenusByUserId = async (userId: string) => {

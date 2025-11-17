@@ -7,12 +7,12 @@
  * - Custom fields for conditions
  */
 
-import { db } from '@/drizzle/db';
-import { roles, user, departments } from '@/drizzle/schema';
+import { db } from '@/core/database/client';
+import { roles, user, departments } from '@/core/database/schema';
 import { eq } from 'drizzle-orm';
 import type { ActionResponse } from '@/lib/types';
 import { withAuth, createPermissionError } from '@/lib/helpers';
-import { checkPermission } from '@/lib/permissions/unified-permission-checker';
+import { checkPermission } from '@/core/permissions/unified-permission-checker';
 
 /**
  * Get all active roles for workflow assignment

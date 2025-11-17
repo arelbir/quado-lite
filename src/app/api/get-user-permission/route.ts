@@ -1,9 +1,9 @@
-import { getMenusByUserId } from "@/server/data/menu";
-import { getUserByEmail } from "@/server/data/user";
-import { getMenusByUserRoles, getUserRoles, isSuperAdmin } from "@/server/data/role-menu";
+import { getMenusByUserId } from "@/core/database/queries/menu";
+import { getUserByEmail } from "@/core/database/queries/user";
+import { getMenusByUserRoles, getUserRoles, isSuperAdmin } from "@/core/database/queries/role-menu";
 import { NextRequest, NextResponse } from "next/server";
 import { getMenuHierarchy } from "@/lib/core/array";
-import { MenuWithChildren } from "@/drizzle/schema";
+import { MenuWithChildren } from "@/core/database/schema";
 
 export async function GET(request: NextRequest) {
 

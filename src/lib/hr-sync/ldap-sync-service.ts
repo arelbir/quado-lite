@@ -16,7 +16,7 @@
  * Week 7-8: Day 1
  */
 
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { 
   hrSyncConfigs, 
   hrSyncLogs, 
@@ -26,8 +26,8 @@ import {
   type LDAPConfig,
   type FieldMapping,
   type SyncResult
-} from "@/drizzle/schema/hr-sync";
-import { departments, positions, user } from "@/drizzle/schema";
+} from "@/core/database/schema/hr-sync";
+import { departments, positions, user } from "@/core/database/schema";
 import { eq, and } from "drizzle-orm";
 
 import { Client, type Entry, type SearchResult } from 'ldapts';

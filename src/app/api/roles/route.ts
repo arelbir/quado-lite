@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db } from "@/drizzle/db";
-import { roles } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { roles } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { currentUser } from "@/lib/auth/server";
 

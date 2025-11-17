@@ -4,8 +4,8 @@ import {
 } from "next-auth";
 
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
-import { db } from "@/drizzle/db";
-import { MenuWithChildren, UserRole, user } from "@/drizzle/schema";
+import { db } from "@/core/database/client";
+import { MenuWithChildren, UserRole, user } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { env } from "@/env";
 import { NextResponse } from "next/server";

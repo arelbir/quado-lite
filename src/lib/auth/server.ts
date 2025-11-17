@@ -1,7 +1,7 @@
 import "server-only"
 
 import { auth } from "@/server/auth"
-import { getUserById } from "@/server/data/user"
+import { getUserById } from "@/core/database/queries/user"
 import { cache } from 'react'
 
 export const currentUser = cache(async () => {

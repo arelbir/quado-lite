@@ -13,7 +13,7 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { RolesTableClient } from "./roles-table-client";
 
 export const metadata: Metadata = {

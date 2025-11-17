@@ -1,10 +1,10 @@
 import { randomUUID } from "crypto";
-import { getPasswordResetTokenByEmail } from "@/server/data/password-reset-token";
-import { getVerificationTokenByEmail } from "@/server/data/verification-token";
-import { getNewEmailVerificationTokenByUserId } from "@/server/data/email-verification-token";
-import { getRegisterVerificationTokenByEmail } from "@/server/data/signup-verification-token";
-import { newEmailVerificationToken, passwordResetToken, registerVerificationToken, verificationToken } from "@/drizzle/schema";
-import { db } from "@/drizzle/db";
+import { getPasswordResetTokenByEmail } from "@/core/database/queries/password-reset-token";
+import { getVerificationTokenByEmail } from "@/core/database/queries/verification-token";
+import { getNewEmailVerificationTokenByUserId } from "@/core/database/queries/email-verification-token";
+import { getRegisterVerificationTokenByEmail } from "@/core/database/queries/signup-verification-token";
+import { newEmailVerificationToken, passwordResetToken, registerVerificationToken, verificationToken } from "@/core/database/schema";
+import { db } from "@/core/database/client";
 import { eq } from "drizzle-orm";
 
 const generateUUID = () => randomUUID();

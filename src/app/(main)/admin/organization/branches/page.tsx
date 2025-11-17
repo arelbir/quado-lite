@@ -12,7 +12,7 @@
  * Week 7-8: HR Module Completion
  */
 
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { BranchesTableClient } from "./branches-table-client";
 import type { BranchWithRelations, Company } from "@/lib/types";
 

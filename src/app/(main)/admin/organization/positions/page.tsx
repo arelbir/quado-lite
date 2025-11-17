@@ -13,7 +13,7 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { PositionsTableClient } from "./positions-table-client";
 import type { Position } from "@/lib/types";
 
