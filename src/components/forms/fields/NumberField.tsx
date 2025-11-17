@@ -2,7 +2,7 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { FieldRendererProps } from '@/lib/types';
+import type { FieldRendererProps } from '@/types/domain';
 
 export function NumberField({ field, value, onChange, disabled }: FieldRendererProps) {
   return (

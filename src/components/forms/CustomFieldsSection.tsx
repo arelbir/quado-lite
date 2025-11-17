@@ -3,7 +3,7 @@
 import { DynamicFieldRenderer } from './DynamicFieldRenderer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import type { CustomFieldDefinition } from '@/lib/types';
+import type { CustomFieldDefinition } from '@/types/domain';
 
 interface CustomFieldsSectionProps {
   fields: CustomFieldDefinition[];

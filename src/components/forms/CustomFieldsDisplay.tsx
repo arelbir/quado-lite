@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import type { CustomFieldWithValue } from '@/lib/types';
+import type { CustomFieldWithValue } from '@/types/domain';
 import { Icons } from '@/components/shared/icons';
 
 interface CustomFieldsDisplayProps {

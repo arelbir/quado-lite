@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/shared/icons';
 import { Separator } from '@/components/ui/separator';
 import { getCustomFieldDefinitions } from '@/features/custom-fields/actions/definition-actions';
-import type { CustomFieldDefinition, EntityType } from '@/lib/types';
+import type { CustomFieldDefinition, EntityType } from '@/types/domain';
 import { toast } from 'sonner';
 import {
   Accordion,

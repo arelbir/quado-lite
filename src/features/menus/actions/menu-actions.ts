@@ -3,7 +3,7 @@
 import { action } from "@/lib/core/safe-action"
 import { assignMenusToUser, getMenusByUserId } from "@/core/database/queries/menu"
 import { MenuWithValue } from "@/types/model/menu"
-import { assignMenusToUserSchema, getMenusByUserIdSchema } from '@/schema/data/menus'
+import { assignMenusToUserSchema, getMenusByUserIdSchema } from '@/features/menus/schemas/menu'
 
 export async function getUserMenus(userId: string): Promise<MenuWithValue[]> {
   const data = await getMenusByUserId(userId)

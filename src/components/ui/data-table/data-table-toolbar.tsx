@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { DataTableFilterField } from "@/types/data-table"
+import type { DataTableFilterField } from "@/types/framework/data-table"
 import { Cross2Icon } from "@radix-ui/react-icons"
 import type { Table } from "@tanstack/react-table"
 import { DateRange } from "react-day-picker"

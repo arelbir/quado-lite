@@ -43,7 +43,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { updateUser, createUser } from "@/features/users/actions/user-actions";
 import { Loader2 } from "lucide-react";
-import type { User as UserType } from "@/lib/types";
+import type { User as UserType } from "@/types/domain";
 import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({

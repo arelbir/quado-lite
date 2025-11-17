@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getCustomFieldDefinitions } from '@/features/custom-fields/actions/definition-actions';
 import { getCustomFieldValues } from '@/features/custom-fields/actions/value-actions';
 import { CustomFieldsSection } from './CustomFieldsSection';
-import type { CustomFieldDefinition, EntityType } from '@/lib/types';
+import type { CustomFieldDefinition, EntityType } from '@/types/domain';
 
 interface HybridFormProps {
   entityType: EntityType;

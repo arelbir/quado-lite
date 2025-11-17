@@ -13,7 +13,7 @@ import {
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Building2, MapPin, User, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
 import Link from "next/link";
-import type { BranchWithRelations } from "@/lib/types";
+import type { BranchWithRelations } from "@/types/domain";
 
 export type Branch = BranchWithRelations;
 

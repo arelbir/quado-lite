@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth/nextauth';
 import { SessionProvider } from 'next-auth/react';
 import React, { Suspense } from 'react'
 import { cookies } from 'next/headers';
-import { defaultLocale, type Locale, locales } from '@/i18n/config';
+import { defaultLocale, type Locale, locales } from '@/core/i18n/config';
 
 
 

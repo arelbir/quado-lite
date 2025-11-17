@@ -44,7 +44,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createPosition, updatePosition } from "@/features/organization/actions/organization-actions";
 import { Loader2 } from "lucide-react";
-import type { Position } from "@/lib/types";
+import type { Position } from "@/types/domain";
 import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({

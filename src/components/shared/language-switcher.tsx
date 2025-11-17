@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { locales, localeNames, localeFlags, type Locale, defaultLocale } from '@/i18n/config';
+import { locales, localeNames, localeFlags, type Locale, defaultLocale } from '@/core/i18n/config';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Briefcase, Users, FileText, Hash } from "lucide-react";
 import { getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
-import { defaultLocale, type Locale, locales } from '@/i18n/config';
+import { defaultLocale, type Locale, locales } from '@/core/i18n/config';
 
 export default async function PositionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

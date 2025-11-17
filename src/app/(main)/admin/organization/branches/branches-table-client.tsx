@@ -5,7 +5,7 @@ import { createColumns, type Branch } from "./columns";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
-import type { DataTableFilterField } from "@/types/data-table";
+import type { DataTableFilterField } from "@/types/framework/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { BranchDialog } from "@/features/organization/components/branch-dialog";
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { deleteBranch } from "@/features/organization/actions/organization-actions";
-import type { Company, BranchWithRelations } from "@/lib/types";
+import type { Company, BranchWithRelations } from "@/types/domain";
 
 interface BranchesTableClientProps {
   branches: BranchWithRelations[];

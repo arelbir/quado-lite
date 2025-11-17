@@ -7,7 +7,7 @@ import "@/styles/globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
-import { defaultLocale, type Locale, locales } from '@/i18n/config';
+import { defaultLocale, type Locale, locales } from '@/core/i18n/config';
 
 import { Inter } from "next/font/google";
 

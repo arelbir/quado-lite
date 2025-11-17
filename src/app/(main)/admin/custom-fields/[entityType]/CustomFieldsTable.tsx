@@ -9,7 +9,7 @@ import { Icons } from '@/components/shared/icons';
 import { CustomFieldDialog } from './CustomFieldDialog';
 import { deleteCustomFieldDefinition } from '@/features/custom-fields/actions/definition-actions';
 import { toast } from 'sonner';
-import type { CustomFieldDefinition, EntityType } from '@/lib/types';
+import type { CustomFieldDefinition, EntityType } from '@/types/domain';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -2,7 +2,7 @@
 
 import { DEFAULT_LOGIN_REDIRECT } from "@/config/routes";
 import { action } from "@/lib/core/safe-action"
-import { LoginSchema, NewPasswordSchema, RegisterByAdminSchema, ResetSchema, SignupByTokenSchema, SignupSchema } from "@/schema/auth"
+import { LoginSchema, NewPasswordSchema, RegisterByAdminSchema, ResetSchema, SignupByTokenSchema, SignupSchema } from "@/features/auth/schemas/auth"
 import { signIn, signOut } from "@/lib/auth/nextauth";
 import { getUserByEmail, getUserById, updateUserEmail, updateUserPassword } from "@/core/database/queries/user";
 import { db } from "@/core/database/client";
@@ -15,7 +15,7 @@ import { generatePasswordResetToken, generateRegisterEmailVerificationToken, gen
 import { deletePasswordResetToken, getPasswordResetTokenByToken } from "@/core/database/queries/password-reset-token";
 import { sendPasswordResetEmail, sendRegisterEmail, sendVerificationEmail } from "@/core/email/service/send-email";
 import { deleteVerificationToken, getVerificationTokenByToken } from "@/core/database/queries/verification-token";
-import { AuthResponse } from "@/types/actions";
+import { AuthResponse } from "@/types/framework/actions";
 import { deleteNewEmailVerificationToken, getNewEmailVerificationTokenByToken } from "@/core/database/queries/email-verification-token";
 import { deleteRegisterVerificationToken, getRegisterVerificationTokenByToken } from "@/core/database/queries/signup-verification-token";
 import { normalizeEmailForLogin } from "@/lib/utils/email";

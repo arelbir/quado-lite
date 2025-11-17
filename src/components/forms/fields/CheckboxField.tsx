@@ -2,7 +2,7 @@
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import type { FieldRendererProps } from '@/lib/types';
+import type { FieldRendererProps } from '@/types/domain';
 
 export function CheckboxField({ field, value, onChange, disabled }: FieldRendererProps) {
   return (

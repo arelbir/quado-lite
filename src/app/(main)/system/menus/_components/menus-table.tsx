@@ -15,7 +15,7 @@ import { useMenusTable } from "./menus-table-provider"
 import { MenusTableToolbarActions } from "./menus-table-toolbar-actions"
 import { getMenus } from "../_lib/queries"
 import { MenuWithChildren, menuTable } from "@/core/database/schema"
-import { DataTableFilterField } from "@/types/data-table"
+import { DataTableFilterField } from "@/types/framework/data-table"
 import { getStatusIcon } from "../_lib/utils"
 
 interface MenusTableProps {

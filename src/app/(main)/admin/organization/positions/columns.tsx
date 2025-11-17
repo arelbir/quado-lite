@@ -13,7 +13,7 @@ import {
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Briefcase, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
 import Link from "next/link";
-import type { Position as PositionType } from "@/lib/types";
+import type { Position as PositionType } from "@/types/domain";
 
 export type Position = PositionType;
 

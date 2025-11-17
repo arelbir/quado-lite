@@ -9,7 +9,7 @@
  */
 
 import { currentUser } from "@/lib/auth/server";
-import type { User, ActionResponse } from "@/lib/types";
+import type { User, ActionResponse } from "@/types/domain";
 import { createPermissionChecker, type PermissionCheck } from "@/lib/auth/permission-checker";
 
 /**

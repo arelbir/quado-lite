@@ -22,7 +22,7 @@ import {
   createPermissionError,
 } from "@/lib/helpers/error-helpers";
 import { checkPermission } from "@/core/permissions/unified-permission-checker";
-import type { ActionResponse, User } from "@/lib/types/common";
+import type { ActionResponse, User } from "@/types/domain/common";
 import { getNextAssignee, type AssignmentStrategy } from "@/features/workflows/lib/auto-assignment";
 import { escalateAssignment as escalateAssignmentInternal } from "@/features/workflows/lib/deadline-monitor";
 

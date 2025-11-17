@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import type { DataTableFilterField, DataTableFilterOption } from "@/types/data-table"
+import type { DataTableFilterField, DataTableFilterOption } from "@/types/framework/data-table"
 import { CaretSortIcon, PlusIcon } from "@radix-ui/react-icons"
 import type { Table } from "@tanstack/react-table"
 

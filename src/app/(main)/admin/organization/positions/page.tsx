@@ -15,7 +15,7 @@
 import { Metadata } from "next";
 import { db } from "@/core/database/client";
 import { PositionsTableClient } from "./positions-table-client";
-import type { Position } from "@/lib/types";
+import type { Position } from "@/types/domain";
 
 export const metadata: Metadata = {
   title: "Position Management | Admin",

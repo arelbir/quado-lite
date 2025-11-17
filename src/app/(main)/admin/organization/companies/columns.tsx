@@ -13,7 +13,7 @@ import {
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Building, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
 import Link from "next/link";
-import type { Company } from "@/lib/types";
+import type { Company } from "@/types/domain";
 
 // Re-export for local usage
 export type { Company };

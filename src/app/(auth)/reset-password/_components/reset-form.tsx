@@ -14,7 +14,7 @@ import {
 import { Button, LoadingButton } from "@/components/ui/button"
 import { FormError } from "@/components/shared/form-error"
 import { FormSuccess } from "@/components/shared/form-success"
-import { ResetSchema } from "@/schema/auth"
+import { ResetSchema } from "@/features/auth/schemas/auth"
 import { reset } from "@/features/auth/actions/auth-actions"
 import { Icons } from "@/components/shared/icons"
 import { Input } from "@/components/ui/input"

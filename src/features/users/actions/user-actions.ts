@@ -26,7 +26,7 @@ import {
 } from "@/lib/helpers";
 import { checkPermission } from "@/core/permissions/unified-permission-checker";
 import { revalidatePath } from "next/cache";
-import type { ActionResponse } from "@/lib/types";
+import type { ActionResponse } from "@/types/domain";
 
 // ============================================
 // USER ACTIONS

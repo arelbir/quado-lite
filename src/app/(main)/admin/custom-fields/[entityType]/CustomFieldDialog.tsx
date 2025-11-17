@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { createCustomFieldDefinition, updateCustomFieldDefinition } from '@/features/custom-fields/actions/definition-actions';
 import { toast } from 'sonner';
-import type { CustomFieldDefinition, EntityType } from '@/lib/types';
+import type { CustomFieldDefinition, EntityType } from '@/types/domain';
 
 const FIELD_TYPES = [
   { value: 'text', label: 'Text' },

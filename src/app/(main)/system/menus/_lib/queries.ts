@@ -5,7 +5,7 @@ import { and, asc, count, desc, eq, gte, lte, or } from "drizzle-orm"
 
 import { db } from "@/core/database/client"
 import { filterColumn } from "@/lib/core/filter"
-import { GetMenusSchema } from "@/schema/data/menus"
+import { GetMenusSchema } from "@/features/menus/schemas/menu"
 import { Menu, MenuWithChildren, menuTable } from "@/core/database/schema"
 import { getMenuHierarchy } from '@/lib/core/array'
 

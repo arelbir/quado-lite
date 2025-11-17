@@ -10,7 +10,7 @@
 import { db } from '@/core/database/client';
 import { roles, user, departments } from '@/core/database/schema';
 import { eq } from 'drizzle-orm';
-import type { ActionResponse } from '@/lib/types';
+import type { ActionResponse } from '@/types/domain';
 import { withAuth, createPermissionError } from '@/lib/helpers';
 import { checkPermission } from '@/core/permissions/unified-permission-checker';
 

@@ -2,7 +2,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import type { FieldRendererProps } from '@/lib/types';
+import type { FieldRendererProps } from '@/types/domain';
 
 export function SelectField({ field, value, onChange, disabled }: FieldRendererProps) {
   return (

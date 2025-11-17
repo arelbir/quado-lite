@@ -17,7 +17,7 @@ import {
   createPermissionError 
 } from "@/lib/helpers/error-helpers";
 import { checkPermission } from "@/core/permissions/unified-permission-checker";
-import type { User } from "@/lib/types";
+import type { User } from "@/types/domain";
 
 interface ActionResponse {
   success: boolean;

@@ -3,7 +3,7 @@
 import { db } from '@/core/database/client';
 import { customFieldDefinitions, customFieldValues } from '@/core/database/schema';
 import { withAuth, createValidationError } from '@/lib/helpers';
-import type { ActionResponse, EntityType, CustomFieldWithValue } from '@/lib/types';
+import type { ActionResponse, EntityType, CustomFieldWithValue } from '@/types/domain';
 import { eq, and } from 'drizzle-orm';
 
 /**

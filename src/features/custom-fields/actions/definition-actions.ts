@@ -5,7 +5,7 @@ import { customFieldDefinitions } from '@/core/database/schema';
 import { withAuth, createValidationError, createNotFoundError, createPermissionError } from '@/lib/helpers';
 import { checkPermission } from '@/core/permissions/unified-permission-checker';
 import { revalidatePath } from 'next/cache';
-import type { ActionResponse, CustomFieldDefinition, EntityType } from '@/lib/types';
+import type { ActionResponse, CustomFieldDefinition, EntityType } from '@/types/domain';
 import { eq, and } from 'drizzle-orm';
 
 /**

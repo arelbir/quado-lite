@@ -7,7 +7,7 @@ import {
 } from "@/config/routes";
 import { authConfig } from "./config/auth";
 import NextAuth from "next-auth";
-import { defaultLocale } from './i18n/config';
+import { defaultLocale } from './core/i18n/config';
 import { NextResponse } from 'next/server';
 
 const { auth } = NextAuth(authConfig);

@@ -5,7 +5,7 @@ import { createColumns, type Company } from "./columns";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
-import type { DataTableFilterField } from "@/types/data-table";
+import type { DataTableFilterField } from "@/types/framework/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { CompanyDialog } from "@/features/organization/components/company-dialog";

@@ -25,7 +25,7 @@ import {
   createPermissionError
 } from "@/lib/helpers";
 import { checkPermission } from "@/core/permissions/unified-permission-checker";
-import type { ActionResponse, User, Company, Branch, Department, Position } from "@/lib/types";
+import type { ActionResponse, User, Company, Branch, Department, Position } from "@/types/domain";
 
 // ============================================
 // COMPANY ACTIONS

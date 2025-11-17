@@ -5,7 +5,7 @@ import { user, Theme, UserStatus, userMenuTable } from "@/core/database/schema";
 import { userRoles as userRolesTable } from "@/core/database/schema/role-system";
 import { currentUser } from "@/lib/auth/server";
 import to from "@/lib/utils/cn";
-import { SignupSchema } from "@/schema/auth";
+import { SignupSchema } from "@/features/auth/schemas/auth";
 import { z } from "zod";
 import { env } from "@/env";
 

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import type { DataTableFilterOption } from "@/types/data-table"
+import type { DataTableFilterOption } from "@/types/framework/data-table"
 import {
   CopyIcon,
   DotsHorizontalIcon,

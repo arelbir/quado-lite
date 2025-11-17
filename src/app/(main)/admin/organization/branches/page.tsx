@@ -14,7 +14,7 @@
 
 import { db } from "@/core/database/client";
 import { BranchesTableClient } from "./branches-table-client";
-import type { BranchWithRelations, Company } from "@/lib/types";
+import type { BranchWithRelations, Company } from "@/types/domain";
 
 export default async function BranchesPage() {
   // Fetch all branches with manager and department count

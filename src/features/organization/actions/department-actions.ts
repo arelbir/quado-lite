@@ -4,7 +4,7 @@ import { db } from "@/core/database/client";
 import { departments } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import type { ActionResponse, User } from "@/lib/types";
+import type { ActionResponse, User } from "@/types/domain";
 import {
   withAuth,
   createNotFoundError,

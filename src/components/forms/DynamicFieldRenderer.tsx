@@ -6,7 +6,7 @@ import { SelectField } from './fields/SelectField';
 import { TextareaField } from './fields/TextareaField';
 import { CheckboxField } from './fields/CheckboxField';
 import { DateField } from './fields/DateField';
-import type { CustomFieldDefinition } from '@/lib/types';
+import type { CustomFieldDefinition } from '@/types/domain';
 
 interface DynamicFieldRendererProps {
   field: CustomFieldDefinition;

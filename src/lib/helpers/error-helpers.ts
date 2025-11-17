@@ -3,7 +3,7 @@
  * DRY: Consistent error handling across all action files
  */
 
-import type { ActionResponse } from "@/lib/types";
+import type { ActionResponse } from "@/types/domain";
 
 /**
  * HELPER: Create standardized error response

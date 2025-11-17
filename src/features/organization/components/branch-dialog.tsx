@@ -45,7 +45,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createBranch, updateBranch } from "@/features/organization/actions/organization-actions";
 import { Loader2 } from "lucide-react";
-import type { Branch, Company } from "@/lib/types";
+import type { Branch, Company } from "@/types/domain";
 import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({

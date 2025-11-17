@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
-import type { DataTableFilterField } from "@/types/data-table";
+import type { DataTableFilterField } from "@/types/framework/data-table";
 import { createColumns, type Department } from "./columns";
 import { DepartmentDialog } from "@/features/organization/components/department-dialog";
 import { deleteDepartment } from "@/features/organization/actions/department-actions";
