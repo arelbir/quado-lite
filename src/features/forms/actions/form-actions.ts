@@ -203,10 +203,7 @@ export async function getFormById(id: string): Promise<any> {
               email: true,
             },
           },
-          versions: {
-            orderBy: desc(formVersions.version),
-            limit: 10,
-          },
+          versions: true, // Remove this line
         },
       });
 

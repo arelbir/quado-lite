@@ -60,7 +60,7 @@ export function SortableFieldItem({
           {...listeners}
           className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground mt-1"
         >
-          <Icons.GripVertical className="size-5" />
+          <Icons.GripHorizontal className="size-5" />
         </button>
 
         {/* Field Icon */}

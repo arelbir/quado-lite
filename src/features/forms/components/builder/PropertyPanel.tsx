@@ -36,16 +36,22 @@ export function PropertyPanel({ field, onUpdate }: PropertyPanelProps) {
   const handleChange = (path: string, value: any) => {
     const updates = { ...field };
     const keys = path.split('.');
-    let current = updates;
+    let current: any = updates;
 
     for (let i = 0; i < keys.length - 1; i++) {
-      if (!current[keys[i]]) {
-        current[keys[i]] = {};
+      const key = keys[i];
+      if (key && !current[key]) {
+        current[key] = {};
       }
-      current = current[keys[i]];
+      if (key) {
+        current = current[key];
+      }
     }
 
-    current[keys[keys.length - 1]] = value;
+    const lastKey = keys[keys.length - 1];
+    if (lastKey) {
+      current?.[lastKey] = value;
+    }
     onUpdate(field.id, updates);
   };
 
