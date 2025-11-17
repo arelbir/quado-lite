@@ -88,7 +88,7 @@ const config = {
     return [
       {
         source: '/',
-        destination: '/denetim/audits',
+        destination: '/admin/dashboard',
         permanent: false,
       }
     ];

@@ -1,64 +1,32 @@
 /**
- * Revalidation Helpers
+ * Revalidation Helpers - Generic Framework
  * DRY: Consistent path revalidation across all action files
  */
 
 import { revalidatePath } from "next/cache";
 
 /**
- * HELPER: Revalidate audit-related paths
+ * HELPER: Revalidate user-related paths
  */
-export function revalidateAuditPaths(options: {
-  plans?: boolean;
-  audits?: boolean;
-  all?: boolean;
-  specificPlan?: string;
-  specificAudit?: string;
+export function revalidateUserPaths(options: {
+  list?: boolean;
+  specific?: string;
+  profile?: boolean;
 }) {
-  if (options.plans) revalidatePath("/denetim/plans");
-  if (options.audits) revalidatePath("/denetim/audits");
-  if (options.all) revalidatePath("/denetim/all");
-  if (options.specificPlan) revalidatePath(`/denetim/plans/${options.specificPlan}`);
-  if (options.specificAudit) revalidatePath(`/denetim/audits/${options.specificAudit}`);
+  if (options.list) revalidatePath("/admin/users");
+  if (options.specific) revalidatePath(`/admin/users/${options.specific}`);
+  if (options.profile) revalidatePath("/profile");
 }
 
 /**
- * HELPER: Revalidate action-related paths
+ * HELPER: Revalidate role-related paths
  */
-export function revalidateActionPaths(options: {
+export function revalidateRolePaths(options: {
   list?: boolean;
   specific?: string;
-  myTasks?: boolean;
 }) {
-  if (options.list) revalidatePath("/denetim/actions");
-  if (options.specific) revalidatePath(`/denetim/actions/${options.specific}`);
-  if (options.myTasks) revalidatePath("/denetim/my-tasks");
-}
-
-/**
- * HELPER: Revalidate finding-related paths
- */
-export function revalidateFindingPaths(options: {
-  list?: boolean;
-  specific?: string;
-  myTasks?: boolean;
-}) {
-  if (options.list) revalidatePath("/denetim/findings");
-  if (options.specific) revalidatePath(`/denetim/findings/${options.specific}`);
-  if (options.myTasks) revalidatePath("/denetim/my-tasks");
-}
-
-/**
- * HELPER: Revalidate DOF-related paths
- */
-export function revalidateDOFPaths(options: {
-  list?: boolean;
-  specific?: string;
-  myTasks?: boolean;
-}) {
-  if (options.list) revalidatePath("/denetim/dofs");
-  if (options.specific) revalidatePath(`/denetim/dofs/${options.specific}`);
-  if (options.myTasks) revalidatePath("/denetim/my-tasks");
+  if (options.list) revalidatePath("/admin/roles");
+  if (options.specific) revalidatePath(`/admin/roles/${options.specific}`);
 }
 
 /**
@@ -85,10 +53,30 @@ export function revalidateOrganizationPaths(options: {
 }
 
 /**
- * HELPER: Revalidate all common paths
+ * HELPER: Revalidate team-related paths
  */
-export function revalidateCommonPaths() {
-  revalidatePath("/denetim");
-  revalidatePath("/denetim/my-tasks");
-  revalidatePath("/denetim/all");
+export function revalidateTeamPaths(options: {
+  list?: boolean;
+  specific?: string;
+}) {
+  if (options.list) revalidatePath("/admin/teams");
+  if (options.specific) revalidatePath(`/admin/teams/${options.specific}`);
+}
+
+/**
+ * HELPER: Revalidate admin paths
+ */
+export function revalidateAdminPaths() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/users");
+  revalidatePath("/admin/roles");
+}
+
+/**
+ * HELPER: Revalidate dashboard
+ */
+export function revalidateDashboard() {
+  revalidatePath("/");
+  revalidatePath("/admin/dashboard");
 }
