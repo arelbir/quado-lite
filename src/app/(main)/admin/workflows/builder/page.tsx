@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { WorkflowCanvas } from "@/features/workflows/components/designer/Canvas/WorkflowCanvas";
 import { ToolbarPanel } from "@/features/workflows/components/designer/Panels/ToolbarPanel";
+import { NodeTemplatesPanel } from "@/features/workflows/components/designer/Panels/NodeTemplatesPanel";
 import { PropertiesPanel } from "@/features/workflows/components/designer/Panels/PropertiesPanel";
 import { ValidationPanel } from "@/features/workflows/components/designer/Panels/ValidationPanel";
 import { CustomFieldsReference } from "@/features/workflows/components/designer/Panels/CustomFieldsReference";
@@ -252,8 +253,9 @@ function WorkflowBuilderContent() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Toolbar */}
-        <div className="w-64 border-r p-4 bg-muted/30 overflow-y-auto">
+        <div className="w-64 border-r bg-muted/30 overflow-y-auto flex flex-col gap-4 p-4">
           <ToolbarPanel />
+          <NodeTemplatesPanel />
         </div>
 
         {/* Center Canvas */}
