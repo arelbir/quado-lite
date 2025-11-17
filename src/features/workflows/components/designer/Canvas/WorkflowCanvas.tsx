@@ -119,9 +119,16 @@ function WorkflowCanvasInner() {
         onDrop={onDrop}
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          animated: true,
+          style: { stroke: '#94a3b8', strokeWidth: 2 },
+        }}
         fitView
         snapToGrid
         snapGrid={[15, 15]}
+        deleteKeyCode="Delete"
+        multiSelectionKeyCode="Shift"
       >
         <Background
           variant={BackgroundVariant.Dots}
