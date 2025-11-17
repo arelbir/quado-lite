@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { db } from "@/core/database/client";
 import { notifications } from "@/core/database/schema";
 import { eq } from "drizzle-orm";
+import { sendSuccess, sendNotFound, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 
 /**
  * PATCH /api/notifications/[id]/read
@@ -24,18 +26,12 @@ export async function PATCH(
       .returning();
 
     if (!updatedNotification) {
-      return NextResponse.json(
-        { error: "Notification not found" },
-        { status: 404 }
-      );
+      return sendNotFound("Notification");
     }
 
-    return NextResponse.json(updatedNotification);
+    return sendSuccess(updatedNotification);
   } catch (error) {
-    console.error("Error marking notification as read:", error);
-    return NextResponse.json(
-      { error: "Failed to mark notification as read" },
-      { status: 500 }
-    );
+    log.error("Error marking notification as read", error as Error);
+    return sendInternalError(error);
   }
 }

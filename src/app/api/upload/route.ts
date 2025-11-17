@@ -3,19 +3,18 @@
  * Handles file uploads to MinIO
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getLatestUser } from '@/lib/auth/server';
-import { uploadFile, validateFile } from '@/lib/storage/upload-helpers';
+import { uploadFileToMinio, validateFile } from '@/lib/storage/upload-helpers';
+import { sendSuccess, sendUnauthorized, sendValidationError, sendInternalError } from '@/lib/api/response-helpers';
+import { log } from '@/lib/monitoring/logger';
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
     const user = await getLatestUser();
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return sendUnauthorized();
     }
 
     // Get form data
@@ -23,10 +22,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+      return sendValidationError({ file: 'No file provided' });
     }
 
     // Validate file
@@ -42,10 +38,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!validation.valid) {
-      return NextResponse.json(
-        { error: validation.error },
-        { status: 400 }
-      );
+      return sendValidationError({ file: validation.error });
     }
 
     // Convert file to buffer
@@ -62,16 +55,13 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    return NextResponse.json({
-      success: true,
+    log.info('File uploaded successfully', { key: result.key, userId: user.id });
+    return sendSuccess({
       url: result.url,
       key: result.key,
     });
   } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json(
-      { error: 'Upload failed' },
-      { status: 500 }
-    );
+    log.error('Upload error', error as Error);
+    return sendInternalError(error);
   }
 }

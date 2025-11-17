@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/core/database/client";
 import { notifications } from "@/core/database/schema";
 import { eq, and, isNull, desc } from "drizzle-orm";
+import { sendSuccess, sendCreated, sendValidationError, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 
 const createNotificationSchema = z.object({
   userId: z.string().uuid(),
@@ -27,10 +29,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("userId");
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
+      return sendValidationError({ userId: 'User ID is required' });
     }
 
     // Fetch notifications (not deleted, ordered by created date)
@@ -49,17 +48,13 @@ export async function GET(request: NextRequest) {
     // Count unread
     const unreadCount = userNotifications.filter((n) => !n.isRead).length;
 
-    return NextResponse.json({
-      notifications: userNotifications,
+    return sendSuccess(userNotifications, {
       unreadCount,
       total: userNotifications.length,
     });
   } catch (error) {
-    console.error("Error fetching notifications:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch notifications" },
-      { status: 500 }
-    );
+    log.error("Error fetching notifications", error as Error);
+    return sendInternalError(error);
   }
 }
 
@@ -73,10 +68,7 @@ export async function POST(request: NextRequest) {
     const validation = createNotificationSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json(
-        { error: "Invalid request", details: validation.error.errors },
-        { status: 400 }
-      );
+      return sendValidationError(validation.error.errors);
     }
 
     const data = validation.data;
@@ -98,12 +90,9 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    return NextResponse.json(notification, { status: 201 });
+    return sendCreated(notification);
   } catch (error) {
-    console.error("Error creating notification:", error);
-    return NextResponse.json(
-      { error: "Failed to create notification" },
-      { status: 500 }
-    );
+    log.error("Error creating notification", error as Error);
+    return sendInternalError(error);
   }
 }

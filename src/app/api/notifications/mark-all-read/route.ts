@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 import { db } from "@/core/database/client";
 import { notifications } from "@/core/database/schema";
 import { eq, and } from "drizzle-orm";
+import { sendSuccess, sendValidationError, sendInternalError } from "@/lib/api/response-helpers";
+import { log } from "@/lib/monitoring/logger";
 
 const markAllReadSchema = z.object({
   userId: z.string().uuid(),
@@ -18,10 +20,7 @@ export async function PATCH(request: NextRequest) {
     const validation = markAllReadSchema.safeParse(body);
     
     if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.errors },
-        { status: 400 }
-      );
+      return sendValidationError(validation.error.errors);
     }
     
     const { userId } = validation.data;
@@ -39,12 +38,9 @@ export async function PATCH(request: NextRequest) {
         )
       );
 
-    return NextResponse.json({ success: true });
+    return sendSuccess({ marked: true });
   } catch (error) {
-    console.error("Error marking all notifications as read:", error);
-    return NextResponse.json(
-      { error: "Failed to mark all notifications as read" },
-      { status: 500 }
-    );
+    log.error("Error marking all notifications as read", error as Error);
+    return sendInternalError(error);
   }
 }

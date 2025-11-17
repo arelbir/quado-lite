@@ -3,10 +3,12 @@
  * Handles file deletion from MinIO
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { getLatestUser } from '@/lib/auth/server';
 import { deleteFile } from '@/lib/storage/upload-helpers';
+import { sendSuccess, sendUnauthorized, sendValidationError, sendInternalError } from '@/lib/api/response-helpers';
+import { log } from '@/lib/monitoring/logger';
 
 const deleteFileSchema = z.object({
   key: z.string().min(1, 'File key is required'),
@@ -17,10 +19,7 @@ export async function DELETE(request: NextRequest) {
     // Check authentication
     const user = await getLatestUser();
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return sendUnauthorized();
     }
 
     // Get key from body with validation
@@ -28,10 +27,7 @@ export async function DELETE(request: NextRequest) {
     const validation = deleteFileSchema.safeParse(body);
     
     if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.errors },
-        { status: 400 }
-      );
+      return sendValidationError(validation.error.errors);
     }
 
     const { key } = validation.data;
@@ -39,16 +35,11 @@ export async function DELETE(request: NextRequest) {
     // Delete from MinIO
     await deleteFile(key);
 
-    return NextResponse.json({
-      success: true,
-      message: 'File deleted successfully',
-    });
+    log.info('File deleted successfully', { key, userId: user.id });
+    return sendSuccess({ deleted: true, key });
   } catch (error) {
-    console.error('Delete error:', error);
-    return NextResponse.json(
-      { error: 'Delete failed' },
-      { status: 500 }
-    );
+    log.error('Delete error', error as Error);
+    return sendInternalError(error);
   }
 }
 
