@@ -214,7 +214,7 @@ export function FormBuilderMain({ initialSchema, onSave, onPreview }: FormBuilde
               {fields.length} {fields.length === 1 ? 'field' : 'fields'}
             </span>
             <Button variant="outline" size="sm" onClick={handleExportJSON}>
-              <Icons.Download className="size-4 mr-2" />
+              <Icons.FileText className="size-4 mr-2" />
               Export JSON
             </Button>
             <Button variant="outline" size="sm" onClick={handlePreview}>
