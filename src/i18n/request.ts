@@ -28,6 +28,7 @@ export default getRequestConfig(async ({ locale }) => {
       questionBanks: (await import(`./locales/${validLocale}/questionBanks.json`)).default,
       questions: (await import(`./locales/${validLocale}/questions.json`)).default,
       plans: (await import(`./locales/${validLocale}/plans.json`)).default,
+      landing: (await import(`./locales/${validLocale}/landing.json`)).default,
     },
   };
 });
