@@ -76,7 +76,7 @@ function DraggableFieldItem({ field }: { field: any }) {
     },
   });
 
-  const IconComponent = (Icons as any)[field.icon] || Icons.Box;
+  const IconComponent = (Icons as any)[field.icon] || Icons.Square;
 
   return (
     <div

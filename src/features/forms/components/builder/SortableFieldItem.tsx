@@ -41,7 +41,7 @@ export function SortableFieldItem({
     transition,
   };
 
-  const IconComponent = (Icons as any)[field.icon] || Icons.Box;
+  const IconComponent = (Icons as any)[field.icon] || Icons.Square;
 
   return (
     <Card
@@ -60,7 +60,7 @@ export function SortableFieldItem({
           {...listeners}
           className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground mt-1"
         >
-          <Icons.GripHorizontal className="size-5" />
+          <Icons.Menu className="size-5" />
         </button>
 
         {/* Field Icon */}

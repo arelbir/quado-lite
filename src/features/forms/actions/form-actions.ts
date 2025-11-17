@@ -203,7 +203,6 @@ export async function getFormById(id: string): Promise<any> {
               email: true,
             },
           },
-          versions: true, // Remove this line
         },
       });
 
