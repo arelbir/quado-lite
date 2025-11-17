@@ -195,6 +195,10 @@ export function WizardRenderer({
   };
 
   const currentStep = steps[wizardState.currentStep];
+  
+  if (!currentStep) {
+    return <div>Invalid step</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit(handleFinalSubmit)} className="space-y-6">

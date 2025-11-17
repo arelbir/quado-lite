@@ -144,7 +144,7 @@ export function DataGridField({
         {fields.length === 0 ? (
           <Card className="p-8 text-center">
             <div className="text-muted-foreground">
-              <Icons.List className="size-12 mx-auto mb-4 opacity-50" />
+              <Icons.LayoutList className="size-12 mx-auto mb-4 opacity-50" />
               <p>No rows yet. Click "Add Row" to get started.</p>
             </div>
           </Card>
