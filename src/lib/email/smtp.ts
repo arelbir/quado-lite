@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 
 // Create SMTP transporter
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'localhost',
   port: parseInt(process.env.SMTP_PORT || '1025'),
   secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
