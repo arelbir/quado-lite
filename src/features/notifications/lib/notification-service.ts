@@ -33,8 +33,10 @@ export async function sendNotification(data: NotificationData) {
         category: data.type as any,
         title: data.title,
         message: data.message,
-        priority: data.priority || 'medium',
-        metadata: data.metadata || {},
+        metadata: {
+          ...(data.metadata || {}),
+          priority: data.priority || 'medium',
+        },
         relatedEntityType: data.metadata?.entityType as any,
         relatedEntityId: data.metadata?.entityId,
         actionUrl: data.actionUrl,
@@ -108,18 +110,17 @@ export async function scheduleNotification(
     await db
       .insert(notifications)
       .values({
-        id: notificationId,
         userId: data.userId,
-        category: data.type,
+        category: data.type as any,
         title: data.title,
         message: data.message,
-        priority: data.priority || 'medium',
         metadata: {
-          ...data.metadata,
+          ...(data.metadata || {}),
+          priority: data.priority || 'medium',
           scheduledFor: scheduleAt.toISOString(),
           scheduled: true,
         },
-        relatedEntityType: data.metadata?.entityType,
+        relatedEntityType: data.metadata?.entityType as any,
         relatedEntityId: data.metadata?.entityId,
         actionUrl: data.actionUrl,
         isRead: false,
