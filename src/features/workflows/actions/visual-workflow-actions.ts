@@ -9,11 +9,12 @@ import { checkPermission } from '@/core/permissions/unified-permission-checker';
 
 /**
  * Create new visual workflow
+ * Generic - works with any entity type
  */
 export async function createVisualWorkflow(data: {
   name: string;
   description?: string;
-  module: 'DOF' | 'ACTION' | 'FINDING' | 'AUDIT';
+  module?: string; // Generic entity type (optional)
   nodes: any[];
   edges: any[];
 }): Promise<any> {
@@ -36,7 +37,7 @@ export async function createVisualWorkflow(data: {
       .values({
         name: data.name,
         description: data.description,
-        module: data.module,
+        module: data.module || 'GENERIC', // Default to GENERIC if not specified
         nodes: data.nodes,
         edges: data.edges,
         status: 'DRAFT',

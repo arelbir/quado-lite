@@ -48,7 +48,7 @@ function WorkflowBuilderContent() {
   const tCommon = useTranslations("common");
   
   const [workflowName, setWorkflowName] = useState("");
-  const [workflowModule, setWorkflowModule] = useState<"DOF" | "ACTION" | "FINDING" | "AUDIT" | "">("");
+  const [workflowModule, setWorkflowModule] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   
@@ -58,7 +58,7 @@ function WorkflowBuilderContent() {
   const [showDraftDialog, setShowDraftDialog] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
   const [tempWorkflowName, setTempWorkflowName] = useState("");
-  const [tempWorkflowModule, setTempWorkflowModule] = useState<"DOF" | "ACTION" | "FINDING" | "AUDIT" | "">("");
+  const [tempWorkflowModule, setTempWorkflowModule] = useState<string>("");
   
   // Enable auto-save only when NOT loading from database
   useAutoSave(!workflowId);
@@ -155,7 +155,7 @@ function WorkflowBuilderContent() {
         // Create new workflow
         const result = await createVisualWorkflow({
           name,
-          module: module as "DOF" | "ACTION" | "FINDING" | "AUDIT",
+          module,
           nodes,
           edges,
         });
@@ -330,18 +330,17 @@ function WorkflowBuilderContent() {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="AUDIT">
-                    {tWorkflow("modules.AUDIT")}
-                  </SelectItem>
-                  <SelectItem value="FINDING">
-                    {tWorkflow("modules.FINDING")}
-                  </SelectItem>
-                  <SelectItem value="ACTION">
-                    {tWorkflow("modules.ACTION")}
-                  </SelectItem>
-                  <SelectItem value="DOF">
-                    {tWorkflow("modules.DOF")}
-                  </SelectItem>
+                  <SelectItem value="Action">Action</SelectItem>
+                  <SelectItem value="Approval">Approval</SelectItem>
+                  <SelectItem value="Audit">Audit</SelectItem>
+                  <SelectItem value="Document">Document</SelectItem>
+                  <SelectItem value="Finding">Finding</SelectItem>
+                  <SelectItem value="Order">Order</SelectItem>
+                  <SelectItem value="Request">Request</SelectItem>
+                  <SelectItem value="Review">Review</SelectItem>
+                  <SelectItem value="Task">Task</SelectItem>
+                  <SelectItem value="Ticket">Ticket</SelectItem>
+                  <SelectItem value="Generic">Generic</SelectItem>
                 </SelectContent>
               </Select>
             </div>

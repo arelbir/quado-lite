@@ -14,7 +14,9 @@ export interface WorkflowTemplate {
   estimatedDuration: string;
   nodes: Omit<Node, 'id'>[];
   edges: Omit<Edge, 'id'>[];
-  defaultModule?: 'DOF' | 'ACTION' | 'FINDING' | 'AUDIT';
+  defaultModule?: string; // Generic - any entity type
+  applicableModules?: string[]; // Can be used with multiple entity types
+  tags?: string[]; // Additional categorization
 }
 
 export const workflowTemplates: WorkflowTemplate[] = [
@@ -72,7 +74,8 @@ export const workflowTemplates: WorkflowTemplate[] = [
     category: 'approval',
     icon: 'Users',
     estimatedDuration: '3-5 days',
-    defaultModule: 'DOF',
+    defaultModule: 'Document',
+    applicableModules: ['Document', 'Finding', 'Audit'],
     nodes: [
       {
         type: 'start',

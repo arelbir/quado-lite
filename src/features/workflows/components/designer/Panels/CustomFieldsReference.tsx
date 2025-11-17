@@ -24,7 +24,7 @@ import {
 import { useTranslations } from 'next-intl';
 
 interface CustomFieldsReferenceProps {
-  module?: EntityType | '';
+  module?: string; // Generic - any entity type
 }
 
 export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
@@ -44,6 +44,7 @@ export function CustomFieldsReference({ module }: CustomFieldsReferenceProps) {
       setLoading(true);
       setError(null);
       try {
+        // Try to get custom fields for this entity type
         const result = await getCustomFieldDefinitions(module as EntityType);
         if (result.success && result.data) {
           setFields(result.data);
