@@ -8,8 +8,8 @@ config({ path: resolve(process.cwd(), '.env') });
 
 export default {
   dialect: "postgresql",
-  out: './src/drizzle/migrations',
-  schema: './src/drizzle/schema/index.ts',
+  out: './src/core/database/migrations',
+  schema: './src/core/database/schema/index.ts',
   dbCredentials: {
     url: process.env.DATABASE_URL!
   },
