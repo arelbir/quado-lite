@@ -49,8 +49,8 @@ export function PropertyPanel({ field, onUpdate }: PropertyPanelProps) {
     }
 
     const lastKey = keys[keys.length - 1];
-    if (lastKey) {
-      current?.[lastKey] = value;
+    if (lastKey && current) {
+      current[lastKey] = value;
     }
     onUpdate(field.id, updates);
   };
