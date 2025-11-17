@@ -64,6 +64,35 @@ export function revalidateTeamPaths(options: {
 }
 
 /**
+ * HELPER: Revalidate common/shared paths
+ */
+export function revalidateCommonPaths() {
+  revalidatePath("/dashboard");
+  revalidatePath("/admin");
+}
+
+/**
+ * HELPER: Revalidate action-related paths
+ */
+export function revalidateActionPaths() {
+  revalidatePath("/admin/actions");
+}
+
+/**
+ * HELPER: Revalidate audit-related paths
+ */
+export function revalidateAuditPaths() {
+  revalidatePath("/admin/audit");
+}
+
+/**
+ * HELPER: Revalidate DOF-related paths
+ */
+export function revalidateDOFPaths() {
+  revalidatePath("/admin/dof");
+}
+
+/**
  * HELPER: Revalidate admin paths
  */
 export function revalidateAdminPaths() {

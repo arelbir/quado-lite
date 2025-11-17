@@ -142,7 +142,7 @@ export function GlobalSearch() {
                       onClick={() => setQuery(search)}
                       className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors text-left text-sm"
                     >
-                      <Icons.History className="size-4 text-muted-foreground" />
+                      <Icons.Clock className="size-4 text-muted-foreground" />
                       {search}
                     </button>
                   ))}

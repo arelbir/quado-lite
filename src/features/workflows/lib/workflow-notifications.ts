@@ -5,7 +5,7 @@
  * Created: 2025-01-25
  */
 
-import { NotificationService } from "@/features/notifications/lib/notification-service";
+import { sendNotification } from "@/features/notifications/lib/notification-service";
 
 /**
  * Send notification when workflow task is assigned
@@ -16,14 +16,15 @@ export async function notifyWorkflowAssignment(data: {
   entityId: string;
   stepName?: string;
 }) {
-  await NotificationService.send({
+  await sendNotification({
     userId: data.userId,
-    category: "workflow_assignment",
+    type: "workflow_assignment",
     title: "New Workflow Task Assigned",
     message: `You have been assigned a new workflow task for ${data.entityType}`,
-    relatedEntityType: data.entityType.toLowerCase() as any,
-    relatedEntityId: data.entityId,
-    sendEmail: false,
+    metadata: {
+      entityType: data.entityType,
+      entityId: data.entityId,
+    },
   });
 }
 
@@ -36,14 +37,16 @@ export async function notifyDeadlineApproaching(data: {
   entityId: string;
   hoursRemaining: number;
 }) {
-  await NotificationService.send({
+  await sendNotification({
     userId: data.userId,
-    category: "workflow_deadline_approaching",
+    type: "workflow_deadline",
     title: "Workflow Task Deadline Approaching",
     message: `Your workflow task is due in ${Math.floor(data.hoursRemaining)} hours`,
-    relatedEntityType: data.entityType.toLowerCase() as any,
-    relatedEntityId: data.entityId,
-    sendEmail: true,
+    priority: 'high',
+    metadata: {
+      entityType: data.entityType,
+      entityId: data.entityId,
+    },
   });
 }
 
@@ -76,14 +79,15 @@ export async function notifyApproval(data: {
   entityId: string;
   approvedBy?: string;
 }) {
-  await NotificationService.send({
+  await sendNotification({
     userId: data.userId,
-    category: "workflow_approved",
+    type: "workflow_approved",
     title: "Workflow Task Approved",
     message: `Your workflow task has been approved`,
-    relatedEntityType: data.entityType.toLowerCase() as any,
-    relatedEntityId: data.entityId,
-    sendEmail: false,
+    metadata: {
+      entityType: data.entityType,
+      entityId: data.entityId,
+    },
   });
 }
 
@@ -96,13 +100,15 @@ export async function notifyRejection(data: {
   entityId: string;
   reason?: string;
 }) {
-  await NotificationService.send({
+  await sendNotification({
     userId: data.userId,
-    category: "workflow_rejected",
+    type: "workflow_rejected",
     title: "Workflow Task Rejected",
     message: `Your workflow task has been rejected${data.reason ? `: ${data.reason}` : ""}`,
-    relatedEntityType: data.entityType.toLowerCase() as any,
-    relatedEntityId: data.entityId,
-    sendEmail: true,
+    priority: 'high',
+    metadata: {
+      entityType: data.entityType,
+      entityId: data.entityId,
+    },
   });
 }
