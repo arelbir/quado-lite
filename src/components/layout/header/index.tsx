@@ -12,8 +12,7 @@ import { getLatestUser } from '@/lib/auth/server'
 import { cn } from '@/lib/utils/cn'
 // GitHub star feature removed
 import { Skeleton } from '@/components/ui/skeleton'
-import { NotificationBell } from '@/features/notifications/components/notification-bell'
-import { getUnreadCount } from '@/features/notifications/actions/notification-actions'
+import { NotificationBell } from '@/components/notifications/notification-bell'
 import { LanguageSwitcher } from '@/components/shared/language-switcher'
 
 
@@ -21,7 +20,6 @@ import { LanguageSwitcher } from '@/components/shared/language-switcher'
 export const Header = async () => {
 
   const user = await getLatestUser()
-  const unreadCount = await getUnreadCount()
   
   return (
     <header className=" flex h-[var(--header-height)] items-center gap-4 border-b bg-muted/20 px-4 lg:h-[60px] lg:px-6">
@@ -106,7 +104,7 @@ export const Header = async () => {
         <HeaderBreadcrumb />
       </div>
 
-      <NotificationBell initialUnreadCount={unreadCount} />
+      {user && <NotificationBell userId={user.id} />}
       <LanguageSwitcher />
       <ThemeToggle theme={user?.theme!} />
       <UserDropdown />
