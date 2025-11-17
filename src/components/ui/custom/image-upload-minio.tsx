@@ -69,8 +69,16 @@ export function ImageUploadMinio({ onChange }: ImageUploadProps) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
-      throw new Error(errorData.error || 'Upload failed');
+      let errorMessage = 'Upload failed';
+      try {
+        const errorData = await response.json();
+        if (errorData && typeof errorData === 'object' && 'error' in errorData) {
+          errorMessage = String(errorData.error);
+        }
+      } catch {
+        // Use default error message
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
