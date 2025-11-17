@@ -28,7 +28,7 @@ export async function sendVerificationEmail(
 
   // Production: Send via SMTP
   try {
-    const html = render(<MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />);
+    const html = await render(<MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />);
     
     const result = await SMTPEmailService.send({
       to: email,
