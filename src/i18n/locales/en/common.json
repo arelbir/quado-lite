@@ -1,0 +1,73 @@
+{
+  "app": {
+    "name": "Quado Framework",
+    "description": "Enterprise Application Framework"
+  },
+  "actions": {
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "view": "View",
+    "close": "Close"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "processing": "Processing..."
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "welcome": "Welcome",
+    "total": "Total",
+    "showing": "Showing",
+    "of": "of",
+    "all": "All",
+    "none": "None",
+    "other": "Other"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be at most {max} characters",
+    "min": "Minimum value is {min}",
+    "max": "Maximum value is {max}"
+  },
+  "messages": {
+    "success": "Operation completed successfully",
+    "error": "An error occurred",
+    "deleteConfirm": "Are you sure you want to delete?",
+    "saveConfirm": "Do you want to save changes?",
+    "unsavedChanges": "You have unsaved changes",
+    "noData": "No data found",
+    "loading": "Loading data..."
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "auth": {
+    "unauthorized": "You are not authorized for this action",
+    "sessionExpired": "Your session has expired",
+    "invalidCredentials": "Invalid username or password",
+    "userNotFound": "User not found",
+    "emailTaken": "This email is already in use"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be at most {max} characters",
+    "min": "Minimum value is {min}",
+    "max": "Maximum value is {max}",
+    "invalid": "Invalid value"
+  },
+  "api": {
+    "serverError": "Server error occurred",
+    "networkError": "Network connection error",
+    "notFound": "{entity} not found",
+    "badRequest": "Invalid request",
+    "timeout": "Request timed out"
+  },
+  "database": {
+    "connectionError": "Database connection error",
+    "duplicateEntry": "This record already exists",
+    "constraintViolation": "Data integrity error"
+  },
+  "file": {
+    "uploadFailed": "File upload failed",
+    "fileTooLarge": "File is too large (max {max}MB)",
+    "invalidType": "Invalid file type",
+    "downloadFailed": "File download failed"
+  }
+}

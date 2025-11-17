@@ -1,0 +1,21 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "admin": "Administration",
+    "users": "Users",
+    "roles": "Roles",
+    "organization": "Organization",
+    "workflows": "Workflows",
+    "reports": "Reports",
+    "settings": "Settings",
+    "notifications": "Notifications"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "admin": "Administration",
+    "details": "Details",
+    "edit": "Edit",
+    "create": "Create",
+    "list": "List"
+  }
+}
