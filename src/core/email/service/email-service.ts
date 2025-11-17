@@ -26,7 +26,7 @@ export class EmailService {
   static async send(data: BaseEmailData) {
     try {
       const emailPayload: any = {
-        from: process.env.EMAIL_FROM || 'Enterprise Framework <noreply@framework.com>',
+        from: process.env.SMTP_FROM || 'Enterprise Framework <noreply@framework.com>',
         to: data.to,
         subject: data.subject,
       };

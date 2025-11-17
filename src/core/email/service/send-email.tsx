@@ -23,7 +23,7 @@ export async function sendVerificationEmail(
     return { success: "Please check your email for the confirmation link.", link: confirmLink }
   }
   const { error } = await resend.emails.send({
-    from: env.EMAIL_FROM,
+    from: env.SMTP_FROM || 'noreply@framework.com',
     to: email,
     subject,
     react: <MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />
@@ -48,7 +48,7 @@ export async function sendPasswordResetEmail(
     return { success: "Please check your email for the confirmation link.", link: resetLink }
   }
   const { error } = await resend.emails.send({
-    from: env.EMAIL_FROM,
+    from: env.SMTP_FROM || 'noreply@framework.com',
     to: email,
     subject,
     react: <MagicLinkEmail magicLink={resetLink} previewTitle={subject} />
@@ -75,7 +75,7 @@ export async function sendRegisterEmail({
     return { success: "Please register using this link.", link: confirmLink}
   }
   const { error } = await resend.emails.send({
-    from: env.EMAIL_FROM,
+    from: env.SMTP_FROM || 'noreply@framework.com',
     to: email,
     subject,
     react: <MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />
