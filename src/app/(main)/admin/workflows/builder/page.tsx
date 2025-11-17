@@ -241,7 +241,7 @@ function WorkflowBuilderContent() {
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   {isEditMode && workflowModule && (
                     <span className="flex items-center gap-1">
-                      <Icons.FileCode className="size-3" />
+                      <Icons.Folder className="size-3" />
                       {workflowModule}
                     </span>
                   )}
