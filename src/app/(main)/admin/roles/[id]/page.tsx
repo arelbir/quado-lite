@@ -13,9 +13,9 @@
  */
 
 import { Metadata } from "next";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { eq } from "drizzle-orm";
-import { roles } from "@/drizzle/schema";
+import { roles } from "@/core/database/schema";
 import { notFound } from "next/navigation";
 import { PermissionMatrix } from "@/components/admin/permission-matrix";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

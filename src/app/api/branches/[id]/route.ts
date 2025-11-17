@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   try {

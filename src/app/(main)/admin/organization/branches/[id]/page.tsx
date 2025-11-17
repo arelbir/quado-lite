@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { db } from "@/drizzle/db";
+import { db } from "@/core/database/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Mail, Phone, MapPin, User, Users } from "lucide-react";
