@@ -9,7 +9,7 @@ import { Icons } from "@/components/shared/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { deleteMinioFile } from "@/lib/storage/minio-actions";
 import { toast } from "sonner";
-import { extractFilename } from "@/lib/storage/upload-helpers";
+import { extractFilename } from "@/lib/storage/file-utils";
 import { Label } from "@/components/ui/label";
 
 

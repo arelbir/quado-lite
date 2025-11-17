@@ -164,7 +164,7 @@ export function ImageUploadMinio({ onChange }: ImageUploadProps) {
         >
           <div className="text-center">
             <div className="border p-2 rounded-md max-w-min mx-auto">
-              <Icons.Upload size={20} />
+              <Icons.UploadCloud size={20} />
             </div>
 
             <p className="mt-2 text-sm text-gray-600">

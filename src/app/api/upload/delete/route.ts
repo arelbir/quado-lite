@@ -19,7 +19,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get key from body
-    const body = await request.json();
+    const body = await request.json() as { key?: string };
     const { key } = body;
 
     if (!key) {
