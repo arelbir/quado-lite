@@ -33,13 +33,13 @@ import { relations } from "drizzle-orm";
 import { user } from "./user";
 
 /**
- * ENUMS
+ * ENUMS - GENERIC FRAMEWORK ONLY
  */
 export const entityType = pgEnum("EntityType", [
-  "Audit",
-  "Finding",
-  "Action",
-  "DOF",
+  "User",
+  "Workflow",
+  "Document",
+  "CustomEntity",
 ]);
 
 export const stepType = pgEnum("StepType", [

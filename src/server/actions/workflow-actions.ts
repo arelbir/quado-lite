@@ -507,7 +507,7 @@ export async function startWorkflow(data: {
       .insert(workflowInstances)
       .values({
         workflowDefinitionId: data.workflowDefinitionId,
-        entityType: data.entityType,
+        entityType: data.entityType as any, // Generic - supports any entity type
         entityId: data.entityId,
         currentStepId: startStep!.id,
         status: "active",
@@ -747,7 +747,7 @@ export async function createDelegation(data: {
       fromUserId: currentUser.id,
       toUserId: data.toUserId,
       role: data.role,
-      entityType: data.entityType || null,
+      entityType: (data.entityType as any) || null, // Generic - supports any entity type
       startDate: data.startDate,
       endDate: data.endDate,
       reason: data.reason,

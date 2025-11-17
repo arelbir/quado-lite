@@ -4,7 +4,8 @@ import { user } from "./user";
 
 /**
  * GENERIC NOTIFICATION CATEGORIES - Framework Core
- * Domain modules can extend these categories
+ * Pure framework-level notifications only
+ * Domain modules define their own categories
  */
 export const notificationCategoryEnum = pgEnum("notification_category", [
   // Core workflow notifications
@@ -22,38 +23,19 @@ export const notificationCategoryEnum = pgEnum("notification_category", [
   "task_completed",
   "approval_required",
   "approval_completed",
-  // Legacy domain categories (for backward compatibility - will be migrated)
-  "finding_assigned",
-  "finding_updated",
-  "action_assigned",
-  "action_pending_approval",
-  "action_approved",
-  "action_rejected",
-  "dof_assigned",
-  "dof_pending_approval",
-  "dof_approved",
-  "dof_rejected",
-  "plan_created",
-  "audit_completed",
-  "audit_reminder",
 ]);
 
 /**
  * GENERIC ENTITY TYPES - Framework Core
- * Changed to text field to support any entity type
- * Note: In production, this would be migrated to a text field for full flexibility
+ * Pure framework entities only
  */
 export const relatedEntityTypeEnum = pgEnum("related_entity_type", [
-  // Legacy types (for backward compatibility)
-  "finding",
-  "action",
-  "dof",
-  "audit",
-  "plan",
-  // Generic types
   "user",
+  "role",
   "workflow",
   "document",
+  "team",
+  "group",
 ]);
 
 /**
@@ -89,21 +71,15 @@ export const notifications = pgTable("notifications", {
 
 /**
  * Kullanıcı Bildirim Tercihleri
+ * Pure framework preferences - no domain-specific fields
  */
 export const notificationPreferences = pgTable("notification_preferences", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => user.id).notNull().unique(),
   
-  // Genel tercihler
+  // Global preferences only - framework level
   emailEnabled: boolean("email_enabled").default(true).notNull(),
   inAppEnabled: boolean("in_app_enabled").default(true).notNull(),
-  
-  // Kategori bazlı tercihler
-  findingNotifications: boolean("finding_notifications").default(true).notNull(),
-  actionNotifications: boolean("action_notifications").default(true).notNull(),
-  dofNotifications: boolean("dof_notifications").default(true).notNull(),
-  planNotifications: boolean("plan_notifications").default(true).notNull(),
-  auditNotifications: boolean("audit_notifications").default(true).notNull(),
   
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
