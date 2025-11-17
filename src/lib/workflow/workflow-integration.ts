@@ -1,8 +1,14 @@
 /**
- * WORKFLOW INTEGRATION HELPERS
- * Helper functions for integrating workflow system with modules
+ * GENERIC WORKFLOW INTEGRATION HELPERS - FRAMEWORK CORE
+ * Entity-agnostic helpers for integrating workflows with any domain module
+ * 
+ * Usage:
+ * 1. Use getWorkflowDefinitionId() to find workflows by name
+ * 2. Use buildEntityMetadata() to prepare metadata for workflow
+ * 3. Domain modules should create their own specific helpers
  * 
  * Created: 2025-01-25
+ * Refactored: 2025-11-17 (Framework Core)
  */
 
 import { db } from "@/drizzle/db";
@@ -16,9 +22,14 @@ import { getCustomFieldValues } from "@/server/actions/custom-field-value-action
 const workflowIdCache = new Map<string, string>();
 
 /**
- * Get workflow definition ID by name
+ * CORE HELPERS - Generic, reusable across all modules
  */
-async function getWorkflowDefinitionId(name: string): Promise<string | null> {
+
+/**
+ * Get workflow definition ID by name
+ * Generic helper - works for any workflow
+ */
+export async function getWorkflowDefinitionId(name: string): Promise<string | null> {
   // Check cache first
   if (workflowIdCache.has(name)) {
     return workflowIdCache.get(name)!;
@@ -41,174 +52,63 @@ async function getWorkflowDefinitionId(name: string): Promise<string | null> {
 }
 
 /**
- * AUDIT MODULE INTEGRATION
+ * GENERIC ENTITY WORKFLOW HELPERS
+ * These helpers work for any entity type
  */
 
 /**
- * Determine which audit workflow to use based on audit properties
+ * Get workflow definition by entity type
+ * Generic helper - finds default workflow for an entity type
  */
-export async function getAuditWorkflowId(auditData: {
-  riskLevel?: string;
-  totalScore?: number;
-  departmentId?: string;
-  findingsCount?: number;
-}): Promise<string | null> {
-  // High-risk audits or many findings use critical flow (manager approval required)
-  if (
-    auditData.riskLevel === "high" || 
-    (auditData.totalScore && auditData.totalScore > 80) ||
-    (auditData.findingsCount && auditData.findingsCount > 5)
-  ) {
-    return await getWorkflowDefinitionId("Audit Critical Flow");
+export async function getWorkflowByEntityType(entityType: string): Promise<string | null> {
+  const definition = await db.query.workflowDefinitions.findFirst({
+    where: and(
+      eq(workflowDefinitions.entityType, entityType),
+      eq(workflowDefinitions.isActive, true)
+    ),
+  });
+
+  return definition?.id || null;
+}
+
+/**
+ * Build generic entity metadata for workflows
+ * Includes custom fields automatically
+ * 
+ * @param entityType - The type of entity (e.g., 'User', 'Order', 'Invoice')
+ * @param entityId - The ID of the entity
+ * @param coreFields - Core fields from your entity
+ * @returns Metadata object ready for workflow
+ * 
+ * @example
+ * const metadata = await buildEntityMetadata('ORDER', orderId, {
+ *   priority: order.priority,
+ *   amount: order.total,
+ *   customerId: order.customerId
+ * });
+ */
+export async function buildEntityMetadata(
+  entityType: string,
+  entityId: string,
+  coreFields: Record<string, any> = {}
+) {
+  // Load custom fields if defined for this entity
+  let customFields = {};
+  try {
+    const customFieldsResult = await getCustomFieldValues(entityType, entityId);
+    if (customFieldsResult.success && customFieldsResult.data) {
+      customFields = customFieldsResult.data;
+    }
+  } catch (error) {
+    console.warn(`No custom fields found for ${entityType}:${entityId}`);
   }
 
-  // Normal audits use normal flow (simple review)
-  return await getWorkflowDefinitionId("Audit Normal Flow");
-}
-
-/**
- * Build audit workflow metadata
- * Now includes custom fields for workflow conditions/rules
- */
-export async function buildAuditMetadata(audit: any) {
-  // Load custom fields
-  const customFieldsResult = await getCustomFieldValues('AUDIT', audit.id);
-  const customFields = customFieldsResult.success && customFieldsResult.data 
-    ? customFieldsResult.data 
-    : {};
-
   return {
-    // Core fields
-    riskLevel: audit.riskLevel || "medium",
-    department: audit.departmentId,
-    auditor: audit.auditorId || audit.createdById,
-    templateId: audit.templateId,
-    totalScore: audit.totalScore || 0,
-    findingsCount: audit.findingsCount || 0,
-    completedDate: audit.updatedAt,
-    
-    // Custom fields (available for workflow conditions)
+    entityType,
+    entityId,
+    ...coreFields,
     customFields,
-  };
-}
-
-/**
- * Get audit completion workflow ID (for closure approval)
- */
-export async function getAuditCompletionWorkflowId(): Promise<string | null> {
-  return await getWorkflowDefinitionId("Audit Completion Flow");
-}
-
-/**
- * ACTION MODULE INTEGRATION
- */
-
-/**
- * Determine which action workflow to use
- */
-export async function getActionWorkflowId(actionData: {
-  priority?: string;
-  type?: string;
-  findingId?: string;
-}): Promise<string | null> {
-  // High priority or corrective actions use complex flow (4 steps)
-  if (actionData.priority === "high" || actionData.type === "Corrective") {
-    return await getWorkflowDefinitionId("Action Complex Flow");
-  }
-
-  // Normal actions use quick flow (2 steps)
-  return await getWorkflowDefinitionId("Action Quick Flow");
-}
-
-/**
- * Build action workflow metadata
- * Now includes custom fields for workflow conditions/rules
- */
-export async function buildActionMetadata(action: any) {
-  // Load custom fields
-  const customFieldsResult = await getCustomFieldValues('ACTION', action.id);
-  const customFields = customFieldsResult.success && customFieldsResult.data 
-    ? customFieldsResult.data 
-    : {};
-
-  return {
-    // Core fields
-    priority: action.priority || "medium",
-    type: action.type,
-    findingId: action.findingId,
-    assignedTo: action.assignedToId,
-    dueDate: action.dueDate,
-    
-    // Custom fields (available for workflow conditions)
-    customFields,
-  };
-}
-
-/**
- * DOF MODULE INTEGRATION
- */
-
-/**
- * Get DOF workflow ID (always uses standard CAPA flow)
- */
-export async function getDofWorkflowId(): Promise<string | null> {
-  return await getWorkflowDefinitionId("DOF Standard CAPA Flow");
-}
-
-/**
- * Build DOF workflow metadata
- * Now includes custom fields for workflow conditions/rules
- */
-export async function buildDofMetadata(dof: any) {
-  // Load custom fields
-  const customFieldsResult = await getCustomFieldValues('DOF', dof.id);
-  const customFields = customFieldsResult.success && customFieldsResult.data 
-    ? customFieldsResult.data 
-    : {};
-
-  return {
-    // Core fields
-    findingId: dof.findingId,
-    currentStep: dof.currentStep || 1,
-    assignedTo: dof.assignedToId,
-    managerId: dof.managerId,
-    
-    // Custom fields (available for workflow conditions)
-    customFields,
-  };
-}
-
-/**
- * FINDING MODULE INTEGRATION
- */
-
-/**
- * Get finding workflow ID (closure flow)
- */
-export async function getFindingWorkflowId(): Promise<string | null> {
-  return await getWorkflowDefinitionId("Finding Closure Flow");
-}
-
-/**
- * Build finding workflow metadata
- * Now includes custom fields for workflow conditions/rules
- */
-export async function buildFindingMetadata(finding: any) {
-  // Load custom fields
-  const customFieldsResult = await getCustomFieldValues('FINDING', finding.id);
-  const customFields = customFieldsResult.success && customFieldsResult.data 
-    ? customFieldsResult.data 
-    : {};
-
-  return {
-    // Core fields
-    severity: finding.severity,
-    riskLevel: finding.riskLevel,
-    hasActions: finding.actions?.length > 0,
-    assignedTo: finding.assignedToId,
-    
-    // Custom fields (available for workflow conditions)
-    customFields,
+    timestamp: new Date().toISOString(),
   };
 }
 

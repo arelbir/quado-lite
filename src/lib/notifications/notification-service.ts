@@ -2,27 +2,30 @@ import { db } from "@/drizzle/db";
 import { notifications, notificationPreferences } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 
+/**
+ * GENERIC NOTIFICATION CATEGORIES
+ * Framework-level categories, domain modules can extend these
+ */
 export type NotificationCategory =
-  | "finding_assigned"
-  | "finding_updated"
-  | "action_assigned"
-  | "action_pending_approval"
-  | "action_approved"
-  | "action_rejected"
-  | "dof_assigned"
-  | "dof_pending_approval"
-  | "dof_approved"
-  | "dof_rejected"
-  | "plan_created"
-  | "audit_completed"
-  | "audit_reminder"
+  // Core workflow notifications
   | "workflow_assignment"
   | "workflow_deadline_approaching"
   | "workflow_escalated"
   | "workflow_approved"
-  | "workflow_rejected";
+  | "workflow_rejected"
+  | "workflow_completed"
+  // Generic system notifications
+  | "system_alert"
+  | "user_mentioned"
+  | "task_assigned"
+  | "task_updated"
+  | "task_completed"
+  | "approval_required"
+  | "approval_completed"
+  // Custom categories (for domain modules)
+  | string;
 
-export type RelatedEntityType = "finding" | "action" | "dof" | "audit" | "plan";
+export type RelatedEntityType = string; // Generic - any entity type
 
 interface NotificationData {
   userId: string;
@@ -134,6 +137,8 @@ export class NotificationService {
 
   /**
    * Kullanıcı tercihlerini kontrol et
+   * Generic implementation - checks only global preferences
+   * Domain modules can extend this with custom category checks
    */
   static async shouldSendNotification(
     userId: string,
@@ -150,28 +155,10 @@ export class NotificationService {
         return { inApp: true, email: true };
       }
 
-      // Genel tercihler kapalıysa direkt false
-      if (!prefs.inAppEnabled && !prefs.emailEnabled) {
-        return { inApp: false, email: false };
-      }
-
-      // Kategori bazlı kontrol
-      let categoryEnabled = true;
-      if (category.startsWith("finding")) {
-        categoryEnabled = prefs.findingNotifications;
-      } else if (category.startsWith("action")) {
-        categoryEnabled = prefs.actionNotifications;
-      } else if (category.startsWith("dof")) {
-        categoryEnabled = prefs.dofNotifications;
-      } else if (category.startsWith("plan")) {
-        categoryEnabled = prefs.planNotifications;
-      } else if (category.startsWith("audit")) {
-        categoryEnabled = prefs.auditNotifications;
-      }
-
+      // Global preferences check
       return {
-        inApp: prefs.inAppEnabled && categoryEnabled,
-        email: prefs.emailEnabled && categoryEnabled,
+        inApp: prefs.inAppEnabled ?? true,
+        email: prefs.emailEnabled ?? true,
       };
     } catch (error) {
       console.error("Error checking notification preferences:", error);
