@@ -4,12 +4,12 @@ import React, { useTransition } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DrawerDialog } from "@/components/ui/custom/drawer-dialog";
-import { ImageUpload } from "@/components/ui/custom/image-upload";
+import { ImageUploadMinio } from "@/components/ui/custom/image-upload-minio";
 import { Icons } from "@/components/shared/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { deleteUploadthingFiles } from "@/lib/uploadthing-actions";
+import { deleteMinioFile } from "@/lib/storage/minio-actions";
 import { toast } from "sonner";
-import { extractFilename } from "@/lib/core/file";
+import { extractFilename } from "@/lib/storage/upload-helpers";
 import { Label } from "@/components/ui/label";
 
 
@@ -32,7 +32,7 @@ export default function UserCard({ src, onChange }: UserCardProps) {
       return;
     }
     startTransition(() => {
-      toast.promise(deleteUploadthingFiles(image), {
+      toast.promise(deleteMinioFile(image), {
         loading: "Deleting image...",
         success: () => {
           onChange("")
@@ -53,7 +53,7 @@ export default function UserCard({ src, onChange }: UserCardProps) {
   const onUsePreviousAvatar = () => {
     const image = extractFilename(imageSrc);
 
-    image && deleteUploadthingFiles(image);
+    image && deleteMinioFile(image);
     if (!src) return;
     onChange(src);
     setImageSrc(src);
@@ -81,7 +81,7 @@ export default function UserCard({ src, onChange }: UserCardProps) {
               title='Upload image'
               description='Upload an image to be displayed on your profile.'
             >
-              <ImageUpload onChange={onUploadCompleted} />
+              <ImageUploadMinio onChange={onUploadCompleted} />
             </DrawerDialog>
             <Button onClick={onDeleteFile} disabled={isPending || !imageSrc} size={"icon"} variant={"outline"}>
               <Icons.Trash size="1.4em" />

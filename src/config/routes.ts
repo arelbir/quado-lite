@@ -6,7 +6,6 @@
 export const publicRoutes = [
   // "/",
   
-  "/api/uploadthing",
   "/api/get-user-permission",
 ];
 
