@@ -241,16 +241,16 @@ function WorkflowBuilderContent() {
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   {isEditMode && workflowModule && (
                     <span className="flex items-center gap-1">
-                      <Icons.Tag className="size-3" />
+                      <Icons.FileCode className="size-3" />
                       {workflowModule}
                     </span>
                   )}
                   <span className="flex items-center gap-1">
-                    <Icons.Box className="size-3" />
+                    <Icons.Circle className="size-3" />
                     {nodes.length} nodes
                   </span>
                   <span className="flex items-center gap-1">
-                    <Icons.Network className="size-3" />
+                    <Icons.GitBranch className="size-3" />
                     {edges.length} connections
                   </span>
                   <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
@@ -269,7 +269,7 @@ function WorkflowBuilderContent() {
               onClick={handleClear}
               className="text-muted-foreground hover:text-destructive"
             >
-              <Icons.Trash2 className="size-4 mr-2" />
+              <Icons.Trash className="size-4 mr-2" />
               Clear
             </Button>
             <Button 
