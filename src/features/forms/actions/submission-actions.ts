@@ -61,6 +61,7 @@ export async function createSubmission(data: {
         })
         .returning();
 
+      revalidatePath('/admin/forms');
       return { success: true, data: submission };
     } catch (error) {
       console.error('[createSubmission] Error:', error);
@@ -122,7 +123,8 @@ export async function updateSubmission(
         })
         .where(eq(formSubmissions.id, id));
 
-      return { success: true };
+      revalidatePath('/admin/forms');
+      return { success: true, data: null };
     } catch (error) {
       console.error('[updateSubmission] Error:', error);
       return { success: false, error: 'Failed to update submission' };
@@ -208,7 +210,8 @@ export async function deleteSubmission(id: string): Promise<any> {
   return withAuth<any>(async (user: any) => {
     try {
       await db.delete(formSubmissions).where(eq(formSubmissions.id, id));
-      return { success: true };
+      revalidatePath('/admin/forms');
+      return { success: true, data: null };
     } catch (error) {
       console.error('[deleteSubmission] Error:', error);
       return { success: false, error: 'Failed to delete submission' };

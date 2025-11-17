@@ -246,9 +246,8 @@ export async function triggerManualSync(
         syncType: config.sourceType,
       });
 
-      await db.update(hrSyncLogs).set({
-        queueJobId: job.jobId,
-      }).where(eq(hrSyncLogs.id, syncLog.id));
+      // Note: queueJobId field doesn't exist in schema
+      // Job tracking is handled by the queue service
 
       revalidatePath("/admin/hr-sync");
 
