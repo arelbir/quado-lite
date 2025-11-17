@@ -6,7 +6,7 @@
 import { db } from '@/core/database/client';
 import { notifications } from '@/core/database/schema';
 import { nanoid } from 'nanoid';
-import { realtimeService } from '@/lib/realtime/realtime-service';
+import { realtime } from '@/lib/realtime/realtime-service';
 
 export interface NotificationData {
   userId: string;
@@ -46,7 +46,8 @@ export async function sendNotification(data: NotificationData) {
 
     // Broadcast to user via WebSocket
     try {
-      realtimeService.sendToUser(data.userId, 'notification', {
+      realtime.send('notification', {
+        userId: data.userId,
         id: notification.id,
         title: notification.title,
         message: notification.message,

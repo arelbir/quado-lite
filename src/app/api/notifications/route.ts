@@ -85,11 +85,11 @@ export async function POST(request: NextRequest) {
       .insert(notifications)
       .values({
         userId: data.userId,
-        category: data.category,
+        category: data.category as any,
         title: data.title,
         message: data.message,
         priority: data.priority || "medium",
-        relatedEntityType: data.relatedEntityType,
+        relatedEntityType: data.relatedEntityType as any,
         relatedEntityId: data.relatedEntityId,
         actionUrl: data.actionUrl,
         metadata: data.metadata || {},
