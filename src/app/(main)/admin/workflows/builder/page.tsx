@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { Suspense, useEffect, useState } from 'react';
-import { WorkflowCanvas } from '@/features/workflows/components/designer/Canvas/WorkflowCanvas';
-import { ToolbarPanel } from '@/features/workflows/components/designer/Panels/ToolbarPanel';
-import { PropertiesPanel } from '@/features/workflows/components/designer/Panels/PropertiesPanel';
-import { ValidationPanel } from '@/features/workflows/components/designer/Panels/ValidationPanel';
-import { CustomFieldsReference } from '@/features/workflows/components/designer/Panels/CustomFieldsReference';
-import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/shared/icons';
-import { useWorkflowStore } from '@/features/workflows/components/designer/Hooks/useWorkflowStore';
-import { useAutoSave, loadDraft, clearDraft, hasDraft } from '@/features/workflows/components/designer/Hooks/useAutoSave';
-import { createVisualWorkflow, getVisualWorkflowById, updateVisualWorkflow } from '@/features/workflows/actions/visual-workflow-actions';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
+import { Suspense, useEffect, useState } from "react";
+import { WorkflowCanvas } from "@/features/workflows/components/designer/Canvas/WorkflowCanvas";
+import { ToolbarPanel } from "@/features/workflows/components/designer/Panels/ToolbarPanel";
+import { PropertiesPanel } from "@/features/workflows/components/designer/Panels/PropertiesPanel";
+import { ValidationPanel } from "@/features/workflows/components/designer/Panels/ValidationPanel";
+import { CustomFieldsReference } from "@/features/workflows/components/designer/Panels/CustomFieldsReference";
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/shared/icons";
+import { useWorkflowStore } from "@/features/workflows/components/designer/Hooks/useWorkflowStore";
+import { useAutoSave, loadDraft, clearDraft, hasDraft } from "@/features/workflows/components/designer/Hooks/useAutoSave";
+import { createVisualWorkflow, getVisualWorkflowById, updateVisualWorkflow } from "@/features/workflows/actions/visual-workflow-actions";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +22,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -30,19 +30,23 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 function WorkflowBuilderContent() {
   const { nodes, edges, reset, setNodes, setEdges } = useWorkflowStore();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const workflowId = searchParams.get('id');
+  const workflowId = searchParams.get("id");
+
+  const tWorkflow = useTranslations("workflow");
+  const tCommon = useTranslations("common");
   
-  const [workflowName, setWorkflowName] = useState('');
-  const [workflowModule, setWorkflowModule] = useState<'DOF' | 'ACTION' | 'FINDING' | 'AUDIT' | ''>('');
+  const [workflowName, setWorkflowName] = useState("");
+  const [workflowModule, setWorkflowModule] = useState<"DOF" | "ACTION" | "FINDING" | "AUDIT" | "">("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   
@@ -51,8 +55,8 @@ function WorkflowBuilderContent() {
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
-  const [tempWorkflowName, setTempWorkflowName] = useState('');
-  const [tempWorkflowModule, setTempWorkflowModule] = useState<'DOF' | 'ACTION' | 'FINDING' | 'AUDIT' | ''>('');
+  const [tempWorkflowName, setTempWorkflowName] = useState("");
+  const [tempWorkflowModule, setTempWorkflowModule] = useState<"DOF" | "ACTION" | "FINDING" | "AUDIT" | "">("");
   
   // Enable auto-save only when NOT loading from database
   useAutoSave(!workflowId);
@@ -75,13 +79,15 @@ function WorkflowBuilderContent() {
             // Clear any existing draft since we're loading from DB
             clearDraft();
           } else {
-            toast.error('Failed to load workflow: ' + result.error);
-            router.push('/admin/workflows');
+            toast.error(
+              result.error || tWorkflow("messages.loadError"),
+            );
+            router.push("/admin/workflows");
           }
         } catch (error) {
-          console.error('Load error:', error);
-          toast.error('Failed to load workflow');
-          router.push('/admin/workflows');
+          console.error("Load error:", error);
+          toast.error(tWorkflow("messages.loadError"));
+          router.push("/admin/workflows");
         } finally {
           setIsLoading(false);
         }
@@ -98,19 +104,19 @@ function WorkflowBuilderContent() {
     };
 
     loadWorkflow();
-  }, [workflowId]); // Re-run if ID changes
+  }, [workflowId, nodes.length, setEdges, setNodes, router, tWorkflow]);
 
   const handleSave = async () => {
     // Basic validation
     if (nodes.length === 0) {
-      toast.error('Cannot save empty workflow');
+      toast.error(tWorkflow("messages.emptyError"));
       return;
     }
 
     // Only prompt if creating new (not editing)
     if (!isEditMode) {
-      setTempWorkflowName('');
-      setTempWorkflowModule('');
+      setTempWorkflowName("");
+      setTempWorkflowModule("");
       setShowSaveDialog(true);
       return;
     }
@@ -119,9 +125,12 @@ function WorkflowBuilderContent() {
     await performSave(workflowName, workflowModule);
   };
 
-  const performSave = async (name: string, module: 'DOF' | 'ACTION' | 'FINDING' | 'AUDIT' | '') => {
-    if (!module || !['DOF', 'ACTION', 'FINDING', 'AUDIT'].includes(module)) {
-      toast.error('Invalid module');
+  const performSave = async (
+    name: string,
+    module: "DOF" | "ACTION" | "FINDING" | "AUDIT" | "",
+  ) => {
+    if (!module || !["DOF", "ACTION", "FINDING", "AUDIT"].includes(module)) {
+      toast.error(tWorkflow("messages.invalidModule"));
       return;
     }
 
@@ -135,31 +144,31 @@ function WorkflowBuilderContent() {
 
         if (result.success) {
           clearDraft();
-          toast.success('Workflow updated successfully!');
-          router.push('/admin/workflows');
+          toast.success(tWorkflow("messages.updateSuccess"));
+          router.push("/admin/workflows");
         } else {
-          toast.error(result.error || 'Failed to update workflow');
+          toast.error(result.error || tWorkflow("messages.updateError"));
         }
       } else {
         // Create new workflow
         const result = await createVisualWorkflow({
           name,
-          module: module as 'DOF' | 'ACTION' | 'FINDING' | 'AUDIT',
+          module: module as "DOF" | "ACTION" | "FINDING" | "AUDIT",
           nodes,
           edges,
         });
 
         if (result.success) {
           clearDraft();
-          toast.success('Workflow saved successfully!');
-          router.push('/admin/workflows');
+          toast.success(tWorkflow("messages.createSuccess"));
+          router.push("/admin/workflows");
         } else {
-          toast.error(result.error || 'Failed to save workflow');
+          toast.error(result.error || tWorkflow("messages.createError"));
         }
       }
     } catch (error) {
-      console.error('Save error:', error);
-      toast.error('Failed to save workflow');
+      console.error("Save error:", error);
+      toast.error(tWorkflow("messages.createError"));
     }
   };
 
@@ -170,7 +179,7 @@ function WorkflowBuilderContent() {
   const confirmClear = () => {
     reset();
     setShowClearDialog(false);
-    toast.success('Workflow cleared');
+    toast.success(tWorkflow("messages.cleared"));
   };
 
   const handleLoadDraft = () => {
@@ -178,17 +187,17 @@ function WorkflowBuilderContent() {
       setNodes(draftData.nodes || []);
       setEdges(draftData.edges || []);
       setShowDraftDialog(false);
-      toast.success('Draft loaded successfully');
+      toast.success(tWorkflow("messages.draftLoaded"));
     }
   };
 
   const handleSaveWithData = () => {
     if (!tempWorkflowName.trim()) {
-      toast.error('Please enter a workflow name');
+      toast.error(tWorkflow("builder.validation.nameRequired"));
       return;
     }
     if (!tempWorkflowModule) {
-      toast.error('Please select a module');
+      toast.error(tWorkflow("builder.validation.moduleRequired"));
       return;
     }
     setShowSaveDialog(false);
@@ -200,7 +209,9 @@ function WorkflowBuilderContent() {
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <Icons.Loader2 className="size-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading workflow...</p>
+          <p className="text-muted-foreground">
+            {tWorkflow("builder.loading")}
+          </p>
         </div>
       </div>
     );
@@ -212,20 +223,28 @@ function WorkflowBuilderContent() {
       <div className="border-b p-4 flex items-center justify-between bg-background">
         <div>
           <h1 className="text-2xl font-bold">
-            {isEditMode ? `Edit: ${workflowName}` : 'Workflow Builder'}
+            {isEditMode
+              ? tWorkflow("builder.header.titleEdit", { name: workflowName })
+              : tWorkflow("builder.header.title")}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {isEditMode ? `Module: ${workflowModule}` : 'Design your workflow visually'}
+            {isEditMode && workflowModule
+              ? tWorkflow("builder.header.subtitleEdit", {
+                  module: tWorkflow(`modules.${workflowModule}` as any),
+                })
+              : tWorkflow("builder.header.subtitle")}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleClear}>
             <Icons.Trash className="size-4 mr-2" />
-            Clear
+            {tCommon("actions.clear")}
           </Button>
           <Button onClick={handleSave}>
             <Icons.Save className="size-4 mr-2" />
-            {isEditMode ? 'Update' : 'Save'}
+            {isEditMode
+              ? tCommon("actions.update")
+              : tCommon("actions.save")}
           </Button>
         </div>
       </div>
@@ -266,21 +285,25 @@ function WorkflowBuilderContent() {
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save Workflow</DialogTitle>
+            <DialogTitle>
+              {tWorkflow("builder.dialogs.save.title")}
+            </DialogTitle>
             <DialogDescription>
-              Enter workflow details to save
+              {tWorkflow("builder.dialogs.save.description")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="workflow-name">Workflow Name *</Label>
+              <Label htmlFor="workflow-name">
+                {tWorkflow("builder.dialogs.save.nameLabel")} *
+              </Label>
               <Input
                 id="workflow-name"
-                placeholder="Enter workflow name..."
+                placeholder={tWorkflow("builder.dialogs.save.namePlaceholder")}
                 value={tempWorkflowName}
                 onChange={(e) => setTempWorkflowName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     handleSaveWithData();
                   }
@@ -288,27 +311,44 @@ function WorkflowBuilderContent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="workflow-module">Module *</Label>
-              <Select value={tempWorkflowModule} onValueChange={(value: any) => setTempWorkflowModule(value)}>
+              <Label htmlFor="workflow-module">
+                {tWorkflow("builder.dialogs.save.moduleLabel")} *
+              </Label>
+              <Select
+                value={tempWorkflowModule}
+                onValueChange={(value: any) => setTempWorkflowModule(value)}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select module" />
+                  <SelectValue
+                    placeholder={tWorkflow(
+                      "builder.dialogs.save.modulePlaceholder",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="AUDIT">Audit</SelectItem>
-                  <SelectItem value="FINDING">Finding</SelectItem>
-                  <SelectItem value="ACTION">Action</SelectItem>
-                  <SelectItem value="DOF">DOF (CAPA)</SelectItem>
+                  <SelectItem value="AUDIT">
+                    {tWorkflow("modules.AUDIT")}
+                  </SelectItem>
+                  <SelectItem value="FINDING">
+                    {tWorkflow("modules.FINDING")}
+                  </SelectItem>
+                  <SelectItem value="ACTION">
+                    {tWorkflow("modules.ACTION")}
+                  </SelectItem>
+                  <SelectItem value="DOF">
+                    {tWorkflow("modules.DOF")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
-              Cancel
+              {tCommon("actions.cancel")}
             </Button>
             <Button onClick={handleSaveWithData}>
               <Icons.Save className="size-4 mr-2" />
-              Save Workflow
+              {tWorkflow("builder.dialogs.save.saveButton")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -318,15 +358,19 @@ function WorkflowBuilderContent() {
       <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Clear Workflow?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {tWorkflow("builder.dialogs.clear.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove all nodes and edges from the canvas. This action cannot be undone.
+              {tWorkflow("builder.dialogs.clear.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>
+              {tCommon("actions.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction onClick={confirmClear}>
-              Clear All
+              {tWorkflow("builder.dialogs.clear.clearButton")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -336,23 +380,23 @@ function WorkflowBuilderContent() {
       <AlertDialog open={showDraftDialog} onOpenChange={setShowDraftDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Unsaved Work Found</AlertDialogTitle>
+            <AlertDialogTitle>
+              {tWorkflow("builder.dialogs.draft.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              {draftData && (
-                <>
-                  Found unsaved work from{' '}
-                  <strong>{new Date(draftData.savedAt).toLocaleString()}</strong>.
-                  Would you like to load it?
-                </>
-              )}
+              {draftData
+                ? tWorkflow("builder.dialogs.draft.description", {
+                    date: new Date(draftData.savedAt).toLocaleString(),
+                  })
+                : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setShowDraftDialog(false)}>
-              Discard
+              {tWorkflow("builder.dialogs.draft.discardButton")}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleLoadDraft}>
-              Load Draft
+              {tWorkflow("builder.dialogs.draft.loadButton")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

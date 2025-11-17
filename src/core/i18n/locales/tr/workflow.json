@@ -92,7 +92,55 @@
     "pauseError": "İş akışı duraklatılamadı",
     "resumeError": "İş akışı devam ettirilemedi",
     "cancelError": "İş akışı iptal edilemedi",
-    "completeError": "İş akışı tamamlanamadı"
+    "completeError": "İş akışı tamamlanamadı",
+    "loadError": "İş akışı yüklenemedi",
+    "emptyError": "Boş iş akışı kaydedilemez",
+    "invalidModule": "Geçersiz modül",
+    "cleared": "İş akışı temizlendi",
+    "draftLoaded": "Taslak başarıyla yüklendi"
+  },
+
+  "modules": {
+    "AUDIT": "Denetim",
+    "FINDING": "Bulgu",
+    "ACTION": "Aksiyon",
+    "DOF": "DOF (DÖF)"
+  },
+
+  "builder": {
+    "header": {
+      "title": "İş Akışı Oluşturucu",
+      "titleEdit": "Düzenle: {name}",
+      "subtitle": "İş akışınızı görsel olarak tasarlayın",
+      "subtitleEdit": "Modül: {module}"
+    },
+    "loading": "İş akışı yükleniyor...",
+    "dialogs": {
+      "save": {
+        "title": "İş Akışını Kaydet",
+        "description": "Kaydetmek için iş akışı detaylarını girin",
+        "nameLabel": "İş Akışı Adı",
+        "namePlaceholder": "İş akışı adını giriniz...",
+        "moduleLabel": "Modül",
+        "modulePlaceholder": "Modül seçiniz",
+        "saveButton": "İş Akışını Kaydet"
+      },
+      "clear": {
+        "title": "İş Akışı Temizlensin mi?",
+        "description": "Bu işlem tuvaldeki tüm düğüm ve bağlantıları kaldıracaktır. Bu işlem geri alınamaz.",
+        "clearButton": "Tümünü Temizle"
+      },
+      "draft": {
+        "title": "Kaydedilmemiş Çalışma Bulundu",
+        "description": "{date} tarihinden kaydedilmemiş bir çalışma bulundu. Yüklemek ister misiniz?",
+        "discardButton": "Yoksay",
+        "loadButton": "Taslağı Yükle"
+      }
+    },
+    "validation": {
+      "nameRequired": "Lütfen bir iş akışı adı girin",
+      "moduleRequired": "Lütfen bir modül seçin"
+    }
   },
 
   "templates": {

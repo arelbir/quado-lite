@@ -1,0 +1,77 @@
+{
+  "title": "Group Management",
+  "overview": "Manage functional and project-based groups",
+  
+  "createNew": "Create New Group",
+  "editGroup": "Edit Group",
+  "deleteGroup": "Delete Group",
+  "deleteConfirm": "Are you sure you want to delete this group?",
+  
+  "description": {
+    "create": "Create a new group",
+    "update": "Update group information"
+  },
+  
+  "fields": {
+    "name": "Group Name",
+    "code": "Group Code",
+    "description": "Description",
+    "type": "Group Type",
+    "owner": "Group Owner",
+    "visibility": "Visibility",
+    "department": "Department",
+    "memberCount": "Member Count",
+    "isActive": "Active?",
+    "members": "Members"
+  },
+  
+  "types": {
+    "Functional": "Functional",
+    "Project": "Project-based",
+    "Committee": "Committee",
+    "Custom": "Custom"
+  },
+  
+  "visibility": {
+    "Public": "Public",
+    "Private": "Private",
+    "Restricted": "Restricted"
+  },
+  
+  "messages": {
+    "created": "Group created successfully",
+    "updated": "Group updated successfully",
+    "deleted": "Group deleted successfully",
+    "createError": "Error creating group",
+    "updateError": "Error updating group",
+    "deleteError": "Error deleting group"
+  },
+  
+  "placeholders": {
+    "searchGroup": "Search by group name or code",
+    "selectOwner": "Select group owner",
+    "selectType": "Select group type",
+    "selectVisibility": "Select visibility"
+  },
+  
+  "memberManagement": {
+    "title": "Member Management",
+    "description": "Manage members for {groupName}",
+    "addMember": "Add Member",
+    "removeMember": "Remove Member",
+    "selectUser": "Select user...",
+    "selectRole": "Select role...",
+    "noMembers": "No members yet",
+    "memberAdded": "Member added successfully",
+    "memberRemoved": "Member removed successfully",
+    "addError": "Error adding member",
+    "removeError": "Error removing member"
+  },
+  
+  "roles": {
+    "Owner": "Owner",
+    "Admin": "Admin",
+    "Lead": "Lead",
+    "Member": "Member"
+  }
+}

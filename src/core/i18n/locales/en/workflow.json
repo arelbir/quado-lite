@@ -92,7 +92,55 @@
     "pauseError": "Failed to pause workflow",
     "resumeError": "Failed to resume workflow",
     "cancelError": "Failed to cancel workflow",
-    "completeError": "Failed to complete workflow"
+    "completeError": "Failed to complete workflow",
+    "loadError": "Failed to load workflow",
+    "emptyError": "Cannot save empty workflow",
+    "invalidModule": "Invalid module",
+    "cleared": "Workflow cleared",
+    "draftLoaded": "Draft loaded successfully"
+  },
+
+  "modules": {
+    "AUDIT": "Audit",
+    "FINDING": "Finding",
+    "ACTION": "Action",
+    "DOF": "DOF (CAPA)"
+  },
+
+  "builder": {
+    "header": {
+      "title": "Workflow Builder",
+      "titleEdit": "Edit: {name}",
+      "subtitle": "Design your workflow visually",
+      "subtitleEdit": "Module: {module}"
+    },
+    "loading": "Loading workflow...",
+    "dialogs": {
+      "save": {
+        "title": "Save Workflow",
+        "description": "Enter workflow details to save",
+        "nameLabel": "Workflow Name",
+        "namePlaceholder": "Enter workflow name...",
+        "moduleLabel": "Module",
+        "modulePlaceholder": "Select module",
+        "saveButton": "Save Workflow"
+      },
+      "clear": {
+        "title": "Clear Workflow?",
+        "description": "This will remove all nodes and edges from the canvas. This action cannot be undone.",
+        "clearButton": "Clear All"
+      },
+      "draft": {
+        "title": "Unsaved Work Found",
+        "description": "Found unsaved work from {date}. Would you like to load it?",
+        "discardButton": "Discard",
+        "loadButton": "Load Draft"
+      }
+    },
+    "validation": {
+      "nameRequired": "Please enter a workflow name",
+      "moduleRequired": "Please select a module"
+    }
   },
 
   "templates": {

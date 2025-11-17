@@ -1,0 +1,69 @@
+{
+  "title": "Team Management",
+  "overview": "Manage organizational teams",
+  
+  "createNew": "Create New Team",
+  "editTeam": "Edit Team",
+  "deleteTeam": "Delete Team",
+  "deleteConfirm": "Are you sure you want to delete this team?",
+  
+  "description": {
+    "create": "Create a new team",
+    "update": "Update team information"
+  },
+  
+  "fields": {
+    "name": "Team Name",
+    "code": "Team Code",
+    "description": "Description",
+    "type": "Team Type",
+    "department": "Department",
+    "teamLeader": "Team Leader",
+    "memberCount": "Member Count",
+    "isActive": "Active?",
+    "members": "Members"
+  },
+  
+  "types": {
+    "Permanent": "Permanent",
+    "Project": "Project-based",
+    "Virtual": "Virtual/Temporary"
+  },
+  
+  "messages": {
+    "created": "Team created successfully",
+    "updated": "Team updated successfully",
+    "deleted": "Team deleted successfully",
+    "createError": "Error creating team",
+    "updateError": "Error updating team",
+    "deleteError": "Error deleting team"
+  },
+  
+  "placeholders": {
+    "searchTeam": "Search by team name or code",
+    "selectDepartment": "Select department",
+    "selectLeader": "Select team leader",
+    "selectType": "Select team type"
+  },
+  
+  "memberManagement": {
+    "title": "Member Management",
+    "description": "Manage members for {teamName}",
+    "addMember": "Add Member",
+    "removeMember": "Remove Member",
+    "selectUser": "Select user...",
+    "selectRole": "Select role...",
+    "noMembers": "No members yet",
+    "memberAdded": "Member added successfully",
+    "memberRemoved": "Member removed successfully",
+    "addError": "Error adding member",
+    "removeError": "Error removing member"
+  },
+  
+  "roles": {
+    "Owner": "Owner",
+    "Admin": "Admin",
+    "Lead": "Lead",
+    "Member": "Member"
+  }
+}

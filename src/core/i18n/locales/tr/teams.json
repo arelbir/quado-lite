@@ -1,0 +1,69 @@
+{
+  "title": "Takım Yönetimi",
+  "overview": "Organizasyonel takımları yönetin",
+  
+  "createNew": "Yeni Takım Oluştur",
+  "editTeam": "Takımı Düzenle",
+  "deleteTeam": "Takımı Sil",
+  "deleteConfirm": "Bu takımı silmek istediğinizden emin misiniz?",
+  
+  "description": {
+    "create": "Yeni bir takım oluşturun",
+    "update": "Takım bilgilerini güncelleyin"
+  },
+  
+  "fields": {
+    "name": "Takım Adı",
+    "code": "Takım Kodu",
+    "description": "Açıklama",
+    "type": "Takım Tipi",
+    "department": "Departman",
+    "teamLeader": "Takım Lideri",
+    "memberCount": "Üye Sayısı",
+    "isActive": "Aktif mi?",
+    "members": "Üyeler"
+  },
+  
+  "types": {
+    "Permanent": "Kalıcı",
+    "Project": "Proje Tabanlı",
+    "Virtual": "Sanal/Geçici"
+  },
+  
+  "messages": {
+    "created": "Takım başarıyla oluşturuldu",
+    "updated": "Takım başarıyla güncellendi",
+    "deleted": "Takım başarıyla silindi",
+    "createError": "Takım oluşturulurken hata oluştu",
+    "updateError": "Takım güncellenirken hata oluştu",
+    "deleteError": "Takım silinirken hata oluştu"
+  },
+  
+  "placeholders": {
+    "searchTeam": "Takım adı veya kodu ile arayın",
+    "selectDepartment": "Departman seçin",
+    "selectLeader": "Takım lideri seçin",
+    "selectType": "Takım tipi seçin"
+  },
+  
+  "memberManagement": {
+    "title": "Üye Yönetimi",
+    "description": "{teamName} için üyeleri yönetin",
+    "addMember": "Üye Ekle",
+    "removeMember": "Üyeyi Kaldır",
+    "selectUser": "Kullanıcı seçin...",
+    "selectRole": "Rol seçin...",
+    "noMembers": "Henüz üye eklenmemiş",
+    "memberAdded": "Üye başarıyla eklendi",
+    "memberRemoved": "Üye başarıyla kaldırıldı",
+    "addError": "Üye eklenirken hata oluştu",
+    "removeError": "Üye kaldırılırken hata oluştu"
+  },
+  
+  "roles": {
+    "Owner": "Sahip",
+    "Admin": "Admin",
+    "Lead": "Lider",
+    "Member": "Üye"
+  }
+}

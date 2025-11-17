@@ -1,0 +1,77 @@
+{
+  "title": "Grup Yönetimi",
+  "overview": "Fonksiyonel ve proje tabanlı grupları yönetin",
+  
+  "createNew": "Yeni Grup Oluştur",
+  "editGroup": "Grubu Düzenle",
+  "deleteGroup": "Grubu Sil",
+  "deleteConfirm": "Bu grubu silmek istediğinizden emin misiniz?",
+  
+  "description": {
+    "create": "Yeni bir grup oluşturun",
+    "update": "Grup bilgilerini güncelleyin"
+  },
+  
+  "fields": {
+    "name": "Grup Adı",
+    "code": "Grup Kodu",
+    "description": "Açıklama",
+    "type": "Grup Tipi",
+    "owner": "Grup Sahibi",
+    "visibility": "Görünürlük",
+    "department": "Departman",
+    "memberCount": "Üye Sayısı",
+    "isActive": "Aktif mi?",
+    "members": "Üyeler"
+  },
+  
+  "types": {
+    "Functional": "Fonksiyonel",
+    "Project": "Proje Tabanlı",
+    "Committee": "Komite",
+    "Custom": "Özel"
+  },
+  
+  "visibility": {
+    "Public": "Herkese Açık",
+    "Private": "Özel",
+    "Restricted": "Kısıtlı"
+  },
+  
+  "messages": {
+    "created": "Grup başarıyla oluşturuldu",
+    "updated": "Grup başarıyla güncellendi",
+    "deleted": "Grup başarıyla silindi",
+    "createError": "Grup oluşturulurken hata oluştu",
+    "updateError": "Grup güncellenirken hata oluştu",
+    "deleteError": "Grup silinirken hata oluştu"
+  },
+  
+  "placeholders": {
+    "searchGroup": "Grup adı veya kodu ile arayın",
+    "selectOwner": "Grup sahibi seçin",
+    "selectType": "Grup tipi seçin",
+    "selectVisibility": "Görünürlük seçin"
+  },
+  
+  "memberManagement": {
+    "title": "Üye Yönetimi",
+    "description": "{groupName} için üyeleri yönetin",
+    "addMember": "Üye Ekle",
+    "removeMember": "Üyeyi Kaldır",
+    "selectUser": "Kullanıcı seçin...",
+    "selectRole": "Rol seçin...",
+    "noMembers": "Henüz üye eklenmemiş",
+    "memberAdded": "Üye başarıyla eklendi",
+    "memberRemoved": "Üye başarıyla kaldırıldı",
+    "addError": "Üye eklenirken hata oluştu",
+    "removeError": "Üye kaldırılırken hata oluştu"
+  },
+  
+  "roles": {
+    "Owner": "Sahip",
+    "Admin": "Admin",
+    "Lead": "Lider",
+    "Member": "Üye"
+  }
+}

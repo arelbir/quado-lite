@@ -1,7 +1,0 @@
-// DISABLED - Dynamic route [id] not working in Next.js 14.2.3
-// Using searchParams pattern instead: /admin/users/detail?id=xxx
-// See: src/app/(main)/admin/users/detail/page.tsx
-
-export default function Disabled() {
-  return null;
-}

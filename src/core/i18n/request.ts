@@ -17,6 +17,9 @@ export default getRequestConfig(async ({ locale }) => {
       common: (await import(`./locales/${validLocale}/common.json`)).default,
       errors: (await import(`./locales/${validLocale}/errors.json`)).default,
       navigation: (await import(`./locales/${validLocale}/navigation.json`)).default,
+      workflow: (await import(`./locales/${validLocale}/workflow.json`)).default,
+      teams: (await import(`./locales/${validLocale}/teams.json`)).default,
+      groups: (await import(`./locales/${validLocale}/groups.json`)).default,
     },
   };
 });
