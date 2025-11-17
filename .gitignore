@@ -71,4 +71,7 @@ drizzle/meta/
 
 # Uploads
 public/uploads/
-uploads/
+uploads/-e 
+# Environment files
+*.env
+*.env.*
