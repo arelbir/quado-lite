@@ -8,17 +8,12 @@ export const workflowStatusEnum = pgEnum('workflow_status', [
   'ARCHIVED',
 ]);
 
-// Workflow module enum
-export const workflowModuleEnum = pgEnum('workflow_module', [
-  'DOF',
-  'ACTION',
-  'FINDING',
-  'AUDIT',
-]);
-
 /**
  * VisualWorkflow Table
  * Stores visual workflow designs with versioning support
+ * 
+ * GENERIC FRAMEWORK - Module can be any entity type
+ * No hardcoded enums, fully extensible
  */
 export const visualWorkflow = pgTable('VisualWorkflow', {
   // Identification
@@ -26,8 +21,8 @@ export const visualWorkflow = pgTable('VisualWorkflow', {
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   
-  // Module & Status
-  module: workflowModuleEnum('module').notNull(),
+  // Module & Status (GENERIC - any entity type)
+  module: varchar('module', { length: 100 }).notNull().default('GENERIC'),
   status: workflowStatusEnum('status').notNull().default('DRAFT'),
   
   // Visual Design (React Flow format)
