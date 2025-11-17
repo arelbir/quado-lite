@@ -25,6 +25,7 @@ import { RadioField } from './fields/RadioField';
 import { CheckboxesField } from './fields/CheckboxesField';
 import { SignatureField } from './fields/SignatureField';
 import { RatingField } from './fields/RatingField';
+import { RichTextField } from './fields/RichTextField';
 
 interface FormRendererProps {
   schema: FormSchema;
@@ -118,6 +119,9 @@ export function FormRenderer({
       
       case 'datagrid':
         return <DataGridField key={fieldName} {...commonProps} control={control} register={register} />;
+      
+      case 'richtext':
+        return <RichTextField key={fieldName} {...commonProps} control={control} />;
       
       default:
         // Text input (email, tel, url, password, text)
