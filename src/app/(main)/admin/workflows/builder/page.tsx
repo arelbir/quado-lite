@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { WorkflowCanvas } from "@/features/workflows/components/designer/Canvas/WorkflowCanvas";
 import { ToolbarPanel } from "@/features/workflows/components/designer/Panels/ToolbarPanel";
 import { NodeTemplatesPanel } from "@/features/workflows/components/designer/Panels/NodeTemplatesPanel";
+import { WorkflowTemplatesPanel } from "@/features/workflows/components/designer/Panels/WorkflowTemplatesPanel";
 import { PropertiesPanel } from "@/features/workflows/components/designer/Panels/PropertiesPanel";
 import { ValidationPanel } from "@/features/workflows/components/designer/Panels/ValidationPanel";
 import { CustomFieldsReference } from "@/features/workflows/components/designer/Panels/CustomFieldsReference";
@@ -237,6 +238,7 @@ function WorkflowBuilderContent() {
           </p>
         </div>
         <div className="flex gap-2">
+          <WorkflowTemplatesPanel />
           <Button variant="outline" onClick={handleClear}>
             <Icons.Trash className="size-4 mr-2" />
             {tCommon("actions.clear")}
