@@ -105,7 +105,7 @@ export function SignatureField({ name, field, control, errors, disabled }: Signa
               onClick={() => clear(formField.onChange)}
               disabled={disabled}
             >
-              <Icons.Eraser className="size-4 mr-2" />
+              <Icons.Trash className="size-4 mr-2" />
               Clear Signature
             </Button>
           </div>
