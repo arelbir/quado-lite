@@ -1,8 +1,8 @@
 import { env } from "@/env";
-import { Resend } from 'resend';
+import { SMTPEmailService } from '@/lib/email/smtp';
+import { render } from '@react-email/render';
 import { MagicLinkEmail } from "../templates/magic-link-email";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const domain = env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export async function sendVerificationEmail(
@@ -19,21 +19,33 @@ export async function sendVerificationEmail(
   const confirmLink = `${domain}/${verificationPath}?token=${token}`;
 
   const subject = "Confirm your email";
+  
+  // Development: Return link directly
   if (env.NODE_ENV === "development") {
+    console.log('📧 [DEV] Verification Email:', confirmLink);
     return { success: "Please check your email for the confirmation link.", link: confirmLink }
   }
-  const { error } = await resend.emails.send({
-    from: env.SMTP_FROM || 'noreply@framework.com',
-    to: email,
-    subject,
-    react: <MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />
-  });
-  if (error) {
-    console.log(error)
+
+  // Production: Send via SMTP
+  try {
+    const html = render(<MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />);
+    
+    const result = await SMTPEmailService.send({
+      to: email,
+      subject,
+      html,
+    });
+
+    if (!result.success) {
+      console.error('Email send error:', result.error);
+      return { error: "Email server error" }
+    }
+    
+    return { success: "Please check your email for the confirmation link." }
+  } catch (error) {
+    console.error('Email error:', error);
     return { error: "Email server error" }
   }
-  return { success: "Please check your email for the confirmation link." }
-
 };
 
 
@@ -44,21 +56,33 @@ export async function sendPasswordResetEmail(
   const resetLink = `${domain}/new-password?token=${token}`
 
   const subject = "Reset your password";
+  
+  // Development: Return link directly
   if (env.NODE_ENV === "development") {
+    console.log('📧 [DEV] Password Reset Email:', resetLink);
     return { success: "Please check your email for the confirmation link.", link: resetLink }
   }
-  const { error } = await resend.emails.send({
-    from: env.SMTP_FROM || 'noreply@framework.com',
-    to: email,
-    subject,
-    react: <MagicLinkEmail magicLink={resetLink} previewTitle={subject} />
-  });
 
-  if (error) {
-    console.log(error)
+  // Production: Send via SMTP
+  try {
+    const html = render(<MagicLinkEmail magicLink={resetLink} previewTitle={subject} />);
+    
+    const result = await SMTPEmailService.send({
+      to: email,
+      subject,
+      html,
+    });
+
+    if (!result.success) {
+      console.error('Email send error:', result.error);
+      return { error: "Email server error" }
+    }
+    
+    return { success: "Reset email sent!" }
+  } catch (error) {
+    console.error('Email error:', error);
     return { error: "Email server error" }
   }
-  return { success: "Reset email sent!" }
 };
 
 export async function sendRegisterEmail({
@@ -71,19 +95,32 @@ export async function sendRegisterEmail({
   const confirmLink = `${domain}/register?token=${token}`;
 
   const subject = "Register confirmation";
+  
+  // Development: Return link directly
   if (env.NODE_ENV === "development") {
+    console.log('📧 [DEV] Register Email:', confirmLink);
     return { success: "Please register using this link.", link: confirmLink}
   }
-  const { error } = await resend.emails.send({
-    from: env.SMTP_FROM || 'noreply@framework.com',
-    to: email,
-    subject,
-    react: <MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />
-  });
-  if (error) {
+
+  // Production: Send via SMTP
+  try {
+    const html = render(<MagicLinkEmail magicLink={confirmLink} previewTitle={subject} />);
+    
+    const result = await SMTPEmailService.send({
+      to: email,
+      subject,
+      html,
+    });
+
+    if (!result.success) {
+      console.error('Email send error:', result.error);
+      return { error: "Email server error" }
+    }
+    
+    return { success: "Register email sent!" }
+  } catch (error) {
+    console.error('Email error:', error);
     return { error: "Email server error" }
   }
-  return { success: "Register email sent!" }
-
 }
 
