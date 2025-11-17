@@ -52,13 +52,15 @@ export async function createForm(data: {
         .returning();
 
       // Create initial version
-      await db.insert(formVersions).values({
-        formId: form.id,
-        version: 1,
-        schema: data.schema as any,
-        changeDescription: 'Initial version',
-        createdById: user.id,
-      });
+      if (form) {
+        await db.insert(formVersions).values({
+          formId: form.id,
+          version: 1,
+          schema: data.schema as any,
+          changeDescription: 'Initial version',
+          createdById: user.id,
+        });
+      }
 
       revalidatePath('/admin/forms');
       return { success: true, data: form };
@@ -142,7 +144,7 @@ export async function updateForm(
 
       revalidatePath('/admin/forms');
       revalidatePath(`/admin/forms/${id}`);
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[updateForm] Error:', error);
       return { success: false, error: 'Failed to update form' };
@@ -177,7 +179,7 @@ export async function deleteForm(id: string): Promise<any> {
         .where(eq(formDefinitions.id, id));
 
       revalidatePath('/admin/forms');
-      return { success: true };
+      return { success: true, data: null };
     } catch (error) {
       console.error('[deleteForm] Error:', error);
       return { success: false, error: 'Failed to delete form' };
