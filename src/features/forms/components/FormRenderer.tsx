@@ -19,6 +19,7 @@ import {
   CheckboxField,
   DateField,
   FileField,
+  DataGridField,
 } from './fields';
 import { RadioField } from './fields/RadioField';
 import { CheckboxesField } from './fields/CheckboxesField';
@@ -114,6 +115,9 @@ export function FormRenderer({
       
       case 'rating':
         return <RatingField key={fieldName} {...commonProps} control={control} />;
+      
+      case 'datagrid':
+        return <DataGridField key={fieldName} {...commonProps} control={control} register={register} />;
       
       default:
         // Text input (email, tel, url, password, text)

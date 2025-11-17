@@ -14,6 +14,7 @@ export { DateField } from './DateField';
 export { FileField } from './FileField';
 export { SignatureField } from './SignatureField';
 export { RatingField } from './RatingField';
+export { DataGridField } from './DataGridField';
 
 // Field component map for dynamic rendering
 import { TextField } from './TextField';
@@ -27,6 +28,7 @@ import { DateField } from './DateField';
 import { FileField } from './FileField';
 import { SignatureField } from './SignatureField';
 import { RatingField } from './RatingField';
+import { DataGridField } from './DataGridField';
 
 export const fieldComponents = {
   text: TextField,
@@ -47,6 +49,7 @@ export const fieldComponents = {
   files: FileField,
   signature: SignatureField,
   rating: RatingField,
+  datagrid: DataGridField,
 } as const;
 
 export type FieldComponentType = keyof typeof fieldComponents;
