@@ -1,11 +1,10 @@
 import { NextRequest } from "next/server";
 import { currentUser } from "@/lib/auth/server";
 import { db } from "@/core/database/client";
-import { role } from "@/core/database/schema";
+import { roles } from "@/core/database/schema";
 import { sendSuccess, sendUnauthorized, sendInternalError } from "@/lib/api/response-helpers";
 import { log } from "@/lib/monitoring/logger";
 import { eq } from "drizzle-orm";
-import { currentUser } from "@/lib/auth/server";
 
 export async function GET() {
   try {
