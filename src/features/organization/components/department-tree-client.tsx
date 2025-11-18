@@ -38,6 +38,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 interface Department {
   id: string;
@@ -64,18 +66,44 @@ interface DepartmentTreeClientProps {
   users: any; // Add type for users
 }
 
-export function DepartmentTreeClient({ 
+export default function DepartmentTreeClient({ 
   departments,
   branches,
   users 
 }: DepartmentTreeClientProps) {
-  const t = useTranslations('organization');
+  const t = useTranslations('organization.departments');
   const tCommon = useTranslations('common');
   const router = useRouter();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDept, setEditingDept] = useState<Department | null>(null);
   const [parentIdForNew, setParentIdForNew] = useState<string | undefined>(undefined);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [departmentToDelete, setDepartmentToDelete] = useState<string | null>(null);
+  
+  // Handle delete confirmation
+  const handleDelete = async () => {
+    if (!departmentToDelete) return;
+    
+    toast.loading(t('deletingDepartment'));
+    try {
+      const response = await fetch(`/api/departments/${departmentToDelete}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Delete failed');
+      }
+      
+      toast.success(t('departmentDeleted'));
+      router.refresh();
+    } catch (error) {
+      toast.error(t('deleteFailed'));
+    } finally {
+      setDeleteDialogOpen(false);
+      setDepartmentToDelete(null);
+    }
+  };
 
   // Build tree structure
   const buildTree = (parentId: string | null = null): Department[] => {
@@ -191,8 +219,8 @@ export function DepartmentTreeClient({
               className="h-7 w-7 text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
-                // TODO: Delete confirmation dialog
-                console.log("Delete department:", dept.id);
+                setDepartmentToDelete(dept.id);
+                setDeleteDialogOpen(true);
               }}
             >
               <Trash2 className="w-3 h-3" />

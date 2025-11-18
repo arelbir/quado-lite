@@ -64,7 +64,7 @@ export function HRSyncDashboard({ configs, stats }: HRSyncDashboardProps) {
   const triggerSync = async (configId: string, sourceType: string) => {
     toast.loading(t('dashboard.triggeringSync'));
     try {
-      // TODO: Call appropriate API based on sourceType
+      // Call appropriate API based on sourceType
       const endpoints: Record<string, string> = {
         'LDAP': '/api/hr-sync/ldap',
         'CSV': '/api/hr-sync/csv',
