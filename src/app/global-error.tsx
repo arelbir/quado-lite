@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { log } from '@/lib/monitoring/logger'
+import { handleError } from '@/lib/monitoring/error-handler'
 
 /**
  * Global Error Handler
@@ -21,27 +21,13 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log error with Pino structured logging
-    log.error('Global unhandled error', {
-      message: error.message,
-      stack: error.stack,
+    // Unified error handling: Pino (local logs) + Sentry (production monitoring)
+    // Automatically handles both logging systems
+    handleError(error, {
       digest: error.digest,
+      context: 'global-error-boundary',
+      severity: 'critical',
     });
-    
-    // Log to Sentry (when configured)
-    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      // Sentry will be auto-imported if installed
-      // To enable: pnpm add @sentry/nextjs && npx @sentry/wizard@latest -i nextjs
-      try {
-        // @ts-ignore - Sentry may not be installed
-        if (typeof Sentry !== 'undefined') {
-          // @ts-ignore
-          Sentry.captureException(error);
-        }
-      } catch (e) {
-        // Sentry not configured, silent fail
-      }
-    }
   }, [error])
 
   return (

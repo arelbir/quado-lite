@@ -2,6 +2,7 @@
 
 import { ErrorComponent } from '@/components/error/500'
 import { useEffect } from 'react'
+import { handleError } from '@/lib/monitoring/error-handler'
 
 export default function Error({
   error,
@@ -11,8 +12,11 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error)
+    // Unified error handling: Pino (local logs) + Sentry (production monitoring)
+    handleError(error, {
+      digest: error.digest,
+      context: 'error-boundary',
+    });
   }, [error])
 
   return (
