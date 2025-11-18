@@ -110,7 +110,7 @@ export async function createCustomFieldDefinition(data: {
     revalidatePath(`/admin/custom-fields/${data.entityType}`);
 
     return { success: true, data: field as CustomFieldDefinition };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -154,7 +154,7 @@ export async function updateCustomFieldDefinition(
     revalidatePath(`/admin/custom-fields/${existing.entityType}`);
 
     return { success: true, data: updated as CustomFieldDefinition };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -197,7 +197,7 @@ export async function deleteCustomFieldDefinition(
     revalidatePath(`/admin/custom-fields/${existing.entityType}`);
 
     return { success: true, data: undefined };
-  }, { requireAdmin: true });
+  });
 }
 
 /**
@@ -236,7 +236,7 @@ export async function reorderCustomFields(
     revalidatePath(`/admin/custom-fields/${entityType}`);
 
     return { success: true, data: undefined };
-  }, { requireAdmin: true });
+  });
 }
 
 /**

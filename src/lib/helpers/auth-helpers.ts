@@ -26,35 +26,6 @@ export async function requireUser(): Promise<{ user: User } | { error: string }>
 }
 
 /**
- * HELPER: Admin yetkisi kontrolü
- * Returns true if user is admin or superAdmin
- * Uses new multi-role system
- */
-export function requireAdmin(user: User): boolean {
-  // Check session roles (string array from JWT)
-  if (user.roles && Array.isArray(user.roles)) {
-    return user.roles.includes('ADMIN') || user.roles.includes('SUPER_ADMIN');
-  }
-  
-  // Fallback: Check userRoles relation (if loaded)
-  if (user.userRoles) {
-    return user.userRoles.some((ur: any) => 
-      ur.role?.code === 'ADMIN' || ur.role?.code === 'SUPER_ADMIN'
-    );
-  }
-  
-  return false;
-}
-
-/**
- * HELPER: Creator veya admin kontrolü
- * Returns true if user is creator or admin
- */
-export function requireCreatorOrAdmin(user: User, creatorId: string): boolean {
-  return user.id === creatorId || requireAdmin(user);
-}
-
-/**
  * HELPER: Auth wrapper - DRY authentication pattern
  * Wraps action functions with authentication and error handling
  * 
