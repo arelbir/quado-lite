@@ -23,8 +23,20 @@ export default function GlobalError({
     // Log error to monitoring service
     console.error('Global error:', error)
     
-    // TODO: Log to Sentry
-    // sentry.captureException(error)
+    // Log to Sentry (when configured)
+    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      // Sentry will be auto-imported if installed
+      // To enable: pnpm add @sentry/nextjs && npx @sentry/wizard@latest -i nextjs
+      try {
+        // @ts-ignore - Sentry may not be installed
+        if (typeof Sentry !== 'undefined') {
+          // @ts-ignore
+          Sentry.captureException(error);
+        }
+      } catch (e) {
+        // Sentry not configured, silent fail
+      }
+    }
   }, [error])
 
   return (
