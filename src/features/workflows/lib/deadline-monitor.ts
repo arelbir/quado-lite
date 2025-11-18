@@ -15,6 +15,9 @@ import { db } from "@/core/database/client";
 import { stepAssignments, workflowInstances, user, workflowTimeline, notifications } from "@/core/database/schema";
 import { eq, and, lte, isNull, sql } from "drizzle-orm";
 
+// Note: workflowEscalationLog table doesn't exist yet in schema
+// Using workflowTimeline for now to track escalations
+
 /**
  * Deadline Status
  */
