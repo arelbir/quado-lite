@@ -130,7 +130,8 @@ export async function withAuth<T>(
       handleError(error as Error, {
         context: 'permission-check',
         userId: user.id,
-        permission,
+        resource: options.requirePermission.resource,
+        action: options.requirePermission.action,
       });
       return { success: false, error: "Permission check failed" };
     }

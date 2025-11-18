@@ -4,6 +4,8 @@
  * Tracks and reports performance metrics for the application
  */
 
+import { log } from './logger';
+
 /**
  * Web Vitals Tracking
  * These metrics are crucial for user experience
@@ -25,13 +27,13 @@ export interface WebVitals {
  * Report Web Vitals to analytics service
  */
 export function reportWebVitals(metric: any) {
-  // Log to console in development
+  // Log to Pino in development
   if (process.env.NODE_ENV === 'development') {
-    console.log('Web Vital:', {
+    log.debug('Web Vital', {
       name: metric.name,
       value: metric.value,
       rating: metric.rating,
-    })
+    });
   }
 
   // Send to analytics service
@@ -70,12 +72,15 @@ export function measure(name: string, startMark: string, endMark: string) {
       const measure = performance.getEntriesByName(name)[0]
       
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Performance: ${name} took ${measure?.duration}ms`)
+        log.debug('Performance measure', {
+          name,
+          duration: measure?.duration,
+        });
       }
       
       return measure?.duration
     } catch (error) {
-      console.error('Performance measure error:', error)
+      log.error('Performance measure error', { name, error });
     }
   }
 }
@@ -85,11 +90,11 @@ export function measure(name: string, startMark: string, endMark: string) {
  */
 export function trackAPICall(endpoint: string, duration: number, success: boolean) {
   if (process.env.NODE_ENV === 'development') {
-    console.log('API Call:', {
+    log.http('API Call completed', {
       endpoint,
-      duration: `${duration}ms`,
+      duration,
       success,
-    })
+    });
   }
 
   // Send to monitoring service

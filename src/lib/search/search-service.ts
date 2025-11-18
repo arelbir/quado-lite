@@ -1,7 +1,11 @@
 /**
  * ADVANCED SEARCH SERVICE
- * Global search across multiple entity types
+ * Unified search across all entities
+ * Client-side implementation with localStorage cache
  */
+
+import { log } from '@/lib/monitoring/logger';
+import { handleError } from '@/lib/monitoring/error-handler';
 
 import { db } from '@/core/database/client';
 import { user } from '@/core/database/schema/user';
@@ -227,7 +231,11 @@ export async function globalSearch(options: SearchOptions): Promise<SearchResult
 
     return results.slice(0, limit);
   } catch (error) {
-    console.error('[Search] Error:', error);
+    handleError(error as Error, {
+      context: 'search',
+      query,
+      types,
+    });
     return [];
   }
 }
@@ -258,7 +266,7 @@ export function saveRecentSearch(query: string): void {
     const updated = [query, ...recent.filter((q) => q !== query)].slice(0, 10);
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   } catch (error) {
-    console.error('[Search] Failed to save recent search:', error);
+    log.warn('Failed to save recent search', { query, error });
   }
 }
 

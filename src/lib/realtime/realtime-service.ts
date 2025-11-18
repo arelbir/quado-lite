@@ -4,6 +4,9 @@
  * Fallback to polling if WebSocket unavailable
  */
 
+import { log } from '@/lib/monitoring/logger';
+import { handleError } from '@/lib/monitoring/error-handler';
+
 type EventCallback = (data: any) => void;
 
 export class RealtimeService {
@@ -35,7 +38,7 @@ export class RealtimeService {
       this.ws = new WebSocket(`${this.url}?userId=${userId}`);
 
       this.ws.onopen = () => {
-        console.log('[Realtime] Connected');
+        log.info('WebSocket connected', { userId });
         this.isConnecting = false;
         this.reconnectAttempts = 0;
         this.emit('connected', {});
@@ -51,27 +54,33 @@ export class RealtimeService {
               'data' in parsed) {
             this.emit(parsed.type, parsed.data);
           } else {
-            console.error('[Realtime] Invalid message format:', parsed);
+            log.error('Invalid WebSocket message format', { message: parsed });
           }
         } catch (error) {
-          console.error('[Realtime] Message parse error:', error);
+          handleError(error as Error, {
+            context: 'websocket-message-parse',
+            userId: this.userId,
+          });
         }
       };
 
       this.ws.onerror = (error) => {
-        console.error('[Realtime] Error:', error);
+        log.error('WebSocket error', { error, userId: this.userId });
         this.emit('error', error);
       };
 
       this.ws.onclose = () => {
-        console.log('[Realtime] Disconnected');
+        log.info('WebSocket disconnected', { userId: this.userId });
         this.isConnecting = false;
         this.ws = null;
         this.emit('disconnected', {});
         this.attemptReconnect();
       };
     } catch (error) {
-      console.error('[Realtime] Connection failed:', error);
+      handleError(error as Error, {
+        context: 'websocket-connect',
+        userId,
+      });
       this.isConnecting = false;
       this.attemptReconnect();
     }
@@ -113,7 +122,10 @@ export class RealtimeService {
         try {
           callback(data);
         } catch (error) {
-          console.error('[Realtime] Listener error:', error);
+          handleError(error as Error, {
+            context: 'websocket-listener',
+            event,
+          });
         }
       });
     }
@@ -126,7 +138,7 @@ export class RealtimeService {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ type, data }));
     } else {
-      console.warn('[Realtime] Cannot send - not connected');
+      log.warn('Cannot send WebSocket message - not connected', { type });
     }
   }
 
@@ -135,14 +147,21 @@ export class RealtimeService {
    */
   private attemptReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('[Realtime] Max reconnect attempts reached');
+      log.warn('Max WebSocket reconnect attempts reached', {
+        attempts: this.reconnectAttempts,
+        userId: this.userId,
+      });
       return;
     }
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
 
-    console.log(`[Realtime] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+    log.info('WebSocket reconnecting', {
+      delay,
+      attempt: this.reconnectAttempts,
+      userId: this.userId,
+    });
 
     setTimeout(() => {
       if (this.userId) {

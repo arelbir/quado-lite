@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { log } from './logger'
 
 export function initSentry() {
   if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
@@ -23,7 +24,11 @@ export function initSentry() {
       beforeSend(event, hint) {
         // Don't send events in development
         if (process.env.NODE_ENV === 'development') {
-          console.error('Sentry Event:', event, hint)
+          log.debug('Sentry Event (dev-only, not sent)', {
+            eventId: event.event_id,
+            level: event.level,
+            message: hint.originalException,
+          });
           return null
         }
         return event
