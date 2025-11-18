@@ -1,0 +1,104 @@
+# SENTRY SELF-HOSTED
+# Official Sentry self-hosted setup
+# 
+# Prerequisites:
+# - Docker 19.03.6+
+# - Docker Compose 1.28.0+
+# - 8GB RAM minimum
+# - 20GB disk space
+#
+# Setup:
+# 1. Clone official repo: git clone https://github.com/getsentry/self-hosted.git
+# 2. Run install script: ./install.sh
+# 3. Start services: docker compose up -d
+#
+# Access: http://localhost:9000
+# Default user will be created during setup
+
+version: '3.7'
+
+# NOTE: This is a simplified example
+# For production use, run the official installer from:
+# https://github.com/getsentry/self-hosted
+
+x-sentry-defaults: &sentry-defaults
+  image: getsentry/sentry:latest
+  depends_on:
+    - redis
+    - postgres
+    - kafka
+  environment:
+    SENTRY_SECRET_KEY: ${SENTRY_SECRET_KEY}
+    SENTRY_POSTGRES_HOST: postgres
+    SENTRY_POSTGRES_PORT: 5432
+    SENTRY_DB_NAME: sentry
+    SENTRY_DB_USER: sentry
+    SENTRY_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    SENTRY_REDIS_HOST: redis
+    SENTRY_REDIS_PORT: 6379
+    SENTRY_KAFKA_HOSTS: kafka:9092
+  volumes:
+    - sentry-data:/var/lib/sentry/files
+
+services:
+  # PostgreSQL
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: sentry
+      POSTGRES_USER: sentry
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    restart: unless-stopped
+
+  # Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    restart: unless-stopped
+
+  # Sentry Web
+  web:
+    <<: *sentry-defaults
+    ports:
+      - "9000:9000"
+    command: run web
+
+  # Sentry Cron
+  cron:
+    <<: *sentry-defaults
+    command: run cron
+
+  # Sentry Worker
+  worker:
+    <<: *sentry-defaults
+    command: run worker
+
+volumes:
+  postgres-data:
+  redis-data:
+  sentry-data:
+
+# IMPORTANT: Use official installer for production!
+# This is a simplified example.
+# Official setup includes more services (ClickHouse, Snuba, etc.)
