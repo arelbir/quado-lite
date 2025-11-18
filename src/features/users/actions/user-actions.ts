@@ -406,7 +406,18 @@ export async function removeRoleFromUser(
  * Fetch all roles assigned to a user
  */
 export async function getUserRoles(userId: string): Promise<ActionResponse<any[]>> {
-  return withAuth(async () => {
+  return withAuth(async (currentUser) => {
+    // Permission check: User.ViewRoles
+    const perm = await checkPermission({
+      user: currentUser as any,
+      resource: 'User',
+      action: 'ViewRoles',
+    });
+
+    if (!perm.allowed) {
+      return { success: false, error: 'Permission denied: User.ViewRoles' };
+    }
+
     const assignments = await db.query.userRoles.findMany({
       where: and(
         eq(userRoles.userId, userId),
@@ -422,7 +433,7 @@ export async function getUserRoles(userId: string): Promise<ActionResponse<any[]
       data: assignments,
       message: "User roles retrieved successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 /**

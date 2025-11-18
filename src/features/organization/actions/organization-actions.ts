@@ -266,6 +266,17 @@ export async function createDepartment(data: {
   costCenter?: string;
 }): Promise<ActionResponse<{ id: string }>> {
   return withAuth(async (user) => {
+    // Permission check: Department.Create
+    const perm = await checkPermission({
+      user: user as any,
+      resource: 'Department',
+      action: 'Create',
+    });
+
+    if (!perm.allowed) {
+      return { success: false, error: 'Permission denied: Department.Create' };
+    }
+
     const [department] = await db.insert(departments).values({
       ...data,
       isActive: true,
@@ -279,7 +290,7 @@ export async function createDepartment(data: {
       data: { id: department!.id },
       message: "Department created successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function updateDepartment(
@@ -296,6 +307,17 @@ export async function updateDepartment(
   }>
 ): Promise<ActionResponse> {
   return withAuth(async (user) => {
+    // Permission check: Department.Update
+    const perm = await checkPermission({
+      user: user as any,
+      resource: 'Department',
+      action: 'Update',
+    });
+
+    if (!perm.allowed) {
+      return { success: false, error: 'Permission denied: Department.Update' };
+    }
+
     await db.update(departments)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(departments.id, id));
@@ -307,7 +329,7 @@ export async function updateDepartment(
       data: undefined,
       message: "Department updated successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 export async function deleteDepartment(id: string): Promise<ActionResponse> {
@@ -321,6 +343,17 @@ export async function deleteDepartment(id: string): Promise<ActionResponse> {
       return createValidationError("Cannot delete department with sub-departments");
     }
 
+    // Permission check: Department.Delete
+    const perm = await checkPermission({
+      user: user as any,
+      resource: 'Department',
+      action: 'Delete',
+    });
+
+    if (!perm.allowed) {
+      return { success: false, error: 'Permission denied: Department.Delete' };
+    }
+
     await db.delete(departments).where(eq(departments.id, id));
 
     revalidateOrganizationPaths({ departments: true });
@@ -330,7 +363,7 @@ export async function deleteDepartment(id: string): Promise<ActionResponse> {
       data: undefined,
       message: "Department deleted successfully",
     };
-  }, { requireAdmin: true });
+  });
 }
 
 // ============================================

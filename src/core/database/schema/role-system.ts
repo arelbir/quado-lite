@@ -300,7 +300,6 @@ export const roleMenuRelations = relations(roleMenus, ({ one }) => ({
 
 /**
  * TYPES
- * Note: Suffixed to avoid conflicts with legacy Role table
  */
 export type SystemRole = typeof roles.$inferSelect;
 export type NewSystemRole = typeof roles.$inferInsert;
