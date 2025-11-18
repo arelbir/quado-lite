@@ -5,8 +5,7 @@
 
 import { NextRequest } from 'next/server';
 import { getLatestUser } from '@/lib/auth/server';
-import { validateFile } from '@/lib/storage/upload-helpers';
-import { uploadFile } from '@/lib/storage/minio-actions';
+import { validateFile, uploadFile } from '@/lib/storage/upload-helpers';
 import { sendSuccess, sendUnauthorized, sendValidationError, sendInternalError } from '@/lib/api/response-helpers';
 import { log } from '@/lib/monitoring/logger';
 
