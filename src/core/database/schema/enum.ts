@@ -22,9 +22,6 @@ export const action = pgEnum("action", ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'
 // ============================================
 // USER & ROLE ENUMS
 // ============================================
-// ⚠️ DEPRECATED: Legacy single-role system
-// Use role-system.ts (roles, userRoles tables) instead
-export const userRole = pgEnum("UserRole", ['user', 'admin', 'superAdmin'])
 export const userStatus = pgEnum("UserStatus", ['active', 'inactive'])
 
 // ============================================
@@ -67,9 +64,6 @@ export type EqualityOp = z.infer<typeof EqualityOp>
 
 export const Action = z.enum(action.enumValues)
 export type Action = z.infer<typeof Action>
-
-export const UserRole = z.enum(userRole.enumValues)
-export type UserRole = z.infer<typeof UserRole>
 
 export const MenuType = z.enum(menuType.enumValues)
 export type MenuType = z.infer<typeof MenuType>

@@ -47,7 +47,7 @@ export interface User {
   deletedById?: string | null;
   createdById?: string | null;
   
-  // Legacy fields for JWT/session
+  // Multi-role system fields
   roles?: string[]; // From JWT session - e.g., ['SUPER_ADMIN', 'ADMIN']
   userRoles?: Array<{
     role?: {
@@ -56,9 +56,6 @@ export interface User {
     };
   }>;
 }
-
-// ❌ REMOVED: Legacy UserRole type - Use multi-role system instead
-// Roles are now fetched from userRoles array with role.code
 
 // ============================================
 // PLAN TYPES

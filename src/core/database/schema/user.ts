@@ -129,7 +129,6 @@ export const session = pgTable("Session", {
 
 
 export const userRelation = relations(user, ({ one, many }) => ({
-	// role: one(role, {...}), // ❌ LEGACY - Removed. Use userRoles instead.
 	userRoles: many(userRoles, {
 		relationName: 'user_roles',
 	}),

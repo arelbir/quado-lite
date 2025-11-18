@@ -27,7 +27,6 @@ export const getUserPermissions = async ({ userId, email, menusWhere }: { userId
   menus = getMenuHierarchy(menus as MenuWithChildren[]) 
   
   return {
-    role: null, // Deprecated - use getUserRoles from role-menu.ts instead
     menus: menus as MenuWithChildren[],
   }
 }
