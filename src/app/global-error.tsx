@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { log } from '@/lib/monitoring/logger'
 
 /**
  * Global Error Handler
@@ -20,8 +21,12 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log error to monitoring service
-    console.error('Global error:', error)
+    // Log error with Pino structured logging
+    log.error('Global unhandled error', {
+      message: error.message,
+      stack: error.stack,
+      digest: error.digest,
+    });
     
     // Log to Sentry (when configured)
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
