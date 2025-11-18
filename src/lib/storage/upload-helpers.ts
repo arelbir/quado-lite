@@ -6,6 +6,7 @@
 
 import { nanoid } from 'nanoid';
 import { minioClient, BUCKET_NAME, ensureBucketExists, getPublicUrl } from './minio-client';
+import { handleError } from '@/lib/monitoring/error-handler';
 
 // Re-export client-safe utilities
 export { extractFilename, validateFile, formatFileSize, getFileExtension, isImageFile } from './file-utils';
@@ -44,7 +45,10 @@ export async function deleteFile(key: string): Promise<void> {
   try {
     await minioClient.removeObject(BUCKET_NAME, key);
   } catch (error) {
-    console.error('Error deleting file:', error);
+    handleError(error as Error, {
+      context: 'delete-file',
+      fileKey: key,
+    });
     throw error;
   }
 }
@@ -56,7 +60,10 @@ export async function deleteFiles(keys: string[]): Promise<void> {
   try {
     await minioClient.removeObjects(BUCKET_NAME, keys);
   } catch (error) {
-    console.error('Error deleting files:', error);
+    handleError(error as Error, {
+      context: 'delete-files',
+      fileCount: keys.length,
+    });
     throw error;
   }
 }

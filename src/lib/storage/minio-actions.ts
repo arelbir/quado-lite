@@ -5,7 +5,9 @@
  * Server actions for file operations
  */
 
+import { del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
+import { handleError } from '@/lib/monitoring/error-handler';
 import { z } from "zod";
 import { getLatestUser } from "@/features/auth";
 import { deleteFile } from "./upload-helpers";
@@ -35,7 +37,10 @@ export async function deleteMinioFile(key: z.infer<typeof deleteFileSchema>) {
     
     return { success: true };
   } catch (error) {
-    console.error('Error deleting file:', error);
+    handleError(error as Error, {
+      context: 'delete-file-action',
+      fileKey: key,
+    });
     return {
       error: "Failed to delete file",
     };

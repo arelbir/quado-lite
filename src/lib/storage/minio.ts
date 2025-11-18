@@ -1,4 +1,5 @@
 import { Client } from 'minio'
+import { handleError } from '@/lib/monitoring/error-handler'
 
 // MinIO client (S3-compatible)
 export const minioClient = new Client({
@@ -34,7 +35,10 @@ export async function ensureBucket() {
       await minioClient.setBucketPolicy(BUCKET_NAME, JSON.stringify(policy))
     }
   } catch (error) {
-    console.error('MinIO bucket initialization error:', error)
+    handleError(error as Error, {
+      context: 'minio-bucket-init',
+      bucket: BUCKET_NAME,
+    });
   }
 }
 
@@ -60,7 +64,10 @@ export async function uploadFile(
     
     return { success: true, url }
   } catch (error) {
-    console.error('File upload error:', error)
+    handleError(error as Error, {
+      context: 'minio-file-upload',
+      filename,
+    });
     return { success: false, error }
   }
 }
@@ -71,7 +78,10 @@ export async function getPresignedUrl(filename: string, expiry = 3600) {
     const url = await minioClient.presignedGetObject(BUCKET_NAME, filename, expiry)
     return { success: true, url }
   } catch (error) {
-    console.error('Presigned URL error:', error)
+    handleError(error as Error, {
+      context: 'minio-presigned-url',
+      filename,
+    });
     return { success: false, error }
   }
 }
@@ -82,7 +92,10 @@ export async function deleteFile(filename: string) {
     await minioClient.removeObject(BUCKET_NAME, filename)
     return { success: true }
   } catch (error) {
-    console.error('File delete error:', error)
+    handleError(error as Error, {
+      context: 'minio-file-delete',
+      filename,
+    });
     return { success: false, error }
   }
 }
@@ -99,7 +112,10 @@ export async function listFiles(prefix?: string) {
     
     return { success: true, files }
   } catch (error) {
-    console.error('List files error:', error)
+    handleError(error as Error, {
+      context: 'minio-list-files',
+      prefix,
+    });
     return { success: false, error }
   }
 }
