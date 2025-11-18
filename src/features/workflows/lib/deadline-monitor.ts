@@ -12,11 +12,8 @@
  */
 
 import { db } from "@/core/database/client";
-import { stepAssignments, workflowInstances, user, workflowTimeline, notifications } from "@/core/database/schema";
+import { stepAssignments, workflowInstances, user, workflowTimeline, notifications, workflowEscalationLog } from "@/core/database/schema";
 import { eq, and, lte, isNull, sql } from "drizzle-orm";
-
-// Note: workflowEscalationLog table doesn't exist yet in schema
-// Using workflowTimeline for now to track escalations
 
 /**
  * Deadline Status
@@ -228,22 +225,19 @@ export async function escalateAssignment(assignmentId: string): Promise<Escalati
       createdAt: new Date(),
     });
 
-    // Save escalation log (using workflowTimeline since workflowEscalationLog doesn't exist yet)
-    // TODO: Create workflowEscalationLog table in schema for proper escalation tracking
-    await db.insert(workflowTimeline).values({
-      workflowInstanceId: assignment.workflowInstanceId,
-      stepId: assignment.stepId,
-      action: 'escalate',
-      comment: `Task escalated from ${assignment.assignedUserId} to ${escalationTarget} due to DEADLINE_EXCEEDED`,
-      performedBy: assignment.assignedUserId || 'SYSTEM',
+    // Save escalation log to dedicated table
+    await db.insert(workflowEscalationLog).values({
+      assignmentId,
+      escalatedFrom: assignment.assignedUserId,
+      escalatedTo: escalationTarget,
+      reason: 'DEADLINE_EXCEEDED',
       metadata: {
-        assignmentId,
-        escalatedFrom: assignment.assignedUserId,
-        escalatedTo: escalationTarget,
-        reason: 'DEADLINE_EXCEEDED',
         originalDeadline: assignment.deadline?.toISOString(),
         escalationDate: new Date().toISOString(),
+        workflowInstanceId: assignment.workflowInstanceId,
+        stepId: assignment.stepId,
       },
+      createdBy: assignment.assignedUserId,
       createdAt: new Date(),
     });
 

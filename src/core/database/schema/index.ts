@@ -43,7 +43,8 @@ export * from "./menu";
 // ============================================
 // WORKFLOW ENGINE
 // ============================================
-export * from "./workflow";
+export * from './workflow';
+export * from './workflow-escalation';
 export * from "./workflow-definition";
 
 // ============================================
