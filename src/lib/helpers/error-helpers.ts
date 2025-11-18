@@ -15,8 +15,10 @@ import type { ActionResponse } from "@/types/domain";
  * }
  * ```
  */
+import { handleError } from '@/lib/monitoring/error-handler';
+
 export function createActionError<T = void>(context: string, error: unknown): ActionResponse<T> {
-  console.error(`Error ${context}:`, error);
+  handleError(error as Error, { context });
   return {
     success: false,
     error: `Failed to ${context}`,

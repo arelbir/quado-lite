@@ -11,6 +11,7 @@
 import { currentUser } from "@/lib/auth/server";
 import type { User, ActionResponse } from "@/types/domain";
 import { createPermissionChecker, type PermissionCheck } from "@/lib/auth/permission-checker";
+import { handleError } from '@/lib/monitoring/error-handler';
 
 /**
  * HELPER: User authentication check
@@ -126,7 +127,11 @@ export async function withAuth<T>(
         };
       }
     } catch (error) {
-      console.error("Permission check error:", error);
+      handleError(error as Error, {
+        context: 'permission-check',
+        userId: user.id,
+        permission,
+      });
       return { success: false, error: "Permission check failed" };
     }
   }
@@ -139,7 +144,10 @@ export async function withAuth<T>(
   try {
     return await callback(user);
   } catch (error) {
-    console.error("Error in authenticated operation:", error);
+    handleError(error as Error, {
+      context: 'authenticated-operation',
+      userId: user.id,
+    });
     return { success: false, error: "Operation failed" };
   }
 }

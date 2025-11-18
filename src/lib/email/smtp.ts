@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer'
+import { log } from '@/lib/monitoring/logger'
+import { handleError } from '@/lib/monitoring/error-handler'
 
 // Create SMTP transporter
 const transporter = nodemailer.createTransport({
@@ -34,16 +36,24 @@ export class SMTPEmailService {
         text: text || (html ? undefined : subject),
       })
 
-      console.log('Email sent:', info.messageId)
+      log.info('Email sent successfully', {
+        messageId: info.messageId,
+        to,
+        subject,
+      });
       
       // MailHog preview URL (development)
       if (process.env.NODE_ENV === 'development') {
-        console.log('Preview URL: http://localhost:8025')
+        log.debug('MailHog preview available', { url: 'http://localhost:8025' });
       }
 
       return { success: true, messageId: info.messageId }
     } catch (error) {
-      console.error('Email send error:', error)
+      handleError(error as Error, {
+        context: 'smtp-send-email',
+        to,
+        subject,
+      });
       return { success: false, error }
     }
   }

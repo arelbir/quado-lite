@@ -5,7 +5,6 @@
  * Server actions for file operations
  */
 
-import { del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { handleError } from '@/lib/monitoring/error-handler';
 import { z } from "zod";

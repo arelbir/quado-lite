@@ -5,6 +5,8 @@
  */
 
 import nodemailer from 'nodemailer';
+import { log } from '@/lib/monitoring/logger';
+import { handleError } from '@/lib/monitoring/error-handler';
 
 // Email configuration from environment
 const EMAIL_CONFIG = {
@@ -48,7 +50,7 @@ export async function sendEmail(options: {
   try {
     // Check if email is configured
     if (!EMAIL_CONFIG.auth.user || !EMAIL_CONFIG.auth.pass) {
-      console.warn('[Email] SMTP not configured, skipping email send');
+      log.warn('SMTP not configured, skipping email send', { to: options.to });
       return { success: false, error: 'SMTP not configured' };
     }
 
@@ -64,7 +66,11 @@ export async function sendEmail(options: {
 
     return { success: true, messageId: result.messageId };
   } catch (error: any) {
-    console.error('[Email] Send error:', error);
+    handleError(error as Error, {
+      context: 'email-send',
+      to: options.to,
+      subject: options.subject,
+    });
     return { success: false, error: error.message };
   }
 }
@@ -111,7 +117,9 @@ export async function verifyEmailConfig(): Promise<boolean> {
     await transport.verify();
     return true;
   } catch (error) {
-    console.error('[Email] Verification failed:', error);
+    handleError(error as Error, {
+      context: 'email-config-verify',
+    });
     return false;
   }
 }
