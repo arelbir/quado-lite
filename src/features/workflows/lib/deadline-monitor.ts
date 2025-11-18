@@ -228,17 +228,22 @@ export async function escalateAssignment(assignmentId: string): Promise<Escalati
       createdAt: new Date(),
     });
 
-    // Save escalation log
-    await db.insert(workflowEscalationLog).values({
-      assignmentId,
-      escalatedFrom: assignment.assignedUserId,
-      escalatedTo: escalationTarget,
-      reason: 'DEADLINE_EXCEEDED',
+    // Save escalation log (using workflowTimeline since workflowEscalationLog doesn't exist yet)
+    // TODO: Create workflowEscalationLog table in schema for proper escalation tracking
+    await db.insert(workflowTimeline).values({
+      workflowInstanceId: assignment.workflowInstanceId,
+      stepId: assignment.stepId,
+      action: 'escalate',
+      comment: `Task escalated from ${assignment.assignedUserId} to ${escalationTarget} due to DEADLINE_EXCEEDED`,
+      performedBy: assignment.assignedUserId || 'SYSTEM',
       metadata: {
+        assignmentId,
+        escalatedFrom: assignment.assignedUserId,
+        escalatedTo: escalationTarget,
+        reason: 'DEADLINE_EXCEEDED',
         originalDeadline: assignment.deadline?.toISOString(),
         escalationDate: new Date().toISOString(),
       },
-      createdBy: 'SYSTEM',
       createdAt: new Date(),
     });
 
