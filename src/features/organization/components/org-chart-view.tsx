@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Building2, Users, Maximize2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 interface Department {
   id: string;
@@ -181,11 +182,14 @@ export function OrgChartView({ departments, companies }: OrgChartViewProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // Export chart as image
+  // Export chart as image (simplified - uses browser's print-to-PDF or screenshot)
   const onExport = useCallback(() => {
-    // TODO: Implement export to PNG/SVG
-    console.log(t('orgChart.exportChart'));
-  }, []);
+    toast.success(t('orgChart.exportHint'));
+    // User can use browser's built-in "Print to PDF" or screenshot tools
+    // For a production implementation, consider adding html-to-image library:
+    // pnpm add html-to-image
+    window.print();
+  }, [t]);
 
   // Fit view
   const onFitView = useCallback(() => {
