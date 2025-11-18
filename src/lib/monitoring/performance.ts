@@ -91,9 +91,9 @@ export function measure(name: string, startMark: string, endMark: string) {
 export function trackAPICall(endpoint: string, duration: number, success: boolean) {
   if (process.env.NODE_ENV === 'development') {
     log.http('API Call completed', {
-      endpoint,
+      url: endpoint,
       duration,
-      success,
+      status: success ? 200 : 500,
     });
   }
 
